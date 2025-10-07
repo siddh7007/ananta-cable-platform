@@ -11,6 +11,7 @@
     "test": "node -e \"console.log('Portal tests not configured')\""
   },
   "dependencies": {
+    "@cable-platform/client-sdk": "workspace:*",
     "svelte": "^4.2.19"
   },
   "devDependencies": {

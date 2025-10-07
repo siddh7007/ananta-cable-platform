@@ -3,6 +3,9 @@ tasks:
   dev:
     cmds:
       - docker compose up --build
+  env:
+    cmds:
+      - ./scripts/env-doctor.sh
   sdk:
     cmds:
       - ./scripts/gen-sdk.sh

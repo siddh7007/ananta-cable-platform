@@ -1,4 +1,4 @@
-.PHONY: dev build test lint sdk contracts sbom gitleaks
+.PHONY: dev build test lint sdk contracts sbom gitleaks env
 dev: ## Run local stack
 	docker compose up --build
 build:
@@ -9,12 +9,16 @@ lint:
 	pnpm -r run lint || true
 sdk:
 	./scripts/gen-sdk.sh
+sdk:check: ## Verify SDK matches spec
+	./scripts/sdk-check.sh
 contracts:
 	./scripts/verify-contracts.sh
 sbom:
 	./scripts/sbom.sh
 gitleaks:
 	gitleaks detect -v -c .gitleaks.toml || true
+env: ## Validate environment variables
+	./scripts/env-doctor.sh
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 

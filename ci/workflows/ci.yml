@@ -11,6 +11,8 @@ jobs:
         with: { node-version: '20' }
       - run: pnpm i
       - run: pnpm -r run build || true
+      - name: SDK drift check
+        run: ./scripts/sdk-check.sh
       - name: Gitleaks
         uses: gitleaks/gitleaks-action@v2
         with:
