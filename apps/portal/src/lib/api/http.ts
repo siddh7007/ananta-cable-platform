@@ -1,10 +1,18 @@
 import { OpenAPI } from '@cable-platform/client-sdk';
-import { randomUUID } from 'crypto';
 
 // Configure SDK with base URL
 const BASE_URL = (import.meta as { env?: Record<string, string> }).env?.VITE_API_BASE_URL ?? 'http://localhost:8080';
 
 OpenAPI.BASE = BASE_URL;
+
+// Browser-compatible UUID generation
+function randomUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 // Unified result type
 export type ApiResponse<T> =
