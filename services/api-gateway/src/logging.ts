@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
+import { trace } from '@opentelemetry/api';
 
 interface RequestWithTiming extends FastifyRequest {
   startTime?: bigint;
@@ -86,6 +87,15 @@ export function attachRequestLogging(fastify: FastifyInstance): void {
     const requestId = req.headers['x-request-id'] as string || randomUUID();
     req.headers['x-request-id'] = requestId;
     reply.header('x-request-id', requestId);
+
+    // Add trace headers if tracing is active
+    const activeSpan = trace.getActiveSpan();
+    if (activeSpan) {
+      const spanContext = activeSpan.spanContext();
+      if (spanContext.traceId) {
+        reply.header('x-trace-id', spanContext.traceId);
+      }
+    }
 
     // Store start time
     (req as RequestWithTiming).startTime = process.hrtime.bigint();

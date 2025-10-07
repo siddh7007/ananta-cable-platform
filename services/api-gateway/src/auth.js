@@ -1,4 +1,5 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
+import { Unauthorized } from "./errors.js";
 const DEV_BYPASS = (process.env.DEV_AUTH_BYPASS ?? "false") === "true";
 const ISSUER = process.env.AUTH0_DOMAIN ? `https://${process.env.AUTH0_DOMAIN}/` : "";
 const AUDIENCE = process.env.AUTH0_AUDIENCE || "";
@@ -32,6 +33,6 @@ export async function authGuard(req, reply) {
     catch (error) {
         // Log concise warning without token details
         console.warn("Auth verification failed:", error instanceof Error ? error.message : "unknown error");
-        return reply.code(401).send({ error: "unauthorized" });
+        throw new Unauthorized();
     }
 }

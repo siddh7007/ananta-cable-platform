@@ -5,6 +5,10 @@ import { authGuard, required } from "./auth.js";
 import { runReadinessChecks } from "./readiness.js";
 import { getAjv } from "@cable-platform/validation";
 import { getLoggerConfig, attachRequestLogging } from "./logging.js";
+import { initOtelIfEnabled } from "./otel.js";
+import { toResponse, UpstreamUnavailable } from './errors.js';
+// Initialize OpenTelemetry if enabled (must be done before any other imports that might use tracing)
+initOtelIfEnabled();
 const loggerConfig = getLoggerConfig(process.env);
 const server = Fastify({
     logger: loggerConfig,
@@ -78,6 +82,11 @@ required("AUTH0_DOMAIN");
 required("AUTH0_AUDIENCE");
 // Register route plugins
 await server.register(import('./routes/drc.js'));
+// Global error handler
+server.setErrorHandler((err, _req, reply) => {
+    const { status, body } = toResponse(err);
+    reply.code(status).headers({ 'cache-control': 'no-store', 'content-type': 'application/json; charset=utf-8' }).send(body);
+});
 server.get("/v1/me", { preHandler: [authGuard], config: { rateLimit: {} } }, async (req) => ({
     sub: req.user?.sub ?? "dev-user",
     roles: req.user?.roles ?? []
@@ -89,7 +98,7 @@ server.get("/drc/health", { config: { rateLimit: {} } }, async (_req, reply) => 
         return reply.send(await r.json());
     }
     catch {
-        return reply.code(502).send({ error: "drc_unreachable" });
+        throw new UpstreamUnavailable('drc unreachable');
     }
 });
 // Health check (liveness probe)

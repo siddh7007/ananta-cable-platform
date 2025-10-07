@@ -5,6 +5,9 @@ import type { FastifyRequest, FastifyReply, FastifyPluginCallback } from 'fastif
 import { authGuard } from '../auth.js';
 import { validateCableDesign, validateDRCResult } from '@cable-platform/validation';
 import { fetchWithRetry, HttpError } from '../http.js';
+import { withChildSpan } from '../otel.js';
+import { trace } from '@opentelemetry/api';
+import { BadRequest, UpstreamUnavailable, UpstreamInvalidPayload, UpstreamBadRequest } from '../errors.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -31,16 +34,13 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
     // Validate Content-Type
     const contentType = req.headers['content-type'];
     if (!contentType || !contentType.includes('application/json')) {
-      return reply.code(415).send({ error: 'unsupported_media_type' });
+      throw new BadRequest('unsupported media type');
     }
 
     // Validate request body
     const validation = validateCableDesign(req.body);
     if (!validation.ok) {
-      return reply.code(400).send({
-        error: 'bad_request',
-        details: validation.errors
-      });
+      throw new BadRequest('validation failed', { errors: validation.errors });
     }
 
     // Prepare headers for upstream call (forward only safe headers)
@@ -56,32 +56,50 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
 
     try {
       // Make upstream call with timeout and retry
-      const response = await fetchWithRetry(
-        'http://drc:8000/v1/drc/run',
-        {
-          method: 'POST',
-          headers: upstreamHeaders,
-          body: JSON.stringify(validation.data),
-        },
-        1, // 1 retry
-        5000 // 5s timeout
-      );
+      const startTime = process.hrtime.bigint();
+      const response = await withChildSpan('drc.run', {
+        'http.method': 'POST',
+        'http.target': '/v1/drc/run',
+        'upstream.url': 'http://drc:8000/v1/drc/run',
+        'user.sub': req.user?.sub || undefined,
+        'request.id': requestId
+      }, async () => {
+        return await fetchWithRetry(
+          'http://drc:8000/v1/drc/run',
+          {
+            method: 'POST',
+            headers: upstreamHeaders,
+            body: JSON.stringify(validation.data),
+          },
+          1, // 1 retry
+          5000 // 5s timeout
+        );
+      });
+
+      // Calculate upstream latency and add span attributes
+      const upstreamLatencyMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
+      const span = trace.getActiveSpan();
+      if (span) {
+        span.setAttribute('http.status_code', response.status);
+        span.setAttribute('upstream.latency_ms', upstreamLatencyMs);
+        span.setAttribute('retry.count', 1); // We always do 1 retry attempt
+      }
 
       // Handle different upstream response codes
       if (response.status === 400) {
-        return reply.code(502).send({ error: 'upstream_bad_request' });
+        throw new UpstreamBadRequest();
       }
 
       if (response.status === 401 || response.status === 403) {
-        return reply.code(502).send({ error: 'upstream_auth_error' });
+        throw new UpstreamBadRequest();
       }
 
       if (response.status === 404) {
-        return reply.code(502).send({ error: 'upstream_not_found' });
+        throw new UpstreamBadRequest();
       }
 
       if (response.status >= 500 || !response.ok) {
-        return reply.code(502).send({ error: 'upstream_unavailable' });
+        throw new UpstreamUnavailable();
       }
 
       // Parse and validate upstream response
@@ -89,18 +107,18 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
 
       const resultValidation = validateDRCResult(responseData);
       if (!resultValidation.ok) {
-        return reply.code(502).send({ error: 'upstream_invalid_payload' });
+        throw new UpstreamInvalidPayload();
       }
 
       return reply.code(200).send(resultValidation.data);
 
     } catch (error) {
       if (error instanceof HttpError && error.status === 408) {
-        return reply.code(502).send({ error: 'upstream_unavailable' });
+        throw new UpstreamUnavailable();
       }
 
       // Network or other errors
-      return reply.code(502).send({ error: 'upstream_unavailable' });
+      throw new UpstreamUnavailable();
     }
   });
 

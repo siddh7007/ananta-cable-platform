@@ -1,0 +1,84 @@
+export class HttpError extends Error {
+    status;
+    code;
+    details;
+    constructor(code, status, msg, details) {
+        super(msg || code);
+        this.code = code;
+        this.status = status;
+        this.details = details;
+    }
+}
+export class BadRequest extends HttpError {
+    constructor(msg = 'bad request', details) {
+        super('bad_request', 400, msg, details);
+    }
+}
+export class Unauthorized extends HttpError {
+    constructor(msg = 'unauthorized') {
+        super('unauthorized', 401, msg);
+    }
+}
+export class Forbidden extends HttpError {
+    constructor(msg = 'forbidden') {
+        super('forbidden', 403, msg);
+    }
+}
+export class NotFound extends HttpError {
+    constructor(msg = 'not found') {
+        super('not_found', 404, msg);
+    }
+}
+export class Conflict extends HttpError {
+    constructor(msg = 'conflict', details) {
+        super('conflict', 409, msg, details);
+    }
+}
+export class RateLimited extends HttpError {
+    constructor(retryMs) {
+        super('rate_limited', 429, 'rate limited', retryMs ? { retry_after_ms: retryMs } : undefined);
+    }
+}
+export class UpstreamUnavailable extends HttpError {
+    constructor(msg = 'upstream unavailable') {
+        super('upstream_unavailable', 502, msg);
+    }
+}
+export class UpstreamInvalidPayload extends HttpError {
+    constructor() {
+        super('upstream_invalid_payload', 502, 'upstream returned invalid payload');
+    }
+}
+export class UpstreamBadRequest extends HttpError {
+    constructor() {
+        super('upstream_bad_request', 502, 'upstream rejected request');
+    }
+}
+export class Internal extends HttpError {
+    constructor(msg = 'internal') {
+        super('internal', 500, msg);
+    }
+}
+export function toResponse(err) {
+    if (err instanceof HttpError) {
+        return {
+            status: err.status,
+            body: {
+                error: err.code,
+                message: err.message,
+                details: err.details
+            }
+        };
+    }
+    // Handle unknown errors
+    console.error('Unhandled error:', err);
+    const internal = new Internal();
+    return {
+        status: internal.status,
+        body: {
+            error: internal.code,
+            message: internal.message,
+            details: err instanceof Error ? { original_message: err.message } : undefined
+        }
+    };
+}

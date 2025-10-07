@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { trace } from '@opentelemetry/api';
 export function getLoggerConfig(env = process.env) {
     const level = env.LOG_LEVEL || 'info';
     const sampling = env.LOG_SAMPLING ? parseFloat(env.LOG_SAMPLING) : 1;
@@ -54,6 +55,14 @@ export function attachRequestLogging(fastify) {
         const requestId = req.headers['x-request-id'] || randomUUID();
         req.headers['x-request-id'] = requestId;
         reply.header('x-request-id', requestId);
+        // Add trace headers if tracing is active
+        const activeSpan = trace.getActiveSpan();
+        if (activeSpan) {
+            const spanContext = activeSpan.spanContext();
+            if (spanContext.traceId) {
+                reply.header('x-trace-id', spanContext.traceId);
+            }
+        }
         // Store start time
         req.startTime = process.hrtime.bigint();
         // Log request start

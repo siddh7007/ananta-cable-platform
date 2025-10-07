@@ -1,5 +1,6 @@
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 import type { FastifyReply, FastifyRequest } from "fastify";
+import { Unauthorized } from "./errors.js";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -27,7 +28,7 @@ export function required(name: string): void {
   }
 }
 
-export async function authGuard(req: FastifyRequest, reply: FastifyReply): Promise<void> {
+export async function authGuard(req: FastifyRequest, _reply: FastifyReply): Promise<void> {
   if (DEV_BYPASS) return;
 
   try {
@@ -43,6 +44,6 @@ export async function authGuard(req: FastifyRequest, reply: FastifyReply): Promi
   } catch (error) {
     // Log concise warning without token details
     console.warn("Auth verification failed:", error instanceof Error ? error.message : "unknown error");
-    return reply.code(401).send({ error: "unauthorized" });
+    throw new Unauthorized();
   }
 }
