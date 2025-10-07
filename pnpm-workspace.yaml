@@ -2,3 +2,4 @@ packages:
   - "apps/*"
   - "services/*"
   - "shared/*"
+  - "shared/libs/*"

@@ -13,6 +13,8 @@ sdk:check: ## Verify SDK matches spec
 	./scripts/sdk-check.sh
 contracts:
 	./scripts/verify-contracts.sh
+contracts:compat: ## Check OpenAPI spec compatibility against baseline
+	./scripts/contract-compat.sh
 sbom:
 	./scripts/sbom.sh
 gitleaks:

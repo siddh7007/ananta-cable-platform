@@ -13,6 +13,8 @@ jobs:
       - run: pnpm -r run build || true
       - name: SDK drift check
         run: ./scripts/sdk-check.sh
+      - name: Contract compatibility check
+        run: ./scripts/contract-compat.sh
       - name: Gitleaks
         uses: gitleaks/gitleaks-action@v2
         with:

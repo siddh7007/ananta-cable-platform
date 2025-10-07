@@ -8,11 +8,22 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "eslint . --ext .ts,.js --no-error-on-unmatched-pattern",
-    "test": "node -e \"console.log('API Gateway tests not configured')\""
+    "test": "tap test/**/*.test.ts",
+    "test:watch": "tap test/**/*.test.ts --watch"
   },
   "dependencies": {
+    "@cable-platform/validation": "workspace:*",
     "@fastify/cors": "^9.0.0",
+    "@fastify/rate-limit": "^9.0.0",
     "fastify": "^4.0.0",
-    "jose": "^5.0.0"
+    "jose": "^5.0.0",
+    "oracledb": "^6.4.0",
+    "pg": "^8.11.0"
+  },
+  "devDependencies": {
+    "@types/oracledb": "^6.9.1",
+    "@types/pg": "^8.15.5",
+    "@types/tap": "^18.0.0",
+    "tap": "^18.0.0"
   }
 }
