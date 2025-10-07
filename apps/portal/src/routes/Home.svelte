@@ -44,7 +44,9 @@
 
     <div style="display: flex; align-items: center; gap: 0.5rem;">
       <span
-        style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: {apiStatus.healthy ? 'green' : 'red'};"
+        style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: {apiStatus.healthy
+          ? 'green'
+          : 'red'};"
         aria-label={apiStatus.healthy ? 'API is healthy' : 'API is unreachable'}
       ></span>
       <span>

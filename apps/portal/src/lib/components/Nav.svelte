@@ -21,7 +21,10 @@
         href="#/"
         aria-current={currentPath === '/' ? 'page' : undefined}
         on:click|preventDefault={() => navigate('/')}
-        style="text-decoration: none; padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; {currentPath === '/' ? 'background-color: #e0e0e0;' : ''}"
+        style="text-decoration: none; padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; {currentPath ===
+        '/'
+          ? 'background-color: #e0e0e0;'
+          : ''}"
       >
         Home
       </a>
@@ -31,7 +34,10 @@
         href="#/drc"
         aria-current={currentPath === '/drc' ? 'page' : undefined}
         on:click|preventDefault={() => navigate('/drc')}
-        style="text-decoration: none; padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; {currentPath === '/drc' ? 'background-color: #e0e0e0;' : ''}"
+        style="text-decoration: none; padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; {currentPath ===
+        '/drc'
+          ? 'background-color: #e0e0e0;'
+          : ''}"
       >
         DRC
       </a>

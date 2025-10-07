@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const PORT = 8080;
+const PORT = 4000;
 
 // Middleware
 app.use(cors());
@@ -51,7 +51,7 @@ app.post('/drc/run', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, 'localhost', () => {
   console.log(`Mock API server running on http://localhost:${PORT}`);
   console.log('Endpoints:');
   console.log('  GET  /health');

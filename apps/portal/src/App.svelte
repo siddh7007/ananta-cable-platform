@@ -26,7 +26,7 @@
   function updateTitle(path: string) {
     const titles = {
       '/': 'Home - Cable Platform Portal',
-      '/drc': 'DRC - Cable Platform Portal'
+      '/drc': 'DRC - Cable Platform Portal',
     };
     document.title = titles[path as keyof typeof titles] || 'Cable Platform Portal';
   }

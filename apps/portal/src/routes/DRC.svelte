@@ -1,6 +1,7 @@
 <script lang="ts">
   import { api } from '../lib/api/client.js';
   import type { DRCResult } from '../lib/types/api.js';
+  import DRCResults from '../lib/components/DRCResults.svelte';
 
   // Form data type
   type FormData = {
@@ -10,7 +11,11 @@
   };
 
   // Simple validation function (inline for now)
-  function validateCableDesign(input: unknown): { ok: true; data: FormData } | { ok: false; errors: Array<{ path: string; message: string }> } {
+  function validateCableDesign(
+    input: unknown,
+  ):
+    | { ok: true; data: FormData }
+    | { ok: false; errors: Array<{ path: string; message: string }> } {
     const data = input as FormData;
 
     const errors: Array<{ path: string; message: string }> = [];
@@ -43,6 +48,9 @@
   // Props
   export let mainHeading: HTMLElement;
   export let firstErrorField: HTMLElement;
+
+  // For focus management in results
+  let resultsHeading: HTMLElement;
 
   // Validation function
   function validateForm(): boolean {
@@ -225,51 +233,6 @@
   {/if}
 
   {#if result}
-    <section aria-labelledby="result-heading" style="margin-top: 2rem;">
-      <h2 id="result-heading" tabindex="-1" style="margin-top: 0;">
-        DRC Results for {result.design_id}
-      </h2>
-
-      {#if result.findings && result.findings.length > 0}
-        <table style="border-collapse: collapse; width: 100%; margin-top: 1rem;">
-          <thead>
-            <tr style="background-color: #f8f9fa;">
-              <th style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: left;">Code</th>
-              <th style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: left;"
-                >Severity</th
-              >
-              <th style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: left;">Message</th
-              >
-            </tr>
-          </thead>
-          <tbody>
-            {#each result.findings as finding}
-              <tr>
-                <td style="border: 1px solid #dee2e6; padding: 0.75rem;">{finding.code}</td>
-                <td style="border: 1px solid #dee2e6; padding: 0.75rem;">
-                  <span
-                    style="display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem; font-weight: bold; color: white; background-color: {finding.severity ===
-                    'error'
-                      ? '#dc3545'
-                      : finding.severity === 'warn'
-                        ? '#ffc107'
-                        : '#17a2b8'};"
-                  >
-                    {finding.severity.toUpperCase()}
-                  </span>
-                </td>
-                <td style="border: 1px solid #dee2e6; padding: 0.75rem;">{finding.message}</td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      {:else}
-        <p
-          style="margin-top: 1rem; padding: 1rem; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; color: #155724;"
-        >
-          ✅ No design rule violations found.
-        </p>
-      {/if}
-    </section>
+    <DRCResults {result} bind:resultsHeading />
   {/if}
 </main>
