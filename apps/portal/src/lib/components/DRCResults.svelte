@@ -3,6 +3,11 @@
 
   export let result: DRCResult | null;
 
+  // New props for enhanced states
+  export let isLoading: boolean = false;
+  export let hadError: boolean = false;
+  export let emptyMessage: string = "No findings — your design passed!";
+
   // Filter state
   type FilterType = 'all' | 'error' | 'warn' | 'info';
   let activeFilter: FilterType = 'all';
@@ -69,7 +74,29 @@
   }
 </script>
 
-{#if result}
+{#if isLoading}
+  <section aria-labelledby="loading-heading">
+    <div class="loading-state">
+      <h2 id="loading-heading">Fetching results...</h2>
+      <div class="loader" aria-hidden="true">⟳</div>
+    </div>
+  </section>
+{:else if result === null}
+  <!-- Render nothing when no result -->
+{:else if result.findings.length === 0}
+  <section aria-labelledby="empty-heading">
+    <div class="empty-state">
+      <h2 id="empty-heading" bind:this={resultsHeading} tabindex="-1">Results for: {result.design_id}</h2>
+      <div class="empty-content">
+        <span class="empty-icon" aria-hidden="true">✅</span>
+        <p>{emptyMessage}</p>
+        <button class="run-again-btn" on:click={() => window.location.reload()}>
+          Run again
+        </button>
+      </div>
+    </div>
+  </section>
+{:else}
   <section aria-labelledby="results-heading">
     <header>
       <h2 id="results-heading" bind:this={resultsHeading} tabindex="-1">
@@ -291,5 +318,63 @@
   :global(.findings-table:focus-visible) {
     outline: 2px solid #007bff;
     outline-offset: 2px;
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .loading-state h2 {
+    color: #6c757d;
+    margin-bottom: 1rem;
+  }
+
+  .loader {
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+  }
+
+  .empty-content {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .empty-content p {
+    font-size: 1.1rem;
+    color: #495057;
+    margin-bottom: 1.5rem;
+  }
+
+  .run-again-btn {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .run-again-btn:hover {
+    background-color: #0056b3;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 </style>

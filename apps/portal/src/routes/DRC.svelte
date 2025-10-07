@@ -42,6 +42,7 @@
   let form: FormData = { id: '', name: '', cores: 1 };
   let errors: Record<string, string> = {};
   let submitting = false;
+  let validateBusy = false;
   let result: DRCResult | null = null;
   let submitError: string | null = null;
 
@@ -51,6 +52,7 @@
 
   // For focus management in results
   let resultsHeading: HTMLElement;
+  let errorBanner: HTMLElement;
 
   // Validation function
   function validateForm(): boolean {
@@ -72,25 +74,54 @@
     }
   }
 
-  // Validate on input/blur
-  function validateField(field: keyof FormData) {
-    const validation = validateCableDesign(form);
-    if (!validation.ok) {
-      // Clear previous errors for this field
-      delete errors[field];
-
-      // Find errors for this specific field
-      for (const err of validation.errors) {
-        const errField = err.path.replace(/^\//, '');
-        if (errField === field) {
-          errors[field] = err.message;
-          break;
-        }
-      }
-    } else {
-      delete errors[field];
+  // Error message mapping
+  function mapErrorToMessage(error: string, status?: number, details?: any): string {
+    switch (error) {
+      case 'bad_request':
+        return 'Form has issues; please fix highlighted fields.';
+      case 'upstream_unavailable':
+        return 'DRC service is unavailable. Try again shortly.';
+      case 'upstream_invalid_payload':
+        return 'Unexpected response from DRC. We\'ve logged this.';
+      default:
+        return error || 'An unexpected error occurred.';
     }
-    errors = { ...errors }; // Trigger reactivity
+  }
+
+  // Clear submit error when user starts editing
+  function clearSubmitError() {
+    if (submitError) {
+      submitError = null;
+    }
+  }
+
+  // Validate on input/blur with busy state
+  async function validateField(field: keyof FormData) {
+    validateBusy = true;
+    try {
+      // Simulate async validation (could be AJV schema validation)
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const validation = validateCableDesign(form);
+      if (!validation.ok) {
+        // Clear previous errors for this field
+        delete errors[field];
+
+        // Find errors for this specific field
+        for (const err of validation.errors) {
+          const errField = err.path.replace(/^\//, '');
+          if (errField === field) {
+            errors[field] = err.message;
+            break;
+          }
+        }
+      } else {
+        delete errors[field];
+      }
+      errors = { ...errors }; // Trigger reactivity
+    } finally {
+      validateBusy = false;
+    }
   }
 
   async function handleSubmit(event: Event) {
@@ -109,20 +140,27 @@
     submitError = null;
 
     try {
-      const response = await api.runDRC(form as CableDesign);
+      const response = await api.runDRC(form as any);
 
       if (response.ok) {
         result = response.data;
         // Focus result heading for accessibility
-        const resultHeading = document.getElementById('result-heading');
-        if (resultHeading) {
-          resultHeading.focus();
+        if (resultsHeading) {
+          resultsHeading.focus();
         }
       } else {
-        submitError = response.error || 'Failed to run DRC';
+        submitError = mapErrorToMessage(response.error || 'unknown_error', response.status, response.details);
+        // Focus error banner
+        if (errorBanner) {
+          errorBanner.focus();
+        }
       }
     } catch (err) {
       submitError = 'Network error occurred';
+      // Focus error banner
+      if (errorBanner) {
+        errorBanner.focus();
+      }
     } finally {
       submitting = false;
     }
@@ -136,7 +174,14 @@
 <main>
   <h1 bind:this={mainHeading} tabindex="-1">Design Rule Check (DRC)</h1>
 
-  <form on:submit={handleSubmit}>
+  {#if validateBusy}
+    <div class="validation-status" aria-live="polite">
+      <span class="loader" aria-hidden="true">⟳</span>
+      Validating...
+    </div>
+  {/if}
+
+  <form on:submit={handleSubmit} aria-busy={submitting}>
     <div style="max-width: 400px;">
       <div style="margin-bottom: 1rem;">
         <label for="design-id" style="display: block; margin-bottom: 0.5rem;">Design ID *</label>
@@ -147,8 +192,10 @@
           required
           aria-invalid={errors.id ? 'true' : 'false'}
           aria-describedby={errors.id ? 'id-error' : undefined}
-          on:input={() => validateField('id')}
+          on:input={() => { validateField('id'); clearSubmitError(); }}
           on:blur={() => validateField('id')}
+          disabled={submitting}
+          bind:this={firstErrorField}
           style="width: 100%; padding: 0.5rem; border: 1px solid {errors.id
             ? '#dc3545'
             : '#ccc'}; border-radius: 4px;"
@@ -156,7 +203,6 @@
         {#if errors.id}
           <span
             id="id-error"
-            bind:this={firstErrorField}
             style="color: #dc3545; font-size: 0.875rem;">{errors.id}</span
           >
         {/if}
@@ -172,8 +218,9 @@
           required
           aria-invalid={errors.name ? 'true' : 'false'}
           aria-describedby={errors.name ? 'name-error' : undefined}
-          on:input={() => validateField('name')}
+          on:input={() => { validateField('name'); clearSubmitError(); }}
           on:blur={() => validateField('name')}
+          disabled={submitting}
           style="width: 100%; padding: 0.5rem; border: 1px solid {errors.name
             ? '#dc3545'
             : '#ccc'}; border-radius: 4px;"
@@ -193,8 +240,9 @@
           required
           aria-invalid={errors.cores ? 'true' : 'false'}
           aria-describedby={errors.cores ? 'cores-error' : undefined}
-          on:input={() => validateField('cores')}
+          on:input={() => { validateField('cores'); clearSubmitError(); }}
           on:blur={() => validateField('cores')}
+          disabled={submitting}
           style="width: 100%; padding: 0.5rem; border: 1px solid {errors.cores
             ? '#dc3545'
             : '#ccc'}; border-radius: 4px;"
@@ -214,7 +262,8 @@
           : 'pointer'};"
       >
         {#if submitting}
-          Running DRC...
+          <span class="loader" aria-hidden="true">⟳</span>
+          Running checks...
         {:else}
           Run DRC
         {/if}
@@ -223,16 +272,86 @@
   </form>
 
   {#if submitError}
-    <section
-      aria-labelledby="error-heading"
-      style="margin-top: 2rem; padding: 1rem; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px;"
+    <div
+      class="banner error"
+      role="alert"
+      aria-live="assertive"
+      bind:this={errorBanner}
+      tabindex="-1"
     >
-      <h2 id="error-heading" style="color: #721c24; margin-top: 0;">Error</h2>
-      <p style="color: #721c24; margin: 0;">{submitError}</p>
-    </section>
+      <h3>Error</h3>
+      <p>{submitError}</p>
+      {#if submitError.includes('logged this') || submitError.includes('details')}
+        <details>
+          <summary>Details</summary>
+          <pre>{JSON.stringify({ error: submitError, timestamp: new Date().toISOString() }, null, 2)}</pre>
+        </details>
+      {/if}
+    </div>
   {/if}
 
   {#if result}
-    <DRCResults {result} bind:resultsHeading />
+    <DRCResults
+      {result}
+      bind:resultsHeading
+      isLoading={false}
+      hadError={!!submitError}
+      emptyMessage={result.findings.length === 0 ? "No findings — your design passed!" : ""}
+    />
   {/if}
 </main>
+
+<style>
+  .validation-status {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+  }
+
+  .loader {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .banner {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid;
+  }
+
+  .banner.error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+
+  .banner.error h3 {
+    margin-top: 0;
+    color: #721c24;
+  }
+
+  .banner.error details {
+    margin-top: 1rem;
+  }
+
+  .banner.error pre {
+    background: #f1f1f1;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    overflow-x: auto;
+  }
+</style>
