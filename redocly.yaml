@@ -1,0 +1,9 @@
+apis:
+  platform@v1:
+    root: ./shared/contracts/openapi/v1/platform.v1.yaml
+lint:
+  rules:
+    no-unused-components: warn
+theme:
+  openapi:
+    htmlTemplate: ./docs/api/template.html

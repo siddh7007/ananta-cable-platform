@@ -1,0 +1,7 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY services/bff-portal ./services/bff-portal
+RUN corepack enable && pnpm i --filter bff-portal... && pnpm --filter bff-portal build
+EXPOSE 4001
+CMD ["pnpm","--filter","bff-portal","start"]

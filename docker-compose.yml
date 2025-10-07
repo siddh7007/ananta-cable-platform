@@ -1,0 +1,109 @@
+version: "3.9"
+services:
+  portal:
+    build: { context: ., dockerfile: Dockerfile.portal }
+    env_file:
+      - .env
+      - .env.local
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+    ports: ["5173:5173"]
+    depends_on: [api-gateway]
+
+  api-gateway:
+    build: { context: ., dockerfile: Dockerfile.api-gateway }
+    env_file:
+      - .env
+      - .env.local
+    environment:
+      PORT: 8080
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
+      DEV_AUTH_BYPASS: ${DEV_AUTH_BYPASS:-true}
+    ports: ["8080:8080"]
+    depends_on: [bff-portal, drc]
+
+  bff-portal:
+    build: { context: ., dockerfile: Dockerfile.bff-portal }
+    env_file:
+      - .env
+      - .env.local
+    environment:
+      PORT: 4001
+    ports: ["4001:4001"]
+
+  drc:
+    build: { context: ., dockerfile: Dockerfile.drc }
+    env_file:
+      - .env
+      - .env.local
+    environment:
+      PORT: 8000
+    ports: ["8000:8000"]
+
+
+otel-collector:
+  image: otel/opentelemetry-collector:0.103.1
+  command: ["--config=/etc/otelcol/config.yaml"]
+  volumes:
+    - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+  ports:
+    - "4317:4317"
+    - "4318:4318"
+
+
+api-docs:
+  image: nginx:alpine
+  volumes:
+    - ./docs:/usr/share/nginx/html/docs:ro
+    - ./shared:/usr/share/nginx/html/shared:ro
+  ports: ["8089:80"]
+  command: [ "nginx", "-g", "daemon off;" ]
+
+
+  # ----- Databases -----
+  supabase-db:
+    image: postgres:15-alpine
+    container_name: supabase-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${SUPABASE_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${SUPABASE_POSTGRES_USER:-postgres}
+      POSTGRES_DB: ${SUPABASE_POSTGRES_DB:-appdb}
+    ports: ["5432:5432"]
+    volumes:
+      - supabase_pg_data:/var/lib/postgresql/data
+      - ./db/supabase/init:/docker-entrypoint-initdb.d:ro
+
+  pg-extra:
+    image: postgres:16-alpine
+    container_name: pg-extra
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${PG_EXTRA_PASSWORD:-postgres}
+      POSTGRES_USER: ${PG_EXTRA_USER:-postgres}
+      POSTGRES_DB: ${PG_EXTRA_DB:-extradb}
+    ports: ["5442:5432"]
+    volumes:
+      - pg_extra_data:/var/lib/postgresql/data
+      - ./db/postgres_extra/init:/docker-entrypoint-initdb.d:ro
+
+  oracle-xe:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: oracle-xe
+    restart: unless-stopped
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD:-oracle}
+      ORACLE_DATABASE: ${ORACLE_DB:-XEPDB1}
+      APP_USER: ${ORACLE_APP_USER:-app}
+      APP_USER_PASSWORD: ${ORACLE_APP_PASSWORD:-app}
+    ports:
+      - "1521:1521"   # Oracle Listener
+      - "5500:5500"   # EM Express
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+
+volumes:
+  supabase_pg_data:
+  pg_extra_data:
+  oracle_data:

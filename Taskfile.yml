@@ -1,0 +1,17 @@
+version: '3'
+tasks:
+  dev:
+    cmds:
+      - docker compose up --build
+  sdk:
+    cmds:
+      - ./scripts/gen-sdk.sh
+  contracts:verify:
+    cmds:
+      - ./scripts/verify-contracts.sh
+  sbom:
+    cmds:
+      - ./scripts/sbom.sh
+  gitleaks:
+    cmds:
+      - gitleaks detect -v -c .gitleaks.toml || true

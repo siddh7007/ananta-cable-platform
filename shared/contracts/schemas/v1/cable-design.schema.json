@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CableDesign",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "cores"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "cores": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

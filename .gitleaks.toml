@@ -1,0 +1,9 @@
+title = "cable-platform gitleaks config"
+[extend]
+useDefault = true
+# Add custom allowlist if needed
+[allowlist]
+description = "allow common local env keys"
+regexes = [
+  '''(?i)AUTH0_DOMAIN=YOUR_TENANT\.auth0\.com'''
+]

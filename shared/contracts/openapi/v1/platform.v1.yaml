@@ -1,0 +1,33 @@
+openapi: 3.0.3
+info: { title: Cable Platform API, version: 1.0.0 }
+servers: [ { url: http://localhost:8080 } ]
+paths:
+  /health:
+    get:
+      summary: API health
+      responses: { "200": { description: OK } }
+  /v1/me:
+    get:
+      summary: Current user
+      security: [ { bearerAuth: [] } ]
+      responses: { "200": { description: OK } }
+  /v1/drc/run:
+    post:
+      summary: Run DRC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "../schemas/v1/cable-design.schema.json" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "../schemas/v1/drc-result.schema.json" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

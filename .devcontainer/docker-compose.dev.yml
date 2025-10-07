@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  dev:
+    image: mcr.microsoft.com/devcontainers/base:jammy
+    volumes:
+      - ..:/workspaces/cable-platform:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sleep infinity
