@@ -41,24 +41,22 @@ services:
       PORT: 8000
     ports: ["8000:8000"]
 
+  otel-collector:
+    image: otel/opentelemetry-collector:0.103.1
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
 
-otel-collector:
-  image: otel/opentelemetry-collector:0.103.1
-  command: ["--config=/etc/otelcol/config.yaml"]
-  volumes:
-    - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
-  ports:
-    - "4317:4317"
-    - "4318:4318"
-
-
-api-docs:
-  image: nginx:alpine
-  volumes:
-    - ./docs:/usr/share/nginx/html/docs:ro
-    - ./shared:/usr/share/nginx/html/shared:ro
-  ports: ["8089:80"]
-  command: [ "nginx", "-g", "daemon off;" ]
+  api-docs:
+    image: nginx:alpine
+    volumes:
+      - ./docs:/usr/share/nginx/html/docs:ro
+      - ./shared:/usr/share/nginx/html/shared:ro
+    ports: ["8089:80"]
+    command: ["nginx", "-g", "daemon off;"]
 
 
   # ----- Databases -----

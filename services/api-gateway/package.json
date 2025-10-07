@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "lint": "eslint . --ext .ts,.js --no-error-on-unmatched-pattern",
+    "test": "node -e \"console.log('API Gateway tests not configured')\""
   },
   "dependencies": {
     "@fastify/cors": "^9.0.0",

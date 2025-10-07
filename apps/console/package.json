@@ -1,5 +1,11 @@
 {
   "name": "console",
   "private": true,
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "scripts": {
+    "lint": "eslint . --ext .ts,.js --no-error-on-unmatched-pattern",
+    "build": "node -e \"console.log('Console build not configured')\"",
+    "dev": "node -e \"console.log('Console dev server not configured')\"",
+    "test": "node -e \"console.log('Console tests not configured')\""
+  }
 }

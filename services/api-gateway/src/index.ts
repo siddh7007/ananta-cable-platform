@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { createRemoteJWKSet, jwtVerify } from "jose";
+import type { FastifyReply, FastifyRequest } from "fastify";
+import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 
 const server = Fastify({ logger: true });
 await server.register(cors, { origin: true });
@@ -11,7 +12,13 @@ const AUDIENCE = process.env.AUTH0_AUDIENCE || "";
 
 const JWKS = ISSUER ? createRemoteJWKSet(new URL(`${ISSUER}.well-known/jwks.json`)) : null;
 
-async function authGuard(req: any, reply: any) {
+declare module "fastify" {
+  interface FastifyRequest {
+    user?: JWTPayload;
+  }
+}
+
+async function authGuard(req: FastifyRequest, reply: FastifyReply) {
   if (DEV_BYPASS) return;
   try {
     const auth = req.headers.authorization || "";
@@ -25,7 +32,7 @@ async function authGuard(req: any, reply: any) {
 }
 
 server.get("/health", async () => ({ status: "ok", service: "api-gateway" }));
-server.get("/v1/me", { preHandler: authGuard }, async (req: any) => ({ sub: req.user?.sub ?? "dev-user"}));
+server.get("/v1/me", { preHandler: authGuard }, async (req) => ({ sub: req.user?.sub ?? "dev-user"}));
 
 // simple reverse-proxy style handoff (local dev): /drc/* -> http://drc:8000/*
 server.get("/drc/health", async (_req, reply) => {
