@@ -1,0 +1,7 @@
+#!/bin/sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+if [ ! -s "$1" ]; then
+  echo "husky - aborting commit due to empty commit message" >&2
+  exit 1
+fi
