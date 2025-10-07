@@ -1,48 +1,104 @@
 <script lang="ts">
   import { api } from '../lib/api/client.js';
-  import type { CableDesign, DRCResult } from '../lib/types/api.js';
+  import { validateCableDesign, type CableDesign } from '../../../shared/libs/validation/index.js';
+  import type { DRCResult } from '../lib/types/api.js';
 
-  let formData: CableDesign = {
-    id: '',
-    name: '',
-    cores: 1
+  // Form data type
+  type FormData = {
+    id: string;
+    name: string;
+    cores: number;
   };
 
-  let isSubmitting = false;
+  let form: FormData = { id: '', name: '', cores: 1 };
+  let errors: Record<string, string> = {};
+  let submitting = false;
   let result: DRCResult | null = null;
-  let error: string | null = null;
+  let submitError: string | null = null;
 
   // Props
   export let mainHeading: HTMLElement;
+  export let firstErrorField: HTMLElement;
 
-  // Form validation
-  $: isValid = formData.id.trim() !== '' && formData.cores >= 1;
-  $: idError = formData.id.trim() === '' ? 'ID is required' : null;
-  $: coresError = formData.cores < 1 ? 'Cores must be at least 1' : null;
+  // Validation function
+  function validateForm(): boolean {
+    const validation = validateCableDesign(form);
+    if (validation.ok) {
+      errors = {};
+      return true;
+    } else {
+      // Convert validation errors to field errors
+      errors = {};
+      for (const err of validation.errors) {
+        // Extract field name from path (remove leading slash)
+        const field = err.path.replace(/^\//, '');
+        if (field && !errors[field]) {
+          errors[field] = err.message;
+        }
+      }
+      return false;
+    }
+  }
+
+  // Validate on input/blur
+  function validateField(field: keyof FormData) {
+    const validation = validateCableDesign(form);
+    if (!validation.ok) {
+      // Clear previous errors for this field
+      delete errors[field];
+
+      // Find errors for this specific field
+      for (const err of validation.errors) {
+        const errField = err.path.replace(/^\//, '');
+        if (errField === field) {
+          errors[field] = err.message;
+          break;
+        }
+      }
+    } else {
+      delete errors[field];
+    }
+    errors = { ...errors }; // Trigger reactivity
+  }
 
   async function handleSubmit(event: Event) {
     event.preventDefault();
 
-    if (!isValid || isSubmitting) return;
+    if (!validateForm() || submitting) {
+      // Focus first error field
+      if (firstErrorField) {
+        firstErrorField.focus();
+      }
+      return;
+    }
 
-    isSubmitting = true;
-    error = null;
+    submitting = true;
     result = null;
+    submitError = null;
 
     try {
-      const response = await api.runDRC(formData);
+      const response = await api.runDRC(form as CableDesign);
 
       if (response.ok) {
         result = response.data;
+        // Focus result heading for accessibility
+        const resultHeading = document.getElementById('result-heading');
+        if (resultHeading) {
+          resultHeading.focus();
+        }
       } else {
-        error = response.error || 'Failed to run DRC';
+        submitError = response.error || 'Failed to run DRC';
       }
     } catch (err) {
-      error = 'Network error occurred';
+      submitError = 'Network error occurred';
     } finally {
-      isSubmitting = false;
+      submitting = false;
     }
   }
+
+  // Check if form has validation errors
+  $: hasErrors = Object.keys(errors).length > 0;
+  $: isDisabled = submitting || hasErrors;
 </script>
 
 <main>

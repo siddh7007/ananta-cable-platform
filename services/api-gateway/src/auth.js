@@ -16,8 +16,9 @@ export function required(name) {
         throw new Error(`Missing required environment variable: ${name}`);
     }
 }
-export async function authGuard(req, reply) {
-    if (DEV_BYPASS)
+export async function authGuard(req, _reply) {
+    const devBypass = (process.env.DEV_AUTH_BYPASS ?? "false") === "true";
+    if (devBypass)
         return;
     try {
         const auth = req.headers.authorization || "";

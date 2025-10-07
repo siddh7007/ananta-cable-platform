@@ -9,6 +9,7 @@
     "start": "node dist/index.js",
     "lint": "eslint . --ext .ts,.js --no-error-on-unmatched-pattern",
     "test": "tap test/**/*.test.ts",
+    "test:contract": "vitest run test-contract",
     "test:watch": "tap test/**/*.test.ts --watch"
   },
   "dependencies": {
@@ -29,7 +30,11 @@
   "devDependencies": {
     "@types/oracledb": "^6.9.1",
     "@types/pg": "^8.15.5",
+    "@types/supertest": "^6.0.3",
     "@types/tap": "^18.0.0",
-    "tap": "^18.0.0"
+    "supertest": "^7.1.4",
+    "tap": "^18.0.0",
+    "vitest": "^3.2.4",
+    "yaml": "^2.8.1"
   }
 }

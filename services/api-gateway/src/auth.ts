@@ -29,7 +29,8 @@ export function required(name: string): void {
 }
 
 export async function authGuard(req: FastifyRequest, _reply: FastifyReply): Promise<void> {
-  if (DEV_BYPASS) return;
+  const devBypass = (process.env.DEV_AUTH_BYPASS ?? "false") === "true";
+  if (devBypass) return;
 
   try {
     const auth = req.headers.authorization || "";

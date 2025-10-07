@@ -12,43 +12,44 @@ import { toResponse, UpstreamUnavailable } from './errors.js';
 // Initialize OpenTelemetry if enabled (must be done before any other imports that might use tracing)
 initOtelIfEnabled();
 
-const loggerConfig = getLoggerConfig(process.env);
+export async function buildServer() {
+  const loggerConfig = getLoggerConfig(process.env);
 
-const server = Fastify({ 
-  logger: loggerConfig,
-  ajv: {
-    customOptions: {
-      strict: true,
-      allErrors: true,
-      allowUnionTypes: true
-    },
-    plugins: []
-  }
-});
+  const server = Fastify({ 
+    logger: loggerConfig,
+    ajv: {
+      customOptions: {
+        strict: true,
+        allErrors: true,
+        allowUnionTypes: true
+      },
+      plugins: []
+    }
+  });
 
-// Set custom AJV instance with schemas
-server.setValidatorCompiler(({ schema, method: _method, url: _url, httpPart: _httpPart }) => {
-  return getAjv().compile(schema);
-});
+  // Set custom AJV instance with schemas
+  server.setValidatorCompiler(({ schema, method: _method, url: _url, httpPart: _httpPart }) => {
+    return getAjv().compile(schema);
+  });
 
-await server.register(cors, { origin: true });
+  await server.register(cors, { origin: true });
 
-// Attach request logging hooks
-attachRequestLogging(server);
+  // Attach request logging hooks
+  attachRequestLogging(server);
 
-// Rate limiting configuration
-const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60000);
-const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX ?? 100);
-const RATE_LIMIT_TRUST_PROXY = (process.env.RATE_LIMIT_TRUST_PROXY ?? "true") === "true";
-const RATE_LIMIT_WHITELIST = (process.env.RATE_LIMIT_WHITELIST ?? "").split(",").filter(Boolean);
-const DEV_BYPASS = (process.env.DEV_AUTH_BYPASS ?? "false") === "true";
+  // Rate limiting configuration
+  const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60000);
+  const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX ?? 100);
+  const RATE_LIMIT_TRUST_PROXY = (process.env.RATE_LIMIT_TRUST_PROXY ?? "true") === "true";
+  const RATE_LIMIT_WHITELIST = (process.env.RATE_LIMIT_WHITELIST ?? "").split(",").filter(Boolean);
+  const DEV_BYPASS = (process.env.DEV_AUTH_BYPASS ?? "false") === "true";
 
-// Apply 5x multiplier for dev bypass
-const effectiveMax = DEV_BYPASS ? RATE_LIMIT_MAX * 5 : RATE_LIMIT_MAX;
+  // Apply 5x multiplier for dev bypass
+  const effectiveMax = DEV_BYPASS ? RATE_LIMIT_MAX * 5 : RATE_LIMIT_MAX;
 
-// Readiness check configuration
-const READINESS_TIMEOUT_MS = Number(process.env.READINESS_TIMEOUT_MS ?? 2000);
-const READINESS_CACHE_MS = Number(process.env.READINESS_CACHE_MS ?? 500);
+  // Readiness check configuration
+  const READINESS_TIMEOUT_MS = Number(process.env.READINESS_TIMEOUT_MS ?? 2000);
+  const READINESS_CACHE_MS = Number(process.env.READINESS_CACHE_MS ?? 500);
 
 // Simple in-memory cache for readiness checks
 let readinessCache: { data: { status: string; checks: { name: string; status: string; latency_ms: number }[] }; timestamp: number } | null = null;
@@ -177,6 +178,11 @@ server.get("/ready", async (req, reply) => {
     return failResult;
   }
 });
+
+  return server;
+}
+
+const server = await buildServer();
 
 const port = Number(process.env.PORT ?? 8080);
 server.listen({ host: "0.0.0.0", port });
