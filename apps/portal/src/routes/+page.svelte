@@ -26,11 +26,22 @@
       <p>Generate optimized cable assemblies</p>
     </a>
 
-    <a href="/assemblies/drc?assembly_id=asm-test-ribbon-001" class="card demo-card">
-      <h2>📐 Test Drawing Generation</h2>
-      <p>View the new drawing generation feature with a test assembly</p>
+    <div class="card demo-card">
+      <h2>📐 Drawing Generation</h2>
+      <p>Generate technical drawings from DRC-validated assemblies</p>
       <span class="badge">NEW</span>
-    </a>
+      <div class="demo-instructions">
+        <strong>How to use:</strong>
+        <ol>
+          <li>Navigate to an assembly's DRC page</li>
+          <li>Ensure the assembly has a passing DRC report</li>
+          <li>Click "Generate Drawing" button</li>
+        </ol>
+        <p class="demo-note">
+          💡 <em>Example:</em> <code>/assemblies/drc?assembly_id=your-assembly-id</code>
+        </p>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -105,5 +116,39 @@
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: bold;
+  }
+
+  .demo-instructions {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 0.9rem;
+  }
+
+  .demo-instructions strong {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .demo-instructions ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .demo-instructions li {
+    margin: 0.25rem 0;
+  }
+
+  .demo-note {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+
+  .demo-note code {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
   }
 </style>
