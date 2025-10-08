@@ -4,7 +4,7 @@ A SvelteKit-based web portal for cable assembly design, synthesis, and design ru
 
 **Status:** Production Ready  
 **Framework:** SvelteKit 2.46.4  
-**Runtime:** Node.js 20  
+**Runtime:** Node.js 20
 
 ---
 
@@ -88,22 +88,22 @@ apps/portal/
 
 ### Pages
 
-| URL | File | Description |
-|-----|------|-------------|
-| `/` | `routes/+page.svelte` | Home page with quick links |
-| `/drc` | `routes/drc/+page.svelte` | DRC form for running design checks |
-| `/synthesis` | `routes/synthesis/+page.svelte` | Synthesis form for cable assembly |
-| `/assemblies/drc?assembly_id=X` | `routes/assemblies/drc/+page.svelte` | DRC review page (Step 3) |
-| `/assemblies/synthesis?draft_id=X` | `routes/assemblies/synthesis/+page.svelte` | Synthesis review page |
+| URL                                | File                                       | Description                        |
+| ---------------------------------- | ------------------------------------------ | ---------------------------------- |
+| `/`                                | `routes/+page.svelte`                      | Home page with quick links         |
+| `/drc`                             | `routes/drc/+page.svelte`                  | DRC form for running design checks |
+| `/synthesis`                       | `routes/synthesis/+page.svelte`            | Synthesis form for cable assembly  |
+| `/assemblies/drc?assembly_id=X`    | `routes/assemblies/drc/+page.svelte`       | DRC review page (Step 3)           |
+| `/assemblies/synthesis?draft_id=X` | `routes/assemblies/synthesis/+page.svelte` | Synthesis review page              |
 
 ### API Endpoints
 
-| URL | File | Method | Description |
-|-----|------|--------|-------------|
-| `/health` | `routes/health/+server.ts` | GET | Health check endpoint |
-| `/api/drc/:id` | `routes/api/drc/[assembly_id]/+server.ts` | GET/POST | DRC operations proxy |
-| `/api/synthesis/:id` | `routes/api/synthesis/[draft_id]/+server.ts` | GET/POST | Synthesis operations proxy |
-| `/api/synthesis/accept/:id` | `routes/api/synthesis/accept/[proposal_id]/+server.ts` | POST | Accept synthesis proposal |
+| URL                         | File                                                   | Method   | Description                |
+| --------------------------- | ------------------------------------------------------ | -------- | -------------------------- |
+| `/health`                   | `routes/health/+server.ts`                             | GET      | Health check endpoint      |
+| `/api/drc/:id`              | `routes/api/drc/[assembly_id]/+server.ts`              | GET/POST | DRC operations proxy       |
+| `/api/synthesis/:id`        | `routes/api/synthesis/[draft_id]/+server.ts`           | GET/POST | Synthesis operations proxy |
+| `/api/synthesis/accept/:id` | `routes/api/synthesis/accept/[proposal_id]/+server.ts` | POST     | Accept synthesis proposal  |
 
 ---
 
@@ -136,7 +136,7 @@ services:
       context: .
       dockerfile: Dockerfile.portal
     ports:
-      - "5173:3000"
+      - '5173:3000'
     environment:
       - NODE_ENV=production
       - BFF_PORTAL_URL=http://bff-portal:4001
@@ -253,6 +253,7 @@ curl http://localhost:5173/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "ok",
@@ -333,7 +334,7 @@ node build/index.js
 ### Best Practices
 
 - ✅ Server-side API routes hide backend URLs
-- ✅ Environment variables separated (PUBLIC_ vs private)
+- ✅ Environment variables separated (PUBLIC\_ vs private)
 - ✅ CSRF protection built into SvelteKit
 - ✅ Input validation on forms
 - ✅ Error messages don't leak sensitive data
@@ -355,6 +356,7 @@ node build/index.js
 **Issue:** Port 5173/5174 already in use
 
 **Solution:**
+
 ```bash
 # Specify different port
 pnpm dev --port 5175
@@ -369,6 +371,7 @@ pnpm dev --port 5175
 **Issue:** TypeScript errors in `.svelte-kit/` directory
 
 **Solution:**
+
 ```bash
 # Regenerate types
 pnpm check
@@ -382,6 +385,7 @@ pnpm dev
 **Issue:** Docker build fails
 
 **Solution:**
+
 ```bash
 # Clear cache and rebuild
 docker-compose build --no-cache portal
@@ -395,6 +399,7 @@ docker-compose logs portal
 **Issue:** Page returns 404 error
 
 **Solution:**
+
 - Verify file naming: Must be `+page.svelte` (not `page.svelte`)
 - Check file location in `routes/` directory
 - Restart dev server: `pnpm dev`
@@ -405,6 +410,7 @@ docker-compose logs portal
 **Issue:** API calls fail with 500/connection errors
 
 **Solution:**
+
 - Check BFF_PORTAL_URL environment variable
 - Verify BFF service is running: `docker-compose ps`
 - Check Docker network: `docker network ls`
@@ -466,6 +472,7 @@ chore(portal): upgrade SvelteKit to 2.47.0
 ### v0.2.0 (October 8, 2025) - SvelteKit Migration
 
 **Major Changes:**
+
 - ✅ Migrated from custom Vite + router to SvelteKit
 - ✅ Implemented server-side rendering (SSR)
 - ✅ Added server-side API proxy routes
@@ -474,6 +481,7 @@ chore(portal): upgrade SvelteKit to 2.47.0
 - ✅ Removed 1,237 lines of legacy code
 
 **Improvements:**
+
 - 🚀 Faster initial page loads with SSR
 - 🎯 Type-safe routing with auto-generated types
 - 🔐 Better security with hidden backend URLs
@@ -481,11 +489,13 @@ chore(portal): upgrade SvelteKit to 2.47.0
 - 🐳 Optimized Docker images (18MB runtime)
 
 **Breaking Changes:**
+
 - URLs changed from hash-based to clean paths
 - `navigate()` replaced with `goto()`
 - Environment variables must use `PUBLIC_` prefix for client
 
 **Testing:**
+
 - ✅ 14/14 automated tests passed
 - ✅ Production build successful (6.49s)
 - ✅ All routes validated

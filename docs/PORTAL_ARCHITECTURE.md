@@ -15,17 +15,20 @@ The Cable Platform Portal is a web application built with SvelteKit that provide
 ## Tech Stack
 
 ### Core Framework
+
 - **SvelteKit:** 2.46.4 - Full-stack framework with SSR
 - **Svelte:** 4.2.19 - Reactive UI component framework
 - **Vite:** 5.4.20 - Build tool and dev server
 - **TypeScript:** 5.9.3 - Type-safe development
 
 ### Adapter & Runtime
+
 - **Adapter:** @sveltejs/adapter-node 5.3.3
 - **Runtime:** Node.js 20 Alpine (Docker)
 - **Server:** SvelteKit Node.js server
 
 ### Build & Development
+
 - **Package Manager:** pnpm (workspace)
 - **Type Checking:** svelte-check
 - **Linting:** ESLint
@@ -156,27 +159,27 @@ SvelteKit uses a file-based routing system where the file structure in `src/rout
 
 #### Route Types
 
-| File Pattern | Purpose | Example |
-|--------------|---------|---------|
-| `+page.svelte` | Page component | Home page, DRC form |
-| `+page.ts` | Client-side data loader | Load data before rendering |
-| `+page.server.ts` | Server-side data loader | SSR data fetching |
-| `+server.ts` | API endpoint | REST API routes |
-| `+layout.svelte` | Layout wrapper | Navigation, global styles |
-| `+error.svelte` | Error boundary | 404, 500 errors |
+| File Pattern      | Purpose                 | Example                    |
+| ----------------- | ----------------------- | -------------------------- |
+| `+page.svelte`    | Page component          | Home page, DRC form        |
+| `+page.ts`        | Client-side data loader | Load data before rendering |
+| `+page.server.ts` | Server-side data loader | SSR data fetching          |
+| `+server.ts`      | API endpoint            | REST API routes            |
+| `+layout.svelte`  | Layout wrapper          | Navigation, global styles  |
+| `+error.svelte`   | Error boundary          | 404, 500 errors            |
 
 #### Current Routes
 
-| URL | File | Type | Description |
-|-----|------|------|-------------|
-| `/` | `routes/+page.svelte` | Page | Home page with quick links |
-| `/drc` | `routes/drc/+page.svelte` | Page | DRC form for running checks |
-| `/synthesis` | `routes/synthesis/+page.svelte` | Page | Synthesis form |
-| `/assemblies/drc?assembly_id=X` | `routes/assemblies/drc/+page.svelte` | Page | DRC review (Step 3) |
-| `/assemblies/synthesis?draft_id=X` | `routes/assemblies/synthesis/+page.svelte` | Page | Synthesis review |
-| `/health` | `routes/health/+server.ts` | API | Health check endpoint |
-| `/api/drc/:id` | `routes/api/drc/[assembly_id]/+server.ts` | API | DRC API proxy |
-| `/api/synthesis/:id` | `routes/api/synthesis/[draft_id]/+server.ts` | API | Synthesis API proxy |
+| URL                                | File                                         | Type | Description                 |
+| ---------------------------------- | -------------------------------------------- | ---- | --------------------------- |
+| `/`                                | `routes/+page.svelte`                        | Page | Home page with quick links  |
+| `/drc`                             | `routes/drc/+page.svelte`                    | Page | DRC form for running checks |
+| `/synthesis`                       | `routes/synthesis/+page.svelte`              | Page | Synthesis form              |
+| `/assemblies/drc?assembly_id=X`    | `routes/assemblies/drc/+page.svelte`         | Page | DRC review (Step 3)         |
+| `/assemblies/synthesis?draft_id=X` | `routes/assemblies/synthesis/+page.svelte`   | Page | Synthesis review            |
+| `/health`                          | `routes/health/+server.ts`                   | API  | Health check endpoint       |
+| `/api/drc/:id`                     | `routes/api/drc/[assembly_id]/+server.ts`    | API  | DRC API proxy               |
+| `/api/synthesis/:id`               | `routes/api/synthesis/[draft_id]/+server.ts` | API  | Synthesis API proxy         |
 
 #### Dynamic Routes
 
@@ -214,7 +217,7 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, fetch }) => {
   const assemblyId = url.searchParams.get('assembly_id');
-  
+
   if (!assemblyId) {
     return { assemblyId: null, report: null };
   }
@@ -230,6 +233,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 ```
 
 **Benefits:**
+
 - ✅ Data available on initial page load (no loading spinners)
 - ✅ Better SEO (content in HTML)
 - ✅ Faster perceived performance
@@ -272,6 +276,7 @@ Browser → SvelteKit Server Routes → BFF Portal → Backend Services
 ### Server-Side API Routes
 
 Located in `routes/api/`, these routes:
+
 - Hide backend URLs from the client
 - Enable server-side authentication
 - Provide a clean API interface
@@ -288,14 +293,14 @@ const BFF_URL = process.env.BFF_PORTAL_URL || 'http://bff-portal:4001';
 
 export const GET: RequestHandler = async ({ params, fetch }) => {
   const { assembly_id } = params;
-  
+
   try {
     const response = await fetch(`${BFF_URL}/api/drc/${assembly_id}`);
-    
+
     if (!response.ok) {
       throw error(response.status, 'Failed to fetch DRC report');
     }
-    
+
     const data = await response.json();
     return json(data);
   } catch (err) {
@@ -315,12 +320,12 @@ class ApiClient {
     if (!response.ok) throw new Error('Failed to fetch');
     return response.json();
   }
-  
+
   async runDrc(assemblyId: string, data: DrcFormData): Promise<DrcReport> {
     const response = await fetch(`/api/drc/${assemblyId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Failed to run DRC');
     return response.json();
@@ -348,7 +353,7 @@ import { writable } from 'svelte/store';
 export const telemetry = writable<TelemetryEvent[]>([]);
 
 export function emitTelemetry(event: string, data?: any) {
-  telemetry.update(events => [...events, { event, data, timestamp: Date.now() }]);
+  telemetry.update((events) => [...events, { event, data, timestamp: Date.now() }]);
   console.log('[Telemetry]', event, data);
 }
 ```
@@ -389,17 +394,17 @@ Built-in stores provided by SvelteKit:
 import { page, navigating, updated } from '$app/stores';
 
 // Current page data
-$page.url      // URL object
-$page.params   // Route parameters
-$page.data     // Data from load functions
-$page.error    // Error object if any
-$page.status   // HTTP status code
+$page.url; // URL object
+$page.params; // Route parameters
+$page.data; // Data from load functions
+$page.error; // Error object if any
+$page.status; // HTTP status code
 
 // Navigation state
-$navigating    // true during navigation
+$navigating; // true during navigation
 
 // App updates
-$updated       // true when new version available
+$updated; // true when new version available
 ```
 
 ---
@@ -426,6 +431,7 @@ $updated       // true when new version available
 #### Nav Component (`$lib/components/Nav.svelte`)
 
 Global navigation bar:
+
 - Logo and branding
 - Main navigation links
 - Active route highlighting
@@ -434,6 +440,7 @@ Global navigation bar:
 #### DRCResults Component (`$lib/components/DRCResults.svelte`)
 
 Reusable DRC results display:
+
 - Findings grouped by domain
 - Severity indicators
 - Checkbox selection
@@ -449,22 +456,22 @@ Each page component follows this structure:
   // 1. Imports
   import { page } from '$app/stores';
   import { api } from '$lib/api/client';
-  
+
   // 2. Props (from load functions)
   export let data;
-  
+
   // 3. Local state
   let loading = false;
   let error = null;
-  
+
   // 4. Reactive declarations
   $: assemblyId = $page.url.searchParams.get('assembly_id');
-  
+
   // 5. Functions
   async function handleSubmit() {
     // ...
   }
-  
+
   // 6. Lifecycle (if needed)
   import { onMount } from 'svelte';
   onMount(() => {
@@ -501,7 +508,7 @@ Catches all errors and displays user-friendly messages:
 ```svelte
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   $: status = $page.status;
   $: message = $page.error?.message;
 </script>
@@ -515,11 +522,11 @@ Catches all errors and displays user-friendly messages:
 
 ### Error Types
 
-| Status | Description | User Message |
-|--------|-------------|--------------|
-| 400 | Bad Request | "Please check your input" |
-| 404 | Not Found | "Page doesn't exist" |
-| 500 | Server Error | "Something went wrong" |
+| Status | Description  | User Message              |
+| ------ | ------------ | ------------------------- |
+| 400    | Bad Request  | "Please check your input" |
+| 404    | Not Found    | "Page doesn't exist"      |
+| 500    | Server Error | "Something went wrong"    |
 
 ### Throwing Errors
 
@@ -628,6 +635,7 @@ CMD ["node", "build/index.js"]
 ```
 
 **Build stats:**
+
 - Build time: ~6 seconds
 - Image size: ~150MB
 - Memory usage: 18MB (runtime)
@@ -700,6 +708,7 @@ services:
 ### Automatic
 
 SvelteKit automatically:
+
 - ✅ Code splits by route
 - ✅ Preloads linked pages on hover
 - ✅ Optimizes bundle sizes
@@ -717,6 +726,7 @@ Total build:     ~5.77s
 ```
 
 Key optimizations:
+
 - Shared chunks extracted
 - Dynamic imports for large components
 - CSS scoped to components
@@ -724,6 +734,7 @@ Key optimizations:
 ### SSR Performance
 
 Server-side rendering benefits:
+
 - Initial HTML includes content (no spinner)
 - Faster time to interactive
 - Better SEO
@@ -746,6 +757,7 @@ SvelteKit has built-in CSRF protection for form actions.
 ### API Proxy Pattern
 
 Benefits:
+
 - Backend URLs not visible to users
 - Can add auth middleware
 - Rate limiting possible
@@ -767,6 +779,7 @@ pnpm check
 ### Manual Testing
 
 Checklist:
+
 - [ ] All routes accessible
 - [ ] Navigation works
 - [ ] Forms submit correctly
@@ -776,6 +789,7 @@ Checklist:
 ### Future: Automated Testing
 
 Recommended additions:
+
 - **Vitest**: Unit tests for utils/stores
 - **Playwright**: E2E tests for user flows
 - **Testing Library**: Component tests
@@ -789,6 +803,7 @@ Recommended additions:
 Endpoint: `GET /health`
 
 Response:
+
 ```json
 {
   "status": "ok",
@@ -800,12 +815,14 @@ Response:
 ### Telemetry
 
 Events tracked:
+
 - Page views
 - DRC runs
 - Synthesis runs
 - Error occurrences
 
 Console output:
+
 ```
 [Telemetry] page.view { path: '/drc' }
 [Telemetry] drc.run { assemblyId: '123' }
@@ -822,14 +839,14 @@ Recommended: Structured logging with winston/pino
 
 ### What Changed
 
-| Before | After | Impact |
-|--------|-------|--------|
+| Before        | After             | Impact                                |
+| ------------- | ----------------- | ------------------------------------- |
 | Custom router | SvelteKit routing | URLs changed from `#/path` to `/path` |
-| `index.html` | `app.html` | Template location changed |
-| `main.ts` | SvelteKit entry | Entry point automated |
-| `App.svelte` | `+layout.svelte` | Root component pattern |
-| Client-only | SSR + Client | Better performance |
-| Static build | Node.js server | Deployment changed |
+| `index.html`  | `app.html`        | Template location changed             |
+| `main.ts`     | SvelteKit entry   | Entry point automated                 |
+| `App.svelte`  | `+layout.svelte`  | Root component pattern                |
+| Client-only   | SSR + Client      | Better performance                    |
+| Static build  | Node.js server    | Deployment changed                    |
 
 ### Breaking Changes
 
@@ -858,6 +875,7 @@ Recommended: Structured logging with winston/pino
 **Issue: Port 5173 already in use**
 
 Solution:
+
 ```bash
 # Dev server auto-switches to 5174
 # Or manually set port
@@ -867,6 +885,7 @@ pnpm dev --port 5175
 **Issue: Type errors in `.svelte-kit/`**
 
 Solution:
+
 ```bash
 # Regenerate types
 pnpm check
@@ -875,6 +894,7 @@ pnpm check
 **Issue: Docker build fails**
 
 Solution:
+
 ```bash
 # Clear cache
 docker-compose build --no-cache portal
@@ -883,6 +903,7 @@ docker-compose build --no-cache portal
 **Issue: Routes not found (404)**
 
 Solution:
+
 - Check file naming: Must be `+page.svelte`, not `page.svelte`
 - Restart dev server: `pnpm dev`
 - Check svelte.config.js routes path
@@ -892,18 +913,21 @@ Solution:
 ## Future Enhancements
 
 ### Short Term
+
 - [ ] Add Playwright E2E tests
 - [ ] Implement proper logging (winston/pino)
 - [ ] Add request tracing
 - [ ] Set up error monitoring (Sentry)
 
 ### Medium Term
+
 - [ ] Add authentication flow
 - [ ] Implement WebSocket updates
 - [ ] Add service worker (offline support)
 - [ ] Improve accessibility (WCAG 2.1 AA)
 
 ### Long Term
+
 - [ ] Add i18n support
 - [ ] Implement caching strategy
 - [ ] Add GraphQL layer
@@ -914,17 +938,20 @@ Solution:
 ## Resources
 
 ### Official Documentation
+
 - [SvelteKit Docs](https://kit.svelte.dev/docs)
 - [Svelte Tutorial](https://svelte.dev/tutorial)
 - [Vite Guide](https://vitejs.dev/guide/)
 
 ### Internal Documentation
+
 - [Migration Plan](./SVELTEKIT_MIGRATION_PLAN.md)
 - [Migration Complete](../SVELTEKIT_MIGRATION_COMPLETE.md)
 - [Phase 7 Cleanup](../SVELTEKIT_PHASE_7_CLEANUP.md)
 - [Phase 6 Testing](../SVELTEKIT_PHASE_6_TESTING.md)
 
 ### Support
+
 - Team Slack: #portal-dev
 - Tech Lead: Review architecture questions
 - SvelteKit Discord: Community support
