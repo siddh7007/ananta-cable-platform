@@ -346,6 +346,67 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /v1/template-packs:
+    get:
+      summary: List available template packs
+      description: Returns an array of available template packs for rendering assemblies
+      responses:
+        '200':
+          description: List of template packs
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - template_packs
+                properties:
+                  template_packs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TemplatePack'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/render:
+    post:
+      summary: Render an assembly with a template pack
+      description: Generates a rendered output (SVG, PDF, or PNG) of an assembly using the specified template pack
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenderRequest'
+      responses:
+        '200':
+          description: Render completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Assembly or template pack not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Rendering error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1035,3 +1096,103 @@ components:
         generated_at:
           type: string
           format: date-time
+
+    TemplatePack:
+      type: object
+      required:
+        - id
+        - version
+        - name
+        - paper
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the template pack
+        version:
+          type: string
+          description: Template pack version
+        name:
+          type: string
+          description: Human-readable name
+        paper:
+          type: string
+          enum: [A3, Letter]
+          description: Target paper size
+        notes:
+          type: string
+          description: Optional notes about the template pack
+
+    RenderRequest:
+      type: object
+      required:
+        - assembly_id
+        - template_pack_id
+      properties:
+        assembly_id:
+          type: string
+          description: ID of the assembly to render
+        template_pack_id:
+          type: string
+          description: ID of the template pack to use
+        format:
+          type: string
+          enum: [svg, pdf, png]
+          default: svg
+          description: Output format
+        inline:
+          type: boolean
+          default: false
+          description: If true, return the rendered output inline in the response
+        renderer_kind:
+          type: string
+          enum: [svg2d, cad]
+          default: svg2d
+          description: Renderer engine to use
+
+    RenderResponse:
+      type: object
+      required:
+        - render_manifest
+      properties:
+        render_manifest:
+          $ref: '#/components/schemas/RenderManifest'
+        url:
+          type: string
+          description: URL to download the rendered output (if inline is false)
+        svg:
+          type: string
+          description: SVG content (if format is svg and inline is true)
+
+    RenderManifest:
+      type: object
+      required:
+        - rendererVersion
+        - templatePackId
+        - rendererKind
+        - schemaHash
+      properties:
+        rendererVersion:
+          type: string
+          description: Version of the renderer used
+        templatePackId:
+          type: string
+          description: Template pack ID used for rendering
+        rendererKind:
+          type: string
+          enum: [svg2d, cad]
+          description: Renderer engine used
+        schemaHash:
+          type: string
+          description: Hash of the assembly schema at render time
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+        details:
+          type: object

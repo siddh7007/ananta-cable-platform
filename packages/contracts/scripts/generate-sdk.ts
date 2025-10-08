@@ -30,7 +30,10 @@ import type {
   DRCRulesetsResponse,
   DRCRunRequest,
   DRCApplyFixesRequest,
-  DRCApplyFixesResponse
+  DRCApplyFixesResponse,
+  TemplatePack,
+  RenderRequest,
+  RenderResponse
 } from '../types/api';
 
 export interface ApiResponse<T> {
@@ -177,6 +180,17 @@ class CablePlatformClient {
 
   async getDrcReport(assemblyId: string): Promise<ApiResponse<DRCReport>> {
     return this.request<DRCReport>(\`/v1/drc/report/\${assemblyId}\`);
+  }
+
+  async listTemplatePacks(): Promise<ApiResponse<{ template_packs: TemplatePack[] }>> {
+    return this.request<{ template_packs: TemplatePack[] }>('/v1/template-packs');
+  }
+
+  async renderAssembly(request: RenderRequest): Promise<ApiResponse<RenderResponse>> {
+    return this.request<RenderResponse>('/v1/render', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
   }
 }
 

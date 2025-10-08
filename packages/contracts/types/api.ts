@@ -182,3 +182,38 @@ export interface DRCReport {
   generated_at: string;
 }
 
+export interface TemplatePack {
+  id: string;
+  version: string;
+  name: string;
+  paper: 'A3' | 'Letter';
+  notes?: string;
+}
+
+export interface RenderRequest {
+  assembly_id: string;
+  template_pack_id: string;
+  format?: 'svg' | 'pdf' | 'png';
+  inline?: boolean;
+  renderer_kind?: 'svg2d' | 'cad';
+}
+
+export interface RenderResponse {
+  render_manifest: RenderManifest;
+  url?: string;
+  svg?: string;
+}
+
+export interface RenderManifest {
+  rendererVersion: string;
+  templatePackId: string;
+  rendererKind: 'svg2d' | 'cad';
+  schemaHash: string;
+}
+
+export interface Error {
+  message: string;
+  code?: string;
+  details?: Record<string, any>;
+}
+
