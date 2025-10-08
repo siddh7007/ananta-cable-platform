@@ -1,7 +1,9 @@
 FROM node:20-alpine
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY shared ./shared
+RUN corepack enable && pnpm i && pnpm --filter @cable-platform/validation build
 COPY services/api-gateway ./services/api-gateway
-RUN corepack enable && pnpm i --filter api-gateway... && pnpm --filter api-gateway build
+RUN pnpm --filter api-gateway install && pnpm --filter api-gateway build
 EXPOSE 8080
-CMD ["pnpm","--filter","api-gateway","start"]
+CMD ["node","services/api-gateway/src/index.js"]

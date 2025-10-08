@@ -46,7 +46,7 @@ export async function buildServer() {
         max: effectiveMax,
         timeWindow: RATE_LIMIT_WINDOW_MS,
         allowList: RATE_LIMIT_WHITELIST,
-        global: false,
+        global: false, // Disable global rate limiting
         keyGenerator: (req) => {
             // Get IP address
             let ip;
@@ -83,6 +83,7 @@ export async function buildServer() {
     required("AUTH0_AUDIENCE");
     // Register route plugins
     await server.register(import('./routes/drc.js'));
+    await server.register(import('./routes/synthesis.js'));
     // Global error handler
     server.setErrorHandler((err, _req, reply) => {
         const { status, body } = toResponse(err);

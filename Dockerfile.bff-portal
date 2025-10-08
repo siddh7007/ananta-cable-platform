@@ -1,7 +1,10 @@
 FROM node:20-alpine
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY shared ./shared
+COPY packages ./packages
+RUN corepack enable && pnpm i && pnpm --filter @cable-platform/validation build && pnpm --filter @cable-platform/contracts build
 COPY services/bff-portal ./services/bff-portal
-RUN corepack enable && pnpm i --filter bff-portal... && pnpm --filter bff-portal build
+RUN pnpm --filter bff-portal install && pnpm --filter bff-portal build
 EXPOSE 4001
-CMD ["pnpm","--filter","bff-portal","start"]
+CMD ["node","services/bff-portal/src/index.js"]

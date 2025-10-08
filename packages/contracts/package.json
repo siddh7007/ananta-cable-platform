@@ -1,0 +1,20 @@
+{
+  "name": "@cable-platform/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate-sdk": "tsx scripts/generate-sdk.ts",
+    "generate-types": "tsx scripts/generate-types.ts",
+    "generate-json": "tsx scripts/generate-json.ts",
+    "validate-openapi": "redocly lint openapi.yaml"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-parser": "^10.1.0",
+    "js-yaml": "^4.1.0",
+    "tsx": "^4.0.0"
+  },
+  "exports": {
+    "./types/api": "./types/api.ts"
+  }
+}

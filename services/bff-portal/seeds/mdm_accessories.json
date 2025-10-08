@@ -1,0 +1,55 @@
+[
+  {
+    "mpn": "3M-3448-89110",
+    "family": "IDC Strain Relief",
+    "connector_family": "3M IDC",
+    "type": "strain_relief",
+    "cable_od_range_in": [0.15, 0.35],
+    "material": "nylon",
+    "flame_rating": "UL94-V2",
+    "status": "active"
+  },
+  {
+    "mpn": "3M-3448-90240",
+    "family": "IDC Strain Relief",
+    "connector_family": "3M IDC",
+    "type": "strain_relief",
+    "cable_od_range_in": [0.35, 0.55],
+    "material": "nylon",
+    "flame_rating": "UL94-V2",
+    "status": "active"
+  },
+  {
+    "mpn": "Molex-2001220040",
+    "family": "Mega-Fit Backshell",
+    "connector_family": "Molex Mega-Fit",
+    "type": "backshell_strain_relief",
+    "cable_od_range_in": [0.15, 0.35],
+    "material": "nylon",
+    "flame_rating": "UL94-V2",
+    "clamp_type": "screw",
+    "status": "active"
+  },
+  {
+    "mpn": "TE-HeatShrink-1/4",
+    "family": "Heat Shrink",
+    "connector_family": "generic",
+    "type": "heat_shrink",
+    "recovered_id_in": 0.125,
+    "expanded_id_in": 0.25,
+    "material": "polyolefin",
+    "flame_rating": "UL94-V0",
+    "status": "active"
+  },
+  {
+    "mpn": "TE-HeatShrink-3/8",
+    "family": "Heat Shrink",
+    "connector_family": "generic",
+    "type": "heat_shrink",
+    "recovered_id_in": 0.187,
+    "expanded_id_in": 0.375,
+    "material": "polyolefin",
+    "flame_rating": "UL94-V0",
+    "status": "active"
+  }
+]

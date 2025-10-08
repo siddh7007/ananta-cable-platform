@@ -8,10 +8,25 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "eslint . --ext .ts,.js --no-error-on-unmatched-pattern",
-    "test": "node -e \"console.log('BFF Portal tests not configured')\""
+    "test": "tap -Rspec test/**/*.test.ts",
+    "test:watch": "tap test/**/*.test.ts --watch"
   },
   "dependencies": {
+    "@cable-platform/client-sdk": "workspace:*",
+    "@cable-platform/contracts": "workspace:*",
+    "@cable-platform/validation": "workspace:*",
     "@fastify/cors": "^9.0.0",
-    "fastify": "^4.0.0"
+    "@fastify/jwt": "^8.0.0",
+    "fastify": "^4.0.0",
+    "pg": "^8.11.0",
+    "postgres": "^3.4.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "crypto": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.0",
+    "@types/tap": "^15.0.12",
+    "tap": "^18.0.0"
   }
 }

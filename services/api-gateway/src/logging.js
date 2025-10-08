@@ -90,7 +90,7 @@ export function attachRequestLogging(fastify) {
         const requestId = req.headers['x-request-id'];
         const startTime = req.startTime;
         const latencyNs = process.hrtime.bigint() - startTime;
-        const latencyMs = Number(latencyNs) / 1000000; // Convert to milliseconds
+        const latencyMs = Number(latencyNs) / 1_000_000; // Convert to milliseconds
         // Estimate request size (headers + body)
         let reqSize = 0;
         if (req.body) {
@@ -112,7 +112,7 @@ export function attachRequestLogging(fastify) {
             method: req.method,
             url: req.url,
             statusCode: reply.statusCode,
-            latency_ms: Math.round(latencyMs * 100) / 100,
+            latency_ms: Math.round(latencyMs * 100) / 100, // Round to 2 decimal places
             req_size: reqSize,
             res_size: resSize
         });

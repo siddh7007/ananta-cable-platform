@@ -99,6 +99,7 @@ required("AUTH0_AUDIENCE");
 
 // Register route plugins
 await server.register(import('./routes/drc.js'));
+await server.register(import('./routes/synthesis.js'));
 
 // Global error handler
 server.setErrorHandler((err, _req, reply) => {

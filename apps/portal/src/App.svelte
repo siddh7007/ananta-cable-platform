@@ -4,6 +4,7 @@
   import Nav from './lib/components/Nav.svelte';
   import Home from './routes/Home.svelte';
   import DRC from './routes/DRC.svelte';
+  import Synthesis from './routes/Synthesis.svelte';
 
   let currentRoute = { path: '/', params: {} };
   let mainHeading: HTMLElement;
@@ -27,6 +28,7 @@
     const titles = {
       '/': 'Home - Cable Platform Portal',
       '/drc': 'DRC - Cable Platform Portal',
+      '/synthesis': 'Synthesis Review - Cable Platform Portal',
     };
     document.title = titles[path as keyof typeof titles] || 'Cable Platform Portal';
   }
@@ -46,6 +48,8 @@
     <Home bind:mainHeading />
   {:else if currentRoute.path === '/drc'}
     <DRC bind:mainHeading />
+  {:else if currentRoute.path === '/synthesis'}
+    <Synthesis bind:mainHeading />
   {:else}
     <main>
       <h1 bind:this={mainHeading} tabindex="-1">Page Not Found</h1>

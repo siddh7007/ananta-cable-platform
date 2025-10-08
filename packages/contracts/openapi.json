@@ -1,0 +1,1211 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cable Platform API",
+    "version": "1.0.0",
+    "description": "API for cable and harness design pipeline"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/md/search/connectors": {
+      "get": {
+        "summary": "Search connectors by query",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query for connectors"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/md/connector/{mpn}": {
+      "get": {
+        "summary": "Get full connector metadata",
+        "parameters": [
+          {
+            "name": "mpn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorMetadata"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Connector not found"
+          }
+        }
+      }
+    },
+    "/v1/assemblies/draft": {
+      "post": {
+        "summary": "Save or update assembly draft",
+        "parameters": [
+          {
+            "name": "X-Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Idempotency key for safe retries"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssemblyDraft"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Draft saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssemblyDraftResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        }
+      }
+    },
+    "/v1/presets/notes-packs": {
+      "get": {
+        "summary": "Get available notes packs",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotesPack"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/assist/locale-colors": {
+      "get": {
+        "summary": "Get locale-specific color mappings",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Region"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocaleColors"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/synthesis/propose": {
+      "post": {
+        "summary": "Generate synthesis proposal from draft",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "draft_id"
+                ],
+                "properties": {
+                  "draft_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Synthesis proposal generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SynthesisProposal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Draft not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/synthesis/accept": {
+      "post": {
+        "summary": "Accept synthesis proposal and create assembly",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "proposal_id"
+                ],
+                "properties": {
+                  "proposal_id": {
+                    "type": "string"
+                  },
+                  "locks": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Assembly created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "assembly_id",
+                    "schema_hash"
+                  ],
+                  "properties": {
+                    "assembly_id": {
+                      "type": "string"
+                    },
+                    "schema_hash": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Proposal not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/synthesis/recompute": {
+      "post": {
+        "summary": "Recompute synthesis proposal with locks",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "draft_id"
+                ],
+                "properties": {
+                  "draft_id": {
+                    "type": "string"
+                  },
+                  "locks": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Synthesis proposal recomputed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SynthesisProposal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Draft not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/drc/preview": {
+      "post": {
+        "summary": "Preview DRC results for synthesis proposal",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SynthesisProposal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "DRC preview results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DrcResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid proposal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Region": {
+        "type": "string",
+        "enum": [
+          "NA",
+          "EU",
+          "JP",
+          "Other"
+        ]
+      },
+      "ConnectorSummary": {
+        "type": "object",
+        "required": [
+          "mpn",
+          "family",
+          "series",
+          "positions",
+          "pitch_in",
+          "termination"
+        ],
+        "properties": {
+          "mpn": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "series": {
+            "type": "string"
+          },
+          "positions": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pitch_in": {
+            "type": "number",
+            "format": "float"
+          },
+          "termination": {
+            "$ref": "#/components/schemas/TerminationType"
+          }
+        }
+      },
+      "ConnectorMetadata": {
+        "type": "object",
+        "required": [
+          "mpn",
+          "family",
+          "series",
+          "positions",
+          "pitch_in",
+          "termination",
+          "gender",
+          "keying",
+          "compatible_contacts_awg",
+          "backshell_strain_relief",
+          "pin1_semantics"
+        ],
+        "properties": {
+          "mpn": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "series": {
+            "type": "string"
+          },
+          "positions": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pitch_in": {
+            "type": "number",
+            "format": "float"
+          },
+          "termination": {
+            "$ref": "#/components/schemas/TerminationType"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female",
+              "hermaphroditic"
+            ]
+          },
+          "keying": {
+            "type": "string"
+          },
+          "compatible_contacts_awg": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "backshell_strain_relief": {
+            "type": "boolean"
+          },
+          "pin1_semantics": {
+            "type": "string"
+          }
+        }
+      },
+      "TerminationType": {
+        "type": "string",
+        "enum": [
+          "crimp",
+          "idc",
+          "ring_lug",
+          "solder"
+        ]
+      },
+      "AssemblyStep1": {
+        "type": "object",
+        "required": [
+          "type",
+          "length_mm",
+          "tolerance_mm",
+          "environment",
+          "emi",
+          "locale",
+          "compliance",
+          "endA",
+          "endB",
+          "notes_pack_id"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "ribbon",
+              "power_cable",
+              "sensor_lead",
+              "rf_coax",
+              "custom"
+            ]
+          },
+          "length_mm": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tolerance_mm": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "environment": {
+            "type": "object",
+            "required": [
+              "temp_min_c",
+              "temp_max_c",
+              "flex_class"
+            ],
+            "properties": {
+              "temp_min_c": {
+                "type": "number",
+                "format": "float"
+              },
+              "temp_max_c": {
+                "type": "number",
+                "format": "float"
+              },
+              "flex_class": {
+                "type": "string",
+                "enum": [
+                  "static",
+                  "flex",
+                  "high_flex"
+                ]
+              },
+              "chemicals": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "electrical": {
+            "type": "object",
+            "properties": {
+              "system_voltage_v": {
+                "type": "number",
+                "format": "float"
+              },
+              "per_circuit": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "circuit"
+                  ],
+                  "properties": {
+                    "circuit": {
+                      "type": "string"
+                    },
+                    "current_a": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "voltage_v": {
+                      "type": "number",
+                      "format": "float"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "emi": {
+            "type": "object",
+            "required": [
+              "shield",
+              "drain_policy"
+            ],
+            "properties": {
+              "shield": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "foil",
+                  "braid",
+                  "foil_braid"
+                ]
+              },
+              "drain_policy": {
+                "type": "string",
+                "enum": [
+                  "isolated",
+                  "fold_back",
+                  "pigtail"
+                ]
+              }
+            }
+          },
+          "locale": {
+            "$ref": "#/components/schemas/Region"
+          },
+          "compliance": {
+            "type": "object",
+            "properties": {
+              "ipc_class": {
+                "type": "string",
+                "enum": [
+                  "1",
+                  "2",
+                  "3"
+                ],
+                "default": "2"
+              },
+              "ul94_v0_labels": {
+                "type": "boolean",
+                "default": true
+              },
+              "rohs_reach": {
+                "type": "boolean",
+                "default": true
+              }
+            }
+          },
+          "endA": {
+            "$ref": "#/components/schemas/Endpoint"
+          },
+          "endB": {
+            "$ref": "#/components/schemas/Endpoint"
+          },
+          "constraints": {
+            "type": "object",
+            "properties": {
+              "stud_size": {
+                "type": "string"
+              },
+              "board_pitch_inch": {
+                "type": "number",
+                "format": "float"
+              }
+            }
+          },
+          "must_use": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notes_pack_id": {
+            "type": "string",
+            "default": "STD-NOTES-IPC620-ROHS-REACH"
+          }
+        }
+      },
+      "Endpoint": {
+        "type": "object",
+        "required": [
+          "selector",
+          "termination"
+        ],
+        "properties": {
+          "selector": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "mpn"
+                ],
+                "properties": {
+                  "mpn": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "series",
+                  "positions"
+                ],
+                "properties": {
+                  "series": {
+                    "type": "string"
+                  },
+                  "positions": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            ]
+          },
+          "termination": {
+            "$ref": "#/components/schemas/TerminationType"
+          }
+        }
+      },
+      "AssemblyDraft": {
+        "type": "object",
+        "required": [
+          "step",
+          "payload",
+          "status"
+        ],
+        "properties": {
+          "step": {
+            "type": "integer",
+            "enum": [
+              1
+            ]
+          },
+          "payload": {
+            "$ref": "#/components/schemas/AssemblyStep1"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "editing",
+              "ready_for_step2"
+            ]
+          }
+        }
+      },
+      "AssemblyDraftResponse": {
+        "type": "object",
+        "required": [
+          "draft_id",
+          "status",
+          "updated_at"
+        ],
+        "properties": {
+          "draft_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "NotesPack": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "LocaleColors": {
+        "type": "object",
+        "required": [
+          "colors",
+          "notes"
+        ],
+        "properties": {
+          "colors": {
+            "type": "object",
+            "properties": {
+              "L": {
+                "type": "string"
+              },
+              "N": {
+                "type": "string"
+              },
+              "PE": {
+                "type": "string"
+              }
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PartRef": {
+        "type": "object",
+        "required": [
+          "mpn"
+        ],
+        "properties": {
+          "mpn": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "series": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "WirelistRow": {
+        "type": "object",
+        "required": [
+          "circuit",
+          "conductor"
+        ],
+        "properties": {
+          "circuit": {
+            "type": "string"
+          },
+          "conductor": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "endA_pin": {
+            "type": "string"
+          },
+          "endB_pin": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "shield": {
+            "type": "string",
+            "enum": [
+              "none",
+              "fold_back",
+              "isolated",
+              "pigtail"
+            ]
+          }
+        }
+      },
+      "BomLine": {
+        "type": "object",
+        "required": [
+          "ref",
+          "qty",
+          "role"
+        ],
+        "properties": {
+          "ref": {
+            "$ref": "#/components/schemas/PartRef"
+          },
+          "qty": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "alternate"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "SynthesisProposal": {
+        "type": "object",
+        "required": [
+          "proposal_id",
+          "draft_id",
+          "cable",
+          "conductors",
+          "endpoints",
+          "shield",
+          "wirelist",
+          "bom",
+          "warnings",
+          "errors",
+          "explain"
+        ],
+        "properties": {
+          "proposal_id": {
+            "type": "string"
+          },
+          "draft_id": {
+            "type": "string"
+          },
+          "cable": {
+            "type": "object",
+            "required": [
+              "primary",
+              "alternates"
+            ],
+            "properties": {
+              "primary": {
+                "$ref": "#/components/schemas/PartRef"
+              },
+              "alternates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PartRef"
+                }
+              }
+            }
+          },
+          "conductors": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "awg": {
+                "type": "integer"
+              },
+              "color_map": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "ribbon": {
+                "type": "object",
+                "required": [
+                  "pitch_in",
+                  "ways",
+                  "red_stripe"
+                ],
+                "properties": {
+                  "pitch_in": {
+                    "type": "number",
+                    "enum": [
+                      0.025,
+                      0.05
+                    ]
+                  },
+                  "ways": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "red_stripe": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "endpoints": {
+            "type": "object",
+            "required": [
+              "endA",
+              "endB"
+            ],
+            "properties": {
+              "endA": {
+                "type": "object",
+                "required": [
+                  "connector",
+                  "termination"
+                ],
+                "properties": {
+                  "connector": {
+                    "$ref": "#/components/schemas/PartRef"
+                  },
+                  "termination": {
+                    "type": "string",
+                    "enum": [
+                      "crimp",
+                      "idc",
+                      "ring_lug",
+                      "solder"
+                    ]
+                  },
+                  "contacts": {
+                    "type": "object",
+                    "required": [
+                      "primary",
+                      "alternates"
+                    ],
+                    "properties": {
+                      "primary": {
+                        "$ref": "#/components/schemas/PartRef"
+                      },
+                      "alternates": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/PartRef"
+                        }
+                      }
+                    }
+                  },
+                  "accessories": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PartRef"
+                    }
+                  }
+                }
+              },
+              "endB": {
+                "type": "object",
+                "required": [
+                  "connector",
+                  "termination"
+                ],
+                "properties": {
+                  "connector": {
+                    "$ref": "#/components/schemas/PartRef"
+                  },
+                  "termination": {
+                    "type": "string",
+                    "enum": [
+                      "crimp",
+                      "idc",
+                      "ring_lug",
+                      "solder"
+                    ]
+                  },
+                  "contacts": {
+                    "type": "object",
+                    "required": [
+                      "primary",
+                      "alternates"
+                    ],
+                    "properties": {
+                      "primary": {
+                        "$ref": "#/components/schemas/PartRef"
+                      },
+                      "alternates": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/PartRef"
+                        }
+                      }
+                    }
+                  },
+                  "accessories": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PartRef"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "shield": {
+            "type": "object",
+            "required": [
+              "type",
+              "drain_policy"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "foil",
+                  "braid",
+                  "foil_braid"
+                ]
+              },
+              "drain_policy": {
+                "type": "string",
+                "enum": [
+                  "isolated",
+                  "fold_back",
+                  "pigtail"
+                ]
+              }
+            }
+          },
+          "wirelist": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WirelistRow"
+            }
+          },
+          "bom": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BomLine"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "explain": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DrcResult": {
+        "type": "object",
+        "required": [
+          "status",
+          "issues",
+          "summary"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warning",
+              "error"
+            ]
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "severity",
+                "message",
+                "location"
+              ],
+              "properties": {
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "info",
+                    "warning",
+                    "error"
+                  ]
+                },
+                "message": {
+                  "type": "string"
+                },
+                "location": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "summary": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

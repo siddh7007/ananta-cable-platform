@@ -8,13 +8,15 @@
     "test": "pnpm -r run test || true",
     "start": "docker compose up --build",
     "prepare": "husky install",
+    "gen:contracts": "cd packages/contracts && pnpm run generate-json && pnpm run generate-types && pnpm run generate-sdk",
     "sdk:gen": "./scripts/gen-sdk.sh",
     "contracts:verify": "./scripts/verify-contracts.sh"
   },
   "workspaces": [
     "apps/*",
     "services/*",
-    "shared/*"
+    "shared/*",
+    "packages/*"
   ],
   "devDependencies": {
     "@types/node": "^20.0.0",

@@ -42,5 +42,18 @@
         DRC
       </a>
     </li>
+    <li>
+      <a
+        href="#/synthesis"
+        aria-current={currentPath === '/synthesis' ? 'page' : undefined}
+        on:click|preventDefault={() => navigate('/synthesis')}
+        style="text-decoration: none; padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; {currentPath ===
+        '/synthesis'
+          ? 'background-color: #e0e0e0;'
+          : ''}"
+      >
+        Synthesis
+      </a>
+    </li>
   </ul>
 </nav>

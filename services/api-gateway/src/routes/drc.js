@@ -64,7 +64,7 @@ const drcRoutes = async (fastify, opts, done) => {
                 );
             });
             // Calculate upstream latency and add span attributes
-            const upstreamLatencyMs = Number(process.hrtime.bigint() - startTime) / 1000000;
+            const upstreamLatencyMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
             const span = trace.getActiveSpan();
             if (span) {
                 span.setAttribute('http.status_code', response.status);

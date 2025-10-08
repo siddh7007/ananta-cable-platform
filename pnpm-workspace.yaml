@@ -3,3 +3,4 @@ packages:
   - 'services/*'
   - 'shared/*'
   - 'shared/libs/*'
+  - 'packages/*'

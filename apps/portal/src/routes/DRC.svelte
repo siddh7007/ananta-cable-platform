@@ -295,7 +295,6 @@
       {result}
       bind:resultsHeading
       isLoading={false}
-      hadError={!!submitError}
       emptyMessage={result.findings.length === 0 ? "No findings — your design passed!" : ""}
     />
   {/if}

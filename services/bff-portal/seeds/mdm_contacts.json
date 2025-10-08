@@ -1,0 +1,42 @@
+[
+  {
+    "mpn": "Molex-0436451001",
+    "family": "Molex Mega-Fit",
+    "connector_family": "Molex Mega-Fit",
+    "termination": "crimp",
+    "awg_range": [14, 16],
+    "plating": "tin",
+    "gender": "male",
+    "status": "active"
+  },
+  {
+    "mpn": "Molex-0436451002",
+    "family": "Molex Mega-Fit",
+    "connector_family": "Molex Mega-Fit",
+    "termination": "crimp",
+    "awg_range": [14, 16],
+    "plating": "gold_flash",
+    "gender": "male",
+    "status": "active"
+  },
+  {
+    "mpn": "Molex-0436451003",
+    "family": "Molex Mega-Fit",
+    "connector_family": "Molex Mega-Fit",
+    "termination": "crimp",
+    "awg_range": [18, 22],
+    "plating": "tin",
+    "gender": "male",
+    "status": "active"
+  },
+  {
+    "mpn": "Molex-0436451004",
+    "family": "Molex Mega-Fit",
+    "connector_family": "Molex Mega-Fit",
+    "termination": "crimp",
+    "awg_range": [18, 22],
+    "plating": "gold_flash",
+    "gender": "male",
+    "status": "active"
+  }
+]

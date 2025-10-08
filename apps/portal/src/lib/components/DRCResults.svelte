@@ -5,7 +5,6 @@
 
   // New props for enhanced states
   export let isLoading: boolean = false;
-  export let hadError: boolean = false;
   export let emptyMessage: string = "No findings — your design passed!";
 
   // Filter state

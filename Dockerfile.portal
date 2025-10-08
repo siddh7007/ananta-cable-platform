@@ -2,6 +2,7 @@ FROM node:20-alpine
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY apps/portal ./apps/portal
+COPY shared ./shared
 RUN corepack enable && pnpm i --filter portal... && pnpm --filter portal build
 EXPOSE 5173
 CMD ["pnpm","--filter","portal","dev","--host","0.0.0.0"]
