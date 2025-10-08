@@ -874,6 +874,8 @@ components:
           type: string
         ruleset_id:
           type: string
+        schema:
+          $ref: '#/components/schemas/AssemblySchema'
 
     DRCApplyFixesRequest:
       type: object
@@ -889,20 +891,60 @@ components:
             type: string
         ruleset_id:
           type: string
+        schema:
+          $ref: '#/components/schemas/AssemblySchema'
 
     DRCApplyFixesResponse:
       type: object
       required:
         - assembly_id
         - schema_hash
+        - schema
         - drc
       properties:
         assembly_id:
           type: string
         schema_hash:
           type: string
+        schema:
+          $ref: '#/components/schemas/AssemblySchema'
         drc:
           $ref: '#/components/schemas/DRCReport'
+
+    AssemblySchema:
+      type: object
+      required:
+        - assembly_id
+        - schema_hash
+        - cable
+        - conductors
+        - endpoints
+        - shield
+        - wirelist
+        - bom
+      properties:
+        assembly_id:
+          type: string
+        schema_hash:
+          type: string
+        cable:
+          type: object
+        conductors:
+          type: object
+        endpoints:
+          type: object
+        shield:
+          type: object
+        wirelist:
+          type: array
+          items:
+            type: object
+        bom:
+          type: array
+          items:
+            type: object
+        labels:
+          type: object
 
     DRCFinding:
       type: object

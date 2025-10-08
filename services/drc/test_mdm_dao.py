@@ -14,7 +14,7 @@ class TestMDMDAO:
         assert len(results) > 0
         cable = results[0]
         assert cable['conductor_count'] == 10
-        assert cable['pitch_in'] == 0.05
+        assert float(cable['pitch_in']) == 0.05
         assert cable['type'] == 'ribbon'
 
     def test_find_ribbon_by_40_way_025_pitch(self, dao):
@@ -23,7 +23,7 @@ class TestMDMDAO:
         assert len(results) > 0
         cable = results[0]
         assert cable['conductor_count'] == 40
-        assert cable['pitch_in'] == 0.025
+        assert float(cable['pitch_in']) == 0.025
 
     def test_find_round_cable_by_2_conductor_14_awg(self, dao):
         """Test finding 2-conductor 14 AWG round shielded cables."""

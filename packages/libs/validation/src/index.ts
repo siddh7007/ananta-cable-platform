@@ -30,6 +30,14 @@ export const validators = {
   AssemblyDraftResponse: ajv.compile(schemas.AssemblyDraftResponse),
   NotesPack: ajv.compile(schemas.NotesPack),
   LocaleColors: ajv.compile(schemas.LocaleColors),
+  DRCRuleset: ajv.compile(schemas.DRCRuleset),
+  DRCRulesetsResponse: ajv.compile(schemas.DRCRulesetsResponse),
+  DRCRunRequest: ajv.compile(schemas.DRCRunRequest),
+  DRCApplyFixesRequest: ajv.compile(schemas.DRCApplyFixesRequest),
+  DRCApplyFixesResponse: ajv.compile(schemas.DRCApplyFixesResponse),
+  DRCFinding: ajv.compile(schemas.DRCFinding),
+  DRCFix: ajv.compile(schemas.DRCFix),
+  DRCReport: ajv.compile(schemas.DRCReport),
 } as const;
 
 export type Validators = typeof validators;

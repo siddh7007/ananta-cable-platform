@@ -1,6 +1,9 @@
+import { createRequire } from "module";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-
+const require = createRequire(import.meta.url);
+const cableDesignSchema = require("../../contracts/schemas/v1/cable-design.schema.json");
+const drcResultSchema = require("../../contracts/schemas/v1/drc-result.schema.json");
 let _ajv = null;
 export function getAjv() {
     if (_ajv)
@@ -32,7 +35,9 @@ export function getAjv() {
     catch {
         // Ignore errors from addFormats - some formats may not be available
     }
-    // Schemas are now defined inline in validation files
+    // Add schemas for Fastify $ref usage
+    ajv.addSchema(cableDesignSchema, 'cable-design.json');
+    ajv.addSchema(drcResultSchema, 'drc-result.json');
     _ajv = ajv;
     return ajv;
 }

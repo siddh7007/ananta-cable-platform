@@ -55,6 +55,9 @@ importers:
       '@cable-platform/client-sdk':
         specifier: workspace:*
         version: link:../../shared/libs/client-sdk
+      '@cable-platform/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@cable-platform/validation':
         specifier: workspace:*
         version: link:../../shared/libs/validation

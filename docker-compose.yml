@@ -44,8 +44,9 @@ services:
     environment:
       PORT: 8000
       BFF_DATABASE_URL: "postgresql://postgres:${SUPABASE_POSTGRES_PASSWORD:-postgres}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-appdb}"
+      MDM_DATABASE_URL: "postgresql://${PG_EXTRA_USER:-postgres}:${PG_EXTRA_PASSWORD:-postgres}@pg-extra:5432/${PG_EXTRA_DB:-extradb}"
     ports: ["8000:8000"]
-    depends_on: [supabase-db]
+    depends_on: [supabase-db, pg-extra]
     restart: unless-stopped
 
   otel-collector:

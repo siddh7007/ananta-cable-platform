@@ -123,18 +123,33 @@ export interface DRCRulesetsResponse {
 export interface DRCRunRequest {
   assembly_id: string;
   ruleset_id?: string;
+  schema?: AssemblySchema;
 }
 
 export interface DRCApplyFixesRequest {
   assembly_id: string;
   fix_ids: string[];
   ruleset_id?: string;
+  schema?: AssemblySchema;
 }
 
 export interface DRCApplyFixesResponse {
   assembly_id: string;
   schema_hash: string;
+  schema: AssemblySchema;
   drc: DRCReport;
+}
+
+export interface AssemblySchema {
+  assembly_id: string;
+  schema_hash: string;
+  cable: Record<string, any>;
+  conductors: Record<string, any>;
+  endpoints: Record<string, any>;
+  shield: Record<string, any>;
+  wirelist: Record<string, any>[];
+  bom: Record<string, any>[];
+  labels?: Record<string, any>;
 }
 
 export interface DRCFinding {

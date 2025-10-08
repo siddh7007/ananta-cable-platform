@@ -247,6 +247,7 @@ def test_missing_label_offset_gets_fix(engine: DRCEngine):
     assert fix is not None
     assert fix.effect == "non_destructive"
 
-    new_hash, fixed_report = engine.apply_fixes(assembly, ["FIX_LABEL_OFFSET_DEFAULT"])
-    assert isinstance(new_hash, str) and new_hash
+    updated_schema, fixed_report = engine.apply_fixes(assembly, ["FIX_LABEL_OFFSET_DEFAULT"])
+    assert isinstance(updated_schema.schema_hash, str) and updated_schema.schema_hash
+    assert updated_schema.labels and updated_schema.labels.get("offset_mm") == 30
     assert all(f.code != "LABEL_OFFSET_MISSING" for f in fixed_report.findings)

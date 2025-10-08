@@ -233,8 +233,8 @@ class DrcEngine:
             # Fallback to simple check
             if proposal.conductors.awg and proposal.conductors.awg > 30:
                 issues.append(DrcIssue(
-                    type=DrcIssueType.ELECTRICAL_RATING,
-                    severity=DrcSeverity.WARNING,
+                    type="electrical_rating",
+                    severity="warning",
                     message=f"AWG {proposal.conductors.awg} may be too small for typical currents",
                     location="conductors.awg",
                     suggestion="Consider larger AWG for better current carrying capacity"
@@ -280,8 +280,8 @@ class DrcEngine:
         # Simplified: if EMI shield is required but no shield specified
         if proposal.shield.type != "none" and not proposal.shield.drain_policy:
             issues.append(DrcIssue(
-                type=DrcIssueType.SHIELDING_REQUIREMENT,
-                severity=DrcSeverity.WARNING,
+                type="shielding_requirement",
+                severity="warning",
                 message=f"Shield type '{proposal.shield.type}' requires drain policy specification",
                 location="shield.drain_policy",
                 suggestion="Specify appropriate drain policy (chassis, pigtail, etc.)"

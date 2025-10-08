@@ -106,7 +106,7 @@ class DRCEngine:
         assembly: AssemblySchema,
         fix_ids: List[str],
         ruleset_id: Optional[str] = None,
-    ) -> Tuple[str, DRCReport]:
+    ) -> Tuple[AssemblySchema, DRCReport]:
         assembly = self._ensure_schema(assembly)
         working = deepcopy(assembly.model_dump(mode="python"))
 
@@ -134,7 +134,7 @@ class DRCEngine:
         self.remember(updated)
 
         report = self.run_drc(updated, ruleset_id)
-        return schema_hash, report
+        return updated, report
 
     # ---------------------------------------------------------------------
     # Mechanical domain

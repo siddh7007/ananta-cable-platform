@@ -6,8 +6,12 @@ from models import PartRef
 
 class MDMDAO:
     def __init__(self):
-        # Connect to BFF database
-        self.db_url = os.getenv('BFF_DATABASE_URL', 'postgresql://user:password@localhost:5432/cable_platform')
+        # Connect to PG Extra database for MDM tables
+        # Falls back to BFF database if MDM_DATABASE_URL not set
+        self.db_url = os.getenv(
+            'MDM_DATABASE_URL',
+            os.getenv('BFF_DATABASE_URL', 'postgresql://postgres:postgres@pg-extra:5432/extradb')
+        )
 
     def _get_connection(self):
         return psycopg2.connect(self.db_url)

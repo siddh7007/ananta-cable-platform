@@ -46,17 +46,20 @@ class RulesetsResponse(BaseModel):
 class DRCRunRequest(BaseModel):
     assembly_id: str
     ruleset_id: Optional[str] = None
+    schema: Optional["AssemblySchema"] = None
 
 # DRC Apply Fixes request
 class DRCApplyFixesRequest(BaseModel):
     assembly_id: str
     fix_ids: List[str]
     ruleset_id: Optional[str] = None
+    schema: Optional["AssemblySchema"] = None
 
 # DRC Apply Fixes response
 class DRCApplyFixesResponse(BaseModel):
     assembly_id: str
     schema_hash: str
+    schema: dict
     drc: DRCReport
 
 # Assembly Schema - for testing (direct input)
@@ -71,3 +74,6 @@ class AssemblySchema(BaseModel):
     wirelist: List[dict]
     bom: List[dict]
     labels: Optional[dict] = None
+
+DRCRunRequest.model_rebuild()
+DRCApplyFixesRequest.model_rebuild()
