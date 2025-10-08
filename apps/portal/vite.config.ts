@@ -7,8 +7,7 @@ export default defineConfig({
   plugins: [svelte({ preprocess: sveltePreprocess() })],
   resolve: {
     alias: {
-      '$lib': path.resolve('./src/lib'),
-      '$app': path.resolve('./node_modules/@sveltejs/kit')
+      '$lib': path.resolve('./src/lib')
     }
   },
   server: { host: true, port: 5173 }
