@@ -35,12 +35,36 @@ function initializeContext(
   dsl: RenderDSL,
   template: TemplatePackManifest
 ): RenderContext {
-  const { width_mm, height_mm } = template.dimensions;
+  // Handle both old and new dimension formats
+  const width_mm = template.dimensions.width_mm || template.dimensions.width || 420;
+  const height_mm = template.dimensions.height_mm || template.dimensions.height || 297;
   const { top, right, bottom, left } = template.margins;
+
+  // Provide default styles if not present
+  const defaultStyles = {
+    lineWidth: template.strokes?.medium || 0.6,
+    fontSize: 10,
+    font: template.fonts?.[0] || 'Inter',
+    colors: {
+      primary: '#000000',
+      secondary: '#666666',
+      accent: '#0066cc',
+    },
+  };
+
+  const styles = template.styles || defaultStyles;
 
   return {
     dsl,
-    template,
+    template: {
+      ...template,
+      styles,
+      dimensions: {
+        ...template.dimensions,
+        width_mm,
+        height_mm,
+      },
+    },
     viewport: {
       width: width_mm,
       height: height_mm,

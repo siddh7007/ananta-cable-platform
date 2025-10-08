@@ -1,6 +1,42 @@
 // API types for the Cable Platform frontend
 // These should eventually be generated from OpenAPI schemas
 
+// Rendering types
+export type RenderFormat = 'svg' | 'pdf';
+
+export interface TemplatePack {
+  id: string;
+  version: string;
+  name?: string;
+  paper: string;
+}
+
+export interface RenderRequest {
+  assembly_id: string;
+  template_pack_id: string;
+  format?: RenderFormat;
+  inline?: boolean;
+  revision?: string;
+}
+
+export interface RenderManifest {
+  assembly_id: string;
+  revision: string;
+  template_pack_id: string;
+  template_pack_version: string;
+  renderer_version: string;
+  schema_hash: string;
+  format: RenderFormat;
+  timestamp: string;
+}
+
+export interface RenderResponse {
+  url?: string;
+  svg_content?: string;
+  manifest: RenderManifest;
+  cached: boolean;
+}
+
 // DRC types (matching OpenAPI schemas from packages/contracts/openapi.yaml)
 export type DrcSeverity = 'info' | 'warning' | 'error';
 export type DrcStatus = 'pass' | 'warning' | 'error';

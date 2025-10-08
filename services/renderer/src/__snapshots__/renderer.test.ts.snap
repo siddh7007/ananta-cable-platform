@@ -6,6 +6,7 @@ exports[`Renderer > Broken Dimension > renders broken dimension glyph when neede
   <metadata>
     <assembly id="asm_broken_dim" schema="hash_broken"/>
     <template id="basic-a3" version="1.0.0"/>
+    <paper size="A3" width="420mm" height="297mm"/>
   </metadata>
   <defs>
     <marker id="pin1-tri" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
@@ -13,12 +14,15 @@ exports[`Renderer > Broken Dimension > renders broken dimension glyph when neede
     </marker>
   </defs>
   <style>
-    .connector { fill: none; stroke: black; stroke-width: 0.35; }
-    .wire { fill: none; stroke-width: 0.25; }
-    .dimension { fill: none; stroke: black; stroke-width: 0.2; }
+    .connector { fill: none; stroke: black; stroke-width: 0.6; }
+    .wire { fill: none; stroke-width: 0.4; }
+    .dimension { fill: none; stroke: black; stroke-width: 0.4; }
     .text { font-family: DIN-Regular; font-size: 3.5px; fill: black; }
     .label { font-size: 2.8000000000000003px; }
   </style>
+  <!-- Fixed Template Elements -->
+  <g id="template-fixed-layer">
+  </g>
   <!-- Connectors -->
   <rect id="asm_broken_dim-endA" class="connector" x="60.00" y="136.00" width="20.00" height="15.00"/>
   <rect id="asm_broken_dim-endB" class="connector" x="340.00" y="136.00" width="20.00" height="15.00"/>
@@ -50,6 +54,7 @@ exports[`Renderer > Ribbon Cable with IDC > renders 12-way ribbon with red strip
   <metadata>
     <assembly id="asm_ribbon_12way" schema="hash123abc"/>
     <template id="basic-a3" version="1.0.0"/>
+    <paper size="A3" width="420mm" height="297mm"/>
   </metadata>
   <defs>
     <marker id="pin1-tri" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
@@ -60,12 +65,15 @@ exports[`Renderer > Ribbon Cable with IDC > renders 12-way ribbon with red strip
     </pattern>
   </defs>
   <style>
-    .connector { fill: none; stroke: black; stroke-width: 0.35; }
-    .wire { fill: none; stroke-width: 0.25; }
-    .dimension { fill: none; stroke: black; stroke-width: 0.2; }
+    .connector { fill: none; stroke: black; stroke-width: 0.6; }
+    .wire { fill: none; stroke-width: 0.4; }
+    .dimension { fill: none; stroke: black; stroke-width: 0.4; }
     .text { font-family: DIN-Regular; font-size: 3.5px; fill: black; }
     .label { font-size: 2.8000000000000003px; }
   </style>
+  <!-- Fixed Template Elements -->
+  <g id="template-fixed-layer">
+  </g>
   <!-- Connectors -->
   <rect id="asm_ribbon_12way-endA" class="connector" x="60.00" y="136.00" width="20.00" height="15.00"/>
   <rect id="asm_ribbon_12way-endB" class="connector" x="340.00" y="136.00" width="20.00" height="15.00"/>
@@ -110,6 +118,7 @@ exports[`Renderer > Round Cable with Labels > renders 2-conductor power cable wi
   <metadata>
     <assembly id="asm_power_2cond" schema="hash789ghi"/>
     <template id="basic-a3" version="1.0.0"/>
+    <paper size="A3" width="420mm" height="297mm"/>
   </metadata>
   <defs>
     <marker id="pin1-tri" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
@@ -117,12 +126,15 @@ exports[`Renderer > Round Cable with Labels > renders 2-conductor power cable wi
     </marker>
   </defs>
   <style>
-    .connector { fill: none; stroke: black; stroke-width: 0.35; }
-    .wire { fill: none; stroke-width: 0.25; }
-    .dimension { fill: none; stroke: black; stroke-width: 0.2; }
+    .connector { fill: none; stroke: black; stroke-width: 0.6; }
+    .wire { fill: none; stroke-width: 0.4; }
+    .dimension { fill: none; stroke: black; stroke-width: 0.4; }
     .text { font-family: DIN-Regular; font-size: 3.5px; fill: black; }
     .label { font-size: 2.8000000000000003px; }
   </style>
+  <!-- Fixed Template Elements -->
+  <g id="template-fixed-layer">
+  </g>
   <!-- Connectors -->
   <rect id="asm_power_2cond-endA" class="connector" x="60.00" y="136.00" width="20.00" height="15.00"/>
   <rect id="asm_power_2cond-endB" class="connector" x="340.00" y="136.00" width="20.00" height="15.00"/>
@@ -147,5 +159,247 @@ exports[`Renderer > Round Cable with Labels > renders 2-conductor power cable wi
   <!-- QR Code -->
   <rect id="asm_power_2cond-qr" x="390.00" y="267.00" width="20" height="20" fill="white" stroke="black" stroke-width="0.2"/>
   <text x="400.00" y="279.00" class="text label" text-anchor="middle" font-size="2">QR</text>
+</svg>"
+`;
+
+exports[`Renderer > Template Pack Switching > renders with STD-A3-IPC620 template pack > a3-template 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297">
+  <metadata>
+    <assembly id="asm_a3_test" schema="hash_a3"/>
+    <template id="STD-A3-IPC620" version="1.1.0"/>
+    <paper size="A3" width="420mm" height="297mm"/>
+  </metadata>
+  <defs>
+    <marker id="pin1-tri" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+      <path d="M 0,0 L 4,2 L 0,4 Z" fill="black"/>
+    </marker>
+    <pattern id="red-stripe" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect width="1" height="2" fill="red"/>
+    </pattern>
+  </defs>
+  <style>
+    .connector { fill: none; stroke: black; stroke-width: 0.6; }
+    .wire { fill: none; stroke-width: 0.4; }
+    .dimension { fill: none; stroke: black; stroke-width: 0.4; }
+    .text { font-family: Inter; font-size: 10px; fill: black; }
+    .label { font-size: 8px; }
+  </style>
+  <!-- Fixed Template Elements -->
+  <g id="template-fixed-layer">
+    <g id="titleblock" transform="translate(225.00, 222.00)">
+      <!-- Title block for A3 drawings -->
+
+  <g id="titleblock">
+    <!-- Outer border -->
+    <rect x="1" y="1" width="178" height="58" fill="white" stroke="black" stroke-width="0.8"/>
+    
+    <!-- Horizontal dividers -->
+    <line x1="1" y1="15" x2="179" y2="15" stroke="black" stroke-width="0.4"/>
+    <line x1="1" y1="30" x2="179" y2="30" stroke="black" stroke-width="0.4"/>
+    <line x1="1" y1="45" x2="179" y2="45" stroke="black" stroke-width="0.4"/>
+    
+    <!-- Vertical dividers -->
+    <line x1="90" y1="1" x2="90" y2="59" stroke="black" stroke-width="0.4"/>
+    
+    <!-- Field labels -->
+    <text x="5" y="11" font-family="Inter" font-size="8" font-weight="bold" fill="black">TITLE:</text>
+    <text x="5" y="26" font-family="Inter" font-size="8" font-weight="bold" fill="black">PART NO:</text>
+    <text x="5" y="41" font-family="Inter" font-size="8" font-weight="bold" fill="black">REV:</text>
+    <text x="5" y="56" font-family="Inter" font-size="8" font-weight="bold" fill="black">DATE:</text>
+    
+    <text x="95" y="11" font-family="Inter" font-size="8" font-weight="bold" fill="black">DRAWN BY:</text>
+    <text x="95" y="26" font-family="Inter" font-size="8" font-weight="bold" fill="black">CHECKED BY:</text>
+    <text x="95" y="41" font-family="Inter" font-size="8" font-weight="bold" fill="black">APPROVED BY:</text>
+    <text x="95" y="56" font-family="Inter" font-size="8" font-weight="bold" fill="black">SHEET:</text>
+    
+    <!-- Standard compliance note -->
+    <text x="90" y="72" text-anchor="middle" font-family="Inter" font-size="6" fill="black">IPC/WHMA-A-620 Class 2</text>
+  </g>
+    </g>
+    <g id="notes-table" transform="translate(15.00, 182.00)">
+      <!-- Notes table for manufacturing instructions -->
+
+  <g id="notes-table">
+    <!-- Outer border -->
+    <rect x="1" y="1" width="198" height="98" fill="white" stroke="black" stroke-width="0.8"/>
+    
+    <!-- Header -->
+    <rect x="1" y="1" width="198" height="15" fill="#f0f0f0" stroke="black" stroke-width="0.6"/>
+    <text x="100" y="11" text-anchor="middle" font-family="Inter" font-size="10" font-weight="bold" fill="black">NOTES</text>
+    
+    <!-- Table headers -->
+    <line x1="1" y1="16" x2="199" y2="16" stroke="black" stroke-width="0.4"/>
+    <line x1="25" y1="16" x2="25" y2="99" stroke="black" stroke-width="0.4"/>
+    
+    <text x="5" y="28" font-family="Inter" font-size="8" font-weight="bold" fill="black">NO.</text>
+    <text x="30" y="28" font-family="Inter" font-size="8" font-weight="bold" fill="black">DESCRIPTION</text>
+    
+    <!-- Note rows -->
+    <line x1="1" y1="32" x2="199" y2="32" stroke="black" stroke-width="0.4"/>
+    <text x="5" y="44" font-family="Inter" font-size="7" fill="black">1</text>
+    <text x="30" y="44" font-family="DejaVuSansMono" font-size="7" fill="black">All conductors: Strip 6mm ± 0.5mm</text>
+    
+    <line x1="1" y1="48" x2="199" y2="48" stroke="black" stroke-width="0.4"/>
+    <text x="5" y="60" font-family="Inter" font-size="7" fill="black">2</text>
+    <text x="30" y="60" font-family="DejaVuSansMono" font-size="7" fill="black">Crimp force: Follow MFG datasheet</text>
+    
+    <line x1="1" y1="64" x2="199" y2="64" stroke="black" stroke-width="0.4"/>
+    <text x="5" y="76" font-family="Inter" font-size="7" fill="black">3</text>
+    <text x="30" y="76" font-family="DejaVuSansMono" font-size="7" fill="black">Test continuity before final assembly</text>
+    
+    <line x1="1" y1="80" x2="199" y2="80" stroke="black" stroke-width="0.4"/>
+    <text x="5" y="92" font-family="Inter" font-size="7" fill="black">4</text>
+    <text x="30" y="92" font-family="DejaVuSansMono" font-size="7" fill="black">Apply label after inspection</text>
+  </g>
+    </g>
+  </g>
+  <!-- Connectors -->
+  <rect id="asm_a3_test-endA" class="connector" x="55.00" y="141.00" width="20.00" height="15.00"/>
+  <rect id="asm_a3_test-endB" class="connector" x="345.00" y="141.00" width="20.00" height="15.00"/>
+  <!-- Pin-1 Indicators -->
+  <circle id="asm_a3_test-pin1-L" cx="52.00" cy="143.00" r="1" fill="black"/>
+  <circle id="asm_a3_test-pin1-R" cx="368.00" cy="143.00" r="1" fill="black"/>
+  <!-- Wires -->
+  <path id="asm_a3_test-net-D0" class="wire" d="M 75.00,144.06 L 345.00,144.06" stroke="black"/>
+  <path id="asm_a3_test-net-D1" class="wire" d="M 75.00,145.33 L 345.00,145.33" stroke="black"/>
+  <path id="asm_a3_test-net-D2" class="wire" d="M 75.00,146.59 L 345.00,146.59" stroke="black"/>
+  <path id="asm_a3_test-net-D3" class="wire" d="M 75.00,147.87 L 345.00,147.87" stroke="black"/>
+  <path id="asm_a3_test-net-D4" class="wire" d="M 75.00,149.14 L 345.00,149.14" stroke="black"/>
+  <path id="asm_a3_test-net-D5" class="wire" d="M 75.00,150.41 L 345.00,150.41" stroke="black"/>
+  <path id="asm_a3_test-net-D6" class="wire" d="M 75.00,151.68 L 345.00,151.68" stroke="black"/>
+  <path id="asm_a3_test-net-D7" class="wire" d="M 75.00,152.94 L 345.00,152.94" stroke="black"/>
+  <!-- Red Stripe -->
+  <rect id="asm_a3_test-red-stripe" x="75.00" y="144.06" width="270.00" height="1" fill="url(#red-stripe)"/>
+  <!-- Dimensions -->
+  <g id="asm_a3_test-dim-oal" class="dimension">
+    <line x1="55.00" y1="183.50" x2="365.00" y2="183.50"/>
+    <line x1="55.00" y1="178.50" x2="55.00" y2="185.50"/>
+    <line x1="365.00" y1="178.50" x2="365.00" y2="185.50"/>
+    <text x="210.00" y="181.50" class="text" text-anchor="middle">1000 ±5 mm</text>
+  </g>
+  <!-- Notes -->
+  <text x="15.00" y="287.00" class="text label">Notes: IPC-620-CLASS-2</text>
+</svg>"
+`;
+
+exports[`Renderer > Template Pack Switching > renders with STD-Letter-IPC620 template pack > letter-template 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="279.4mm" height="215.9mm" viewBox="0 0 279.4 215.9">
+  <metadata>
+    <assembly id="asm_letter_test" schema="hash_letter"/>
+    <template id="STD-Letter-IPC620" version="1.0.0"/>
+    <paper size="Letter" width="279.4mm" height="215.9mm"/>
+  </metadata>
+  <defs>
+    <marker id="pin1-tri" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+      <path d="M 0,0 L 4,2 L 0,4 Z" fill="black"/>
+    </marker>
+    <pattern id="red-stripe" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect width="1" height="2" fill="red"/>
+    </pattern>
+  </defs>
+  <style>
+    .connector { fill: none; stroke: black; stroke-width: 0.5; }
+    .wire { fill: none; stroke-width: 0.35; }
+    .dimension { fill: none; stroke: black; stroke-width: 0.35; }
+    .text { font-family: Inter; font-size: 10px; fill: black; }
+    .label { font-size: 8px; }
+  </style>
+  <!-- Fixed Template Elements -->
+  <g id="template-fixed-layer">
+    <g id="titleblock" transform="translate(87.40, 143.90)">
+      <!-- Title block for US Letter drawings (slightly smaller) -->
+
+  <g id="titleblock">
+    <!-- Outer border -->
+    <rect x="1" y="1" width="158" height="53" fill="white" stroke="black" stroke-width="0.7"/>
+    
+    <!-- Horizontal dividers -->
+    <line x1="1" y1="14" x2="159" y2="14" stroke="black" stroke-width="0.35"/>
+    <line x1="1" y1="27" x2="159" y2="27" stroke="black" stroke-width="0.35"/>
+    <line x1="1" y1="40" x2="159" y2="40" stroke="black" stroke-width="0.35"/>
+    
+    <!-- Vertical dividers -->
+    <line x1="80" y1="1" x2="80" y2="54" stroke="black" stroke-width="0.35"/>
+    
+    <!-- Field labels -->
+    <text x="4" y="10" font-family="Inter" font-size="7" font-weight="bold" fill="black">TITLE:</text>
+    <text x="4" y="23" font-family="Inter" font-size="7" font-weight="bold" fill="black">PART NO:</text>
+    <text x="4" y="36" font-family="Inter" font-size="7" font-weight="bold" fill="black">REV:</text>
+    <text x="4" y="49" font-family="Inter" font-size="7" font-weight="bold" fill="black">DATE:</text>
+    
+    <text x="84" y="10" font-family="Inter" font-size="7" font-weight="bold" fill="black">DRAWN BY:</text>
+    <text x="84" y="23" font-family="Inter" font-size="7" font-weight="bold" fill="black">CHECKED BY:</text>
+    <text x="84" y="36" font-family="Inter" font-size="7" font-weight="bold" fill="black">APPROVED BY:</text>
+    <text x="84" y="49" font-family="Inter" font-size="7" font-weight="bold" fill="black">SHEET:</text>
+    
+    <!-- Standard compliance note -->
+    <text x="80" y="66" text-anchor="middle" font-family="Inter" font-size="5.5" fill="black">IPC/WHMA-A-620 Class 2</text>
+  </g>
+    </g>
+    <g id="notes-table" transform="translate(12.00, 103.90)">
+      <!-- Notes table for US Letter (slightly smaller) -->
+
+  <g id="notes-table">
+    <!-- Outer border -->
+    <rect x="1" y="1" width="178" height="88" fill="white" stroke="black" stroke-width="0.7"/>
+    
+    <!-- Header -->
+    <rect x="1" y="1" width="178" height="13" fill="#f0f0f0" stroke="black" stroke-width="0.5"/>
+    <text x="90" y="10" text-anchor="middle" font-family="Inter" font-size="9" font-weight="bold" fill="black">NOTES</text>
+    
+    <!-- Table headers -->
+    <line x1="1" y1="14" x2="179" y2="14" stroke="black" stroke-width="0.35"/>
+    <line x1="22" y1="14" x2="22" y2="89" stroke="black" stroke-width="0.35"/>
+    
+    <text x="4" y="25" font-family="Inter" font-size="7" font-weight="bold" fill="black">NO.</text>
+    <text x="26" y="25" font-family="Inter" font-size="7" font-weight="bold" fill="black">DESCRIPTION</text>
+    
+    <!-- Note rows -->
+    <line x1="1" y1="28" x2="179" y2="28" stroke="black" stroke-width="0.35"/>
+    <text x="4" y="39" font-family="Inter" font-size="6.5" fill="black">1</text>
+    <text x="26" y="39" font-family="DejaVuSansMono" font-size="6.5" fill="black">All conductors: Strip 6mm ± 0.5mm</text>
+    
+    <line x1="1" y1="43" x2="179" y2="43" stroke="black" stroke-width="0.35"/>
+    <text x="4" y="54" font-family="Inter" font-size="6.5" fill="black">2</text>
+    <text x="26" y="54" font-family="DejaVuSansMono" font-size="6.5" fill="black">Crimp force: Follow MFG datasheet</text>
+    
+    <line x1="1" y1="58" x2="179" y2="58" stroke="black" stroke-width="0.35"/>
+    <text x="4" y="69" font-family="Inter" font-size="6.5" fill="black">3</text>
+    <text x="26" y="69" font-family="DejaVuSansMono" font-size="6.5" fill="black">Test continuity before final assembly</text>
+    
+    <line x1="1" y1="73" x2="179" y2="73" stroke="black" stroke-width="0.35"/>
+    <text x="4" y="84" font-family="Inter" font-size="6.5" fill="black">4</text>
+    <text x="26" y="84" font-family="DejaVuSansMono" font-size="6.5" fill="black">Apply label after inspection</text>
+  </g>
+    </g>
+  </g>
+  <!-- Connectors -->
+  <rect id="asm_letter_test-endA" class="connector" x="52.00" y="100.45" width="20.00" height="15.00"/>
+  <rect id="asm_letter_test-endB" class="connector" x="207.40" y="100.45" width="20.00" height="15.00"/>
+  <!-- Pin-1 Indicators -->
+  <circle id="asm_letter_test-pin1-L" cx="49.00" cy="102.45" r="1" fill="black"/>
+  <circle id="asm_letter_test-pin1-R" cx="230.40" cy="102.45" r="1" fill="black"/>
+  <!-- Wires -->
+  <path id="asm_letter_test-net-D0" class="wire" d="M 72.00,103.50 L 207.40,103.50" stroke="black"/>
+  <path id="asm_letter_test-net-D1" class="wire" d="M 72.00,104.77 L 207.40,104.77" stroke="black"/>
+  <path id="asm_letter_test-net-D2" class="wire" d="M 72.00,106.05 L 207.40,106.05" stroke="black"/>
+  <path id="asm_letter_test-net-D3" class="wire" d="M 72.00,107.31 L 207.40,107.31" stroke="black"/>
+  <path id="asm_letter_test-net-D4" class="wire" d="M 72.00,108.58 L 207.40,108.58" stroke="black"/>
+  <path id="asm_letter_test-net-D5" class="wire" d="M 72.00,109.85 L 207.40,109.85" stroke="black"/>
+  <path id="asm_letter_test-net-D6" class="wire" d="M 72.00,111.13 L 207.40,111.13" stroke="black"/>
+  <path id="asm_letter_test-net-D7" class="wire" d="M 72.00,112.39 L 207.40,112.39" stroke="black"/>
+  <!-- Red Stripe -->
+  <rect id="asm_letter_test-red-stripe" x="72.00" y="103.50" width="135.40" height="1" fill="url(#red-stripe)"/>
+  <!-- Dimensions -->
+  <g id="asm_letter_test-dim-oal" class="dimension">
+    <line x1="52.00" y1="142.95" x2="227.40" y2="142.95"/>
+    <line x1="52.00" y1="137.95" x2="52.00" y2="144.95"/>
+    <line x1="227.40" y1="137.95" x2="227.40" y2="144.95"/>
+    <text x="139.70" y="140.95" class="text" text-anchor="middle">800 ±5 mm</text>
+  </g>
+  <!-- Notes -->
+  <text x="12.00" y="205.90" class="text label">Notes: IPC-620-CLASS-2</text>
 </svg>"
 `;

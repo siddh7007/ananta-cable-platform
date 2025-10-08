@@ -1,0 +1,27 @@
+{
+  "id": "STD-Letter-IPC620",
+  "version": "1.0.0",
+  "paper": "Letter",
+  "dimensions": {
+    "width": 279.4,
+    "height": 215.9,
+    "unit": "mm"
+  },
+  "margins": {
+    "left": 12,
+    "right": 12,
+    "top": 12,
+    "bottom": 12
+  },
+  "fonts": [
+    "Inter",
+    "DejaVuSansMono"
+  ],
+  "strokes": {
+    "thin": 0.35,
+    "medium": 0.5,
+    "thick": 0.7
+  },
+  "titleblock": "symbols/titleblock.svg",
+  "notes": "symbols/notes-table.svg"
+}

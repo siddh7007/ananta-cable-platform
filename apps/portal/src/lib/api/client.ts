@@ -1,5 +1,11 @@
 import { CablePlatformClient, type ApiResponse } from '@cable-platform/client-sdk';
-import type { SynthesisProposal, DrcReport } from '../types/api';
+import type { 
+  SynthesisProposal, 
+  DrcReport,
+  TemplatePack,
+  RenderRequest,
+  RenderResponse
+} from '../types/api';
 
 // Configure SDK with base URL
 const BASE_URL = (import.meta as { env?: Record<string, string> }).env?.VITE_API_BASE_URL ?? 'http://localhost:8080';
@@ -85,6 +91,36 @@ class ApiClient {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fixIds })
+      });
+      if (!response.ok) {
+        return { ok: false, error: `HTTP ${response.status}` };
+      }
+      const data = await response.json();
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
+    }
+  }
+
+  async listTemplatePacks(): Promise<ApiResponse<TemplatePack[]>> {
+    try {
+      const response = await fetch(`${BASE_URL}/v1/template-packs`);
+      if (!response.ok) {
+        return { ok: false, error: `HTTP ${response.status}` };
+      }
+      const data = await response.json();
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
+    }
+  }
+
+  async renderAssembly(request: RenderRequest): Promise<ApiResponse<RenderResponse>> {
+    try {
+      const response = await fetch(`${BASE_URL}/v1/render`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
       });
       if (!response.ok) {
         return { ok: false, error: `HTTP ${response.status}` };

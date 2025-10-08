@@ -1,4 +1,5 @@
 import { RenderContext } from '../types.js';
+import { getSymbol } from './template-loader.js';
 
 /**
  * Generate deterministic SVG from render context
@@ -22,6 +23,7 @@ export function generateSVG(ctx: RenderContext): string {
   elements.push(`  <metadata>`);
   elements.push(`    <assembly id="${assemblyId}" schema="${dsl.meta.schema_hash}"/>`);
   elements.push(`    <template id="${template.id}" version="${template.version}"/>`);
+  elements.push(`    <paper size="${template.paper}" width="${template.dimensions.width_mm}mm" height="${template.dimensions.height_mm}mm"/>`);
   elements.push(`  </metadata>`);
 
   // Defs for reusable elements
@@ -41,14 +43,42 @@ export function generateSVG(ctx: RenderContext): string {
   
   elements.push(`  </defs>`);
 
-  // Styles
+  // Styles (use template strokes)
+  const strokes = template.strokes || { thin: 0.4, medium: 0.6, thick: 0.8 };
+  const styles = template.styles || { font: 'Inter', fontSize: 10, lineWidth: 0.6, colors: { primary: '#000', secondary: '#666', accent: '#00f' } };
   elements.push(`  <style>`);
-  elements.push(`    .connector { fill: none; stroke: black; stroke-width: ${template.styles.lineWidth}; }`);
-  elements.push(`    .wire { fill: none; stroke-width: 0.25; }`);
-  elements.push(`    .dimension { fill: none; stroke: black; stroke-width: 0.2; }`);
-  elements.push(`    .text { font-family: ${template.styles.font}; font-size: ${template.styles.fontSize}px; fill: black; }`);
-  elements.push(`    .label { font-size: ${template.styles.fontSize * 0.8}px; }`);
+  elements.push(`    .connector { fill: none; stroke: black; stroke-width: ${strokes.medium}; }`);
+  elements.push(`    .wire { fill: none; stroke-width: ${strokes.thin}; }`);
+  elements.push(`    .dimension { fill: none; stroke: black; stroke-width: ${strokes.thin}; }`);
+  elements.push(`    .text { font-family: ${styles.font}; font-size: ${styles.fontSize}px; fill: black; }`);
+  elements.push(`    .label { font-size: ${styles.fontSize * 0.8}px; }`);
   elements.push(`  </style>`);
+
+  // Fixed layers: Title block and Notes table
+  elements.push(`  <!-- Fixed Template Elements -->`);
+  elements.push(`  <g id="template-fixed-layer">`);
+  
+  // Title block (bottom right corner)
+  const titleblockSymbol = getSymbol(template, 'titleblock');
+  if (titleblockSymbol) {
+    const titleblockX = viewport.width - 180 - template.margins.right;
+    const titleblockY = viewport.height - 60 - template.margins.bottom;
+    elements.push(`    <g id="titleblock" transform="translate(${norm(titleblockX)}, ${norm(titleblockY)})">`);
+    elements.push(`      ${titleblockSymbol.replace(/^<\?xml[^>]*\?>\s*/, '').replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '').trim()}`);
+    elements.push(`    </g>`);
+  }
+  
+  // Notes table (bottom left)
+  const notesSymbol = getSymbol(template, 'notes-table');
+  if (notesSymbol) {
+    const notesX = template.margins.left;
+    const notesY = viewport.height - 100 - template.margins.bottom;
+    elements.push(`    <g id="notes-table" transform="translate(${norm(notesX)}, ${norm(notesY)})">`);
+    elements.push(`      ${notesSymbol.replace(/^<\?xml[^>]*\?>\s*/, '').replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '').trim()}`);
+    elements.push(`    </g>`);
+  }
+  
+  elements.push(`  </g>`);
 
   // Draw connectors
   elements.push(`  <!-- Connectors -->`);

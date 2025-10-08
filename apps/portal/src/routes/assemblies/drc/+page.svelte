@@ -3,8 +3,19 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { api } from '$lib/api/client';
-  import type { DrcReport, DrcFinding, DrcFix, DrcDomain } from '$lib/types/api';
+  import type { 
+    DrcReport, 
+    DrcFinding, 
+    DrcFix, 
+    DrcDomain,
+    RenderFormat,
+    RenderManifest,
+    RenderResponse
+  } from '$lib/types/api';
   import { telemetry } from '$lib/stores/telemetry';
+  import RenderDialog from '$lib/components/RenderDialog.svelte';
+  import SvgPreview from '$lib/components/SvgPreview.svelte';
+  import ManifestPanel from '$lib/components/ManifestPanel.svelte';
 
   // Props for accessibility
   export let mainHeading: HTMLElement | undefined = undefined;
@@ -18,6 +29,13 @@
   let error: string | null = null;
   let selectedFixIds = new Set<string>();
   let applyingFixes = false;
+
+  // Render state
+  let showRenderDialog = false;
+  let rendering = false;
+  let renderError: string | null = null;
+  let renderResult: RenderResponse | null = null;
+  let showPreview = false;
 
   // Group findings by domain
   $: groupedFindings = report ? groupFindingsByDomain(report.findings) : {};
@@ -174,6 +192,107 @@
       event.preventDefault();
       toggleFix(fixId);
     }
+  }
+
+  function openRenderDialog() {
+    showRenderDialog = true;
+    telemetry.track('render.openDialog', { assembly_id: assemblyId });
+  }
+
+  function closeRenderDialog() {
+    showRenderDialog = false;
+  }
+
+  async function handleRenderSubmit(event: CustomEvent<{ 
+    templatePackId: string; 
+    format: RenderFormat; 
+    inline: boolean 
+  }>) {
+    if (!assemblyId) return;
+
+    const { templatePackId, format, inline } = event.detail;
+
+    try {
+      rendering = true;
+      renderError = null;
+      showRenderDialog = false;
+
+      const response = await api.renderAssembly({
+        assembly_id: assemblyId,
+        template_pack_id: templatePackId,
+        format,
+        inline
+      });
+
+      if (!response.ok) {
+        throw new Error(response.error);
+      }
+
+      renderResult = response.data;
+
+      telemetry.track('render.done', {
+        assembly_id: assemblyId,
+        template_pack_id: templatePackId,
+        format,
+        inline,
+        cached: renderResult.cached
+      });
+
+      // Show inline preview if requested
+      if (inline && renderResult.svg_content) {
+        showPreview = true;
+      }
+
+    } catch (err) {
+      renderError = err instanceof Error ? err.message : 'Failed to render drawing';
+      telemetry.track('render.error', { 
+        assembly_id: assemblyId, 
+        error: renderError 
+      });
+    } finally {
+      rendering = false;
+    }
+  }
+
+  function closePreview() {
+    showPreview = false;
+  }
+
+  function downloadRenderedDrawing() {
+    if (!renderResult) return;
+
+    if (renderResult.svg_content) {
+      // Download inline SVG
+      const blob = new Blob([renderResult.svg_content], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${assemblyId}-${renderResult.manifest.revision}.svg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      telemetry.track('render.download', {
+        assembly_id: assemblyId,
+        format: 'svg',
+        source: 'inline'
+      });
+    } else if (renderResult.url) {
+      // Open URL in new tab
+      window.open(renderResult.url, '_blank');
+      
+      telemetry.track('render.download', {
+        assembly_id: assemblyId,
+        format: renderResult.manifest.format,
+        source: 'url'
+      });
+    }
+  }
+
+  function dismissRenderResult() {
+    renderResult = null;
+    renderError = null;
   }
 
   onMount(() => {
@@ -366,15 +485,30 @@
 
       <!-- Continue Button -->
       <div class="continue-section">
-        <button
-          type="button"
-          class="continue-btn"
-          disabled={!canContinue}
-          on:click={continueToLayout}
-          aria-label={canContinue ? 'Continue to layout editor' : 'Fix all errors before continuing'}
-        >
-          Continue to Layout
-        </button>
+        <div class="action-buttons">
+          <button
+            type="button"
+            class="continue-btn"
+            disabled={!canContinue}
+            on:click={continueToLayout}
+            aria-label={canContinue ? 'Continue to layout editor' : 'Fix all errors before continuing'}
+          >
+            Continue to Layout
+          </button>
+          
+          {#if canContinue}
+            <button
+              type="button"
+              class="generate-drawing-btn"
+              on:click={openRenderDialog}
+              disabled={rendering}
+              aria-label="Generate technical drawing"
+            >
+              {rendering ? 'Generating...' : '📐 Generate Drawing'}
+            </button>
+          {/if}
+        </div>
+        
         {#if !canContinue}
           <p class="continue-note">
             {#if report.errors > 0}
@@ -386,10 +520,67 @@
             {/if}
           </p>
         {/if}
+
+        {#if renderError}
+          <div class="render-error" role="alert">
+            <strong>Render Error:</strong> {renderError}
+            <button type="button" class="dismiss-btn" on:click={dismissRenderResult}>
+              Dismiss
+            </button>
+          </div>
+        {/if}
+
+        {#if renderResult && !showPreview}
+          <div class="render-success">
+            <h3>Drawing Generated Successfully!</h3>
+            
+            <ManifestPanel 
+              manifest={renderResult.manifest} 
+              cached={renderResult.cached} 
+            />
+
+            {#if renderResult.url}
+              <div class="download-section">
+                <p>Your drawing is ready for download:</p>
+                <button
+                  type="button"
+                  class="download-link-btn"
+                  on:click={downloadRenderedDrawing}
+                >
+                  ↓ Download {renderResult.manifest.format.toUpperCase()} Drawing
+                </button>
+              </div>
+            {/if}
+
+            <button type="button" class="dismiss-btn" on:click={dismissRenderResult}>
+              Dismiss
+            </button>
+          </div>
+        {/if}
       </div>
     </div>
   {/if}
 </div>
+
+<!-- Render Dialog -->
+{#if assemblyId}
+  <RenderDialog
+    {assemblyId}
+    bind:open={showRenderDialog}
+    on:close={closeRenderDialog}
+    on:submit={handleRenderSubmit}
+  />
+{/if}
+
+<!-- SVG Preview -->
+{#if showPreview && renderResult?.svg_content && assemblyId}
+  <SvgPreview
+    svgContent={renderResult.svg_content}
+    {assemblyId}
+    onClose={closePreview}
+    onDownload={downloadRenderedDrawing}
+  />
+{/if}
 
 <style>
   .drc-review {
@@ -894,6 +1085,113 @@
     font-size: 0.875rem;
   }
 
+  /* Render Section */
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .generate-drawing-btn {
+    padding: 1rem 2.5rem;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .generate-drawing-btn:hover:not(:disabled) {
+    background: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+  }
+
+  .generate-drawing-btn:disabled {
+    background: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+  }
+
+  .render-error {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+    border-radius: 0.5rem;
+    color: #991b1b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .render-success {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #d1fae5;
+    border: 1px solid #6ee7b7;
+    border-radius: 0.5rem;
+  }
+
+  .render-success h3 {
+    margin: 0 0 1rem 0;
+    color: #065f46;
+    font-size: 1.25rem;
+  }
+
+  .download-section {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+  }
+
+  .download-section p {
+    margin: 0 0 0.75rem 0;
+    color: #065f46;
+    font-weight: 500;
+  }
+
+  .download-link-btn {
+    padding: 0.75rem 1.5rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .download-link-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  }
+
+  .dismiss-btn {
+    padding: 0.5rem 1rem;
+    background: white;
+    color: #64748b;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 1rem;
+  }
+
+  .dismiss-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+  }
+
   @media (max-width: 768px) {
     .header-content {
       flex-direction: column;
@@ -907,6 +1205,15 @@
     .fixes-controls {
       flex-direction: column;
       gap: 0.75rem;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .continue-btn,
+    .generate-drawing-btn {
+      width: 100%;
     }
   }
 </style>

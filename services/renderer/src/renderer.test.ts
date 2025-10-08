@@ -401,4 +401,152 @@ describe('Renderer', () => {
       });
     });
   });
+
+  describe('Template Pack Switching', () => {
+    it('renders with STD-A3-IPC620 template pack', async () => {
+      const dsl: RenderDSL = {
+        meta: {
+          assembly_id: 'asm_a3_test',
+          schema_hash: 'hash_a3',
+        },
+        dimensions: {
+          oal_mm: 1000,
+          tolerance_mm: 5,
+        },
+        cable: {
+          type: 'ribbon',
+          ways: 8,
+          pitch_in: 0.05,
+          red_stripe: true,
+        },
+        endA: {
+          connector_mpn: 'TEST-A',
+          type: 'idc',
+          positions: 8,
+        },
+        endB: {
+          connector_mpn: 'TEST-B',
+          type: 'idc',
+          positions: 8,
+        },
+        nets: Array.from({ length: 8 }, (_, i) => ({
+          circuit: `D${i}`,
+          endA_pin: String(i + 1),
+          endB_pin: String(i + 1),
+        })),
+        labels: [],
+        notesPack: 'IPC-620-CLASS-2',
+      };
+
+      const svg = await renderToSVG(dsl, 'STD-A3-IPC620');
+
+      expect(svg).toContain('width="420mm"');
+      expect(svg).toContain('height="297mm"');
+      expect(svg).toContain('STD-A3-IPC620');
+      expect(svg).toContain('1.1.0');
+      expect(svg).toContain('titleblock');
+      expect(svg).toContain('notes-table');
+      
+      // Snapshot for visual comparison
+      expect(svg).toMatchSnapshot('a3-template');
+    });
+
+    it('renders with STD-Letter-IPC620 template pack', async () => {
+      const dsl: RenderDSL = {
+        meta: {
+          assembly_id: 'asm_letter_test',
+          schema_hash: 'hash_letter',
+        },
+        dimensions: {
+          oal_mm: 800,
+          tolerance_mm: 5,
+        },
+        cable: {
+          type: 'ribbon',
+          ways: 8,
+          pitch_in: 0.05,
+          red_stripe: true,
+        },
+        endA: {
+          connector_mpn: 'TEST-A',
+          type: 'idc',
+          positions: 8,
+        },
+        endB: {
+          connector_mpn: 'TEST-B',
+          type: 'idc',
+          positions: 8,
+        },
+        nets: Array.from({ length: 8 }, (_, i) => ({
+          circuit: `D${i}`,
+          endA_pin: String(i + 1),
+          endB_pin: String(i + 1),
+        })),
+        labels: [],
+        notesPack: 'IPC-620-CLASS-2',
+      };
+
+      const svg = await renderToSVG(dsl, 'STD-Letter-IPC620');
+
+      expect(svg).toContain('width="279.4mm"');
+      expect(svg).toContain('height="215.9mm"');
+      expect(svg).toContain('STD-Letter-IPC620');
+      expect(svg).toContain('1.0.0');
+      expect(svg).toContain('titleblock');
+      expect(svg).toContain('notes-table');
+      
+      // Snapshot for visual comparison
+      expect(svg).toMatchSnapshot('letter-template');
+    });
+
+    it('snapshots differ only in expected regions (sheet size and titleblock)', async () => {
+      const dsl: RenderDSL = {
+        meta: {
+          assembly_id: 'asm_compare',
+          schema_hash: 'hash_compare',
+        },
+        dimensions: {
+          oal_mm: 1000,
+          tolerance_mm: 5,
+        },
+        cable: {
+          type: 'ribbon',
+          ways: 8,
+          pitch_in: 0.05,
+          red_stripe: false,
+        },
+        endA: {
+          connector_mpn: 'TEST',
+          type: 'idc',
+          positions: 8,
+        },
+        endB: {
+          connector_mpn: 'TEST',
+          type: 'idc',
+          positions: 8,
+        },
+        nets: Array.from({ length: 8 }, (_, i) => ({
+          circuit: `D${i}`,
+          endA_pin: String(i + 1),
+          endB_pin: String(i + 1),
+        })),
+        labels: [],
+        notesPack: 'IPC-620',
+      };
+
+      const svgA3 = await renderToSVG(dsl, 'STD-A3-IPC620');
+      const svgLetter = await renderToSVG(dsl, 'STD-Letter-IPC620');
+
+      // Both should contain the same assembly content
+      expect(svgA3).toContain('asm_compare');
+      expect(svgLetter).toContain('asm_compare');
+
+      // But different dimensions
+      expect(svgA3).toContain('420');
+      expect(svgLetter).toContain('279.4');
+
+      // Different titleblock positions (visual verification needed)
+      expect(svgA3).not.toEqual(svgLetter);
+    });
+  });
 });

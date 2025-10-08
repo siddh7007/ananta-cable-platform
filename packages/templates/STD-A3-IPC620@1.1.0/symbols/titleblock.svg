@@ -1,0 +1,29 @@
+<!-- Title block for A3 drawings -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" width="180" height="60">
+  <g id="titleblock">
+    <!-- Outer border -->
+    <rect x="1" y="1" width="178" height="58" fill="white" stroke="black" stroke-width="0.8"/>
+    
+    <!-- Horizontal dividers -->
+    <line x1="1" y1="15" x2="179" y2="15" stroke="black" stroke-width="0.4"/>
+    <line x1="1" y1="30" x2="179" y2="30" stroke="black" stroke-width="0.4"/>
+    <line x1="1" y1="45" x2="179" y2="45" stroke="black" stroke-width="0.4"/>
+    
+    <!-- Vertical dividers -->
+    <line x1="90" y1="1" x2="90" y2="59" stroke="black" stroke-width="0.4"/>
+    
+    <!-- Field labels -->
+    <text x="5" y="11" font-family="Inter" font-size="8" font-weight="bold" fill="black">TITLE:</text>
+    <text x="5" y="26" font-family="Inter" font-size="8" font-weight="bold" fill="black">PART NO:</text>
+    <text x="5" y="41" font-family="Inter" font-size="8" font-weight="bold" fill="black">REV:</text>
+    <text x="5" y="56" font-family="Inter" font-size="8" font-weight="bold" fill="black">DATE:</text>
+    
+    <text x="95" y="11" font-family="Inter" font-size="8" font-weight="bold" fill="black">DRAWN BY:</text>
+    <text x="95" y="26" font-family="Inter" font-size="8" font-weight="bold" fill="black">CHECKED BY:</text>
+    <text x="95" y="41" font-family="Inter" font-size="8" font-weight="bold" fill="black">APPROVED BY:</text>
+    <text x="95" y="56" font-family="Inter" font-size="8" font-weight="bold" fill="black">SHEET:</text>
+    
+    <!-- Standard compliance note -->
+    <text x="90" y="72" text-anchor="middle" font-family="Inter" font-size="6" fill="black">IPC/WHMA-A-620 Class 2</text>
+  </g>
+</svg>

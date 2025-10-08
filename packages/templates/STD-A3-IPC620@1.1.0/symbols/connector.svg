@@ -1,0 +1,12 @@
+<!-- Connector symbol - rectangular housing with pin indicators -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 30" width="40" height="30">
+  <g id="connector">
+    <rect x="2" y="5" width="36" height="20" fill="none" stroke="black" stroke-width="0.8"/>
+    <line x1="5" y1="5" x2="5" y2="25" stroke="black" stroke-width="0.4"/>
+    <line x1="35" y1="5" x2="35" y2="25" stroke="black" stroke-width="0.4"/>
+    <!-- Pin indicators -->
+    <circle cx="10" cy="15" r="1.5" fill="none" stroke="black" stroke-width="0.4"/>
+    <circle cx="20" cy="15" r="1.5" fill="none" stroke="black" stroke-width="0.4"/>
+    <circle cx="30" cy="15" r="1.5" fill="none" stroke="black" stroke-width="0.4"/>
+  </g>
+</svg>

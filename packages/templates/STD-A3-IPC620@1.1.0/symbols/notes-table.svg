@@ -1,0 +1,35 @@
+<!-- Notes table for manufacturing instructions -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="200" height="100">
+  <g id="notes-table">
+    <!-- Outer border -->
+    <rect x="1" y="1" width="198" height="98" fill="white" stroke="black" stroke-width="0.8"/>
+    
+    <!-- Header -->
+    <rect x="1" y="1" width="198" height="15" fill="#f0f0f0" stroke="black" stroke-width="0.6"/>
+    <text x="100" y="11" text-anchor="middle" font-family="Inter" font-size="10" font-weight="bold" fill="black">NOTES</text>
+    
+    <!-- Table headers -->
+    <line x1="1" y1="16" x2="199" y2="16" stroke="black" stroke-width="0.4"/>
+    <line x1="25" y1="16" x2="25" y2="99" stroke="black" stroke-width="0.4"/>
+    
+    <text x="5" y="28" font-family="Inter" font-size="8" font-weight="bold" fill="black">NO.</text>
+    <text x="30" y="28" font-family="Inter" font-size="8" font-weight="bold" fill="black">DESCRIPTION</text>
+    
+    <!-- Note rows -->
+    <line x1="1" y1="32" x2="199" y2="32" stroke="black" stroke-width="0.4"/>
+    <text x="5" y="44" font-family="Inter" font-size="7" fill="black">1</text>
+    <text x="30" y="44" font-family="DejaVuSansMono" font-size="7" fill="black">All conductors: Strip 6mm ± 0.5mm</text>
+    
+    <line x1="1" y1="48" x2="199" y2="48" stroke="black" stroke-width="0.4"/>
+    <text x="5" y="60" font-family="Inter" font-size="7" fill="black">2</text>
+    <text x="30" y="60" font-family="DejaVuSansMono" font-size="7" fill="black">Crimp force: Follow MFG datasheet</text>
+    
+    <line x1="1" y1="64" x2="199" y2="64" stroke="black" stroke-width="0.4"/>
+    <text x="5" y="76" font-family="Inter" font-size="7" fill="black">3</text>
+    <text x="30" y="76" font-family="DejaVuSansMono" font-size="7" fill="black">Test continuity before final assembly</text>
+    
+    <line x1="1" y1="80" x2="199" y2="80" stroke="black" stroke-width="0.4"/>
+    <text x="5" y="92" font-family="Inter" font-size="7" fill="black">4</text>
+    <text x="30" y="92" font-family="DejaVuSansMono" font-size="7" fill="black">Apply label after inspection</text>
+  </g>
+</svg>

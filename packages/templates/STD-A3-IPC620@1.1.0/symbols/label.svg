@@ -1,0 +1,7 @@
+<!-- Label box for wire marking -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 20" width="60" height="20">
+  <g id="label">
+    <rect x="2" y="2" width="56" height="16" rx="2" fill="white" stroke="black" stroke-width="0.6"/>
+    <text x="30" y="13" text-anchor="middle" font-family="DejaVuSansMono" font-size="10" fill="black">LABEL</text>
+  </g>
+</svg>

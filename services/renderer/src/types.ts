@@ -108,11 +108,14 @@ export interface RenderManifest {
 export interface TemplatePackManifest {
   id: string;
   version: string;
-  name: string;
-  paper: 'A3' | 'Letter' | 'A4';
+  name?: string;
+  paper: 'A3' | 'Letter' | 'A4' | string;
   dimensions: {
-    width_mm: number;
-    height_mm: number;
+    width_mm?: number;
+    height_mm?: number;
+    width?: number;
+    height?: number;
+    unit?: string;
   };
   margins: {
     top: number;
@@ -120,7 +123,15 @@ export interface TemplatePackManifest {
     bottom: number;
     left: number;
   };
-  styles: {
+  fonts?: string[];
+  strokes?: {
+    thin: number;
+    medium: number;
+    thick: number;
+  };
+  titleblock?: string;
+  notes?: string;
+  styles?: {
     lineWidth: number;
     fontSize: number;
     font: string;

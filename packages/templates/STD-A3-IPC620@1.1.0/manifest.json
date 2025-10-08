@@ -1,0 +1,27 @@
+{
+  "id": "STD-A3-IPC620",
+  "version": "1.1.0",
+  "paper": "A3",
+  "dimensions": {
+    "width": 420,
+    "height": 297,
+    "unit": "mm"
+  },
+  "margins": {
+    "left": 15,
+    "right": 15,
+    "top": 15,
+    "bottom": 15
+  },
+  "fonts": [
+    "Inter",
+    "DejaVuSansMono"
+  ],
+  "strokes": {
+    "thin": 0.4,
+    "medium": 0.6,
+    "thick": 0.8
+  },
+  "titleblock": "symbols/titleblock.svg",
+  "notes": "symbols/notes-table.svg"
+}

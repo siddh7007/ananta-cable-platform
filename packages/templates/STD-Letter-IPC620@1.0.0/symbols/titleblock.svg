@@ -1,0 +1,29 @@
+<!-- Title block for US Letter drawings (slightly smaller) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 55" width="160" height="55">
+  <g id="titleblock">
+    <!-- Outer border -->
+    <rect x="1" y="1" width="158" height="53" fill="white" stroke="black" stroke-width="0.7"/>
+    
+    <!-- Horizontal dividers -->
+    <line x1="1" y1="14" x2="159" y2="14" stroke="black" stroke-width="0.35"/>
+    <line x1="1" y1="27" x2="159" y2="27" stroke="black" stroke-width="0.35"/>
+    <line x1="1" y1="40" x2="159" y2="40" stroke="black" stroke-width="0.35"/>
+    
+    <!-- Vertical dividers -->
+    <line x1="80" y1="1" x2="80" y2="54" stroke="black" stroke-width="0.35"/>
+    
+    <!-- Field labels -->
+    <text x="4" y="10" font-family="Inter" font-size="7" font-weight="bold" fill="black">TITLE:</text>
+    <text x="4" y="23" font-family="Inter" font-size="7" font-weight="bold" fill="black">PART NO:</text>
+    <text x="4" y="36" font-family="Inter" font-size="7" font-weight="bold" fill="black">REV:</text>
+    <text x="4" y="49" font-family="Inter" font-size="7" font-weight="bold" fill="black">DATE:</text>
+    
+    <text x="84" y="10" font-family="Inter" font-size="7" font-weight="bold" fill="black">DRAWN BY:</text>
+    <text x="84" y="23" font-family="Inter" font-size="7" font-weight="bold" fill="black">CHECKED BY:</text>
+    <text x="84" y="36" font-family="Inter" font-size="7" font-weight="bold" fill="black">APPROVED BY:</text>
+    <text x="84" y="49" font-family="Inter" font-size="7" font-weight="bold" fill="black">SHEET:</text>
+    
+    <!-- Standard compliance note -->
+    <text x="80" y="66" text-anchor="middle" font-family="Inter" font-size="5.5" fill="black">IPC/WHMA-A-620 Class 2</text>
+  </g>
+</svg>
