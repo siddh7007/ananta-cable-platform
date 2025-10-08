@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { route } from '../../../lib/router.js';
-  import { api } from '../../../lib/api/client.js';
-  import type { SynthesisProposal, PartRef } from '../../../lib/types/api.js';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { api } from '$lib/api/client';
+  import type { SynthesisProposal } from '$lib/types/api';
 
   let mainHeading: HTMLElement;
   let proposal: SynthesisProposal | null = null;
@@ -20,11 +21,11 @@
   }
 
   // Get draft_id from URL params
-  $: draftId = $route.params.draft_id;
+  $: draftId = $page.url.searchParams.get('draft_id');
 
   onMount(async () => {
     if (!draftId) {
-      error = 'No draft_id provided in URL. Please navigate to this page with a valid draft_id parameter (e.g., #/assemblies/synthesis?draft_id=your-draft-id)';
+      error = 'No draft_id provided in URL. Please navigate to this page with a valid draft_id parameter (e.g., /assemblies/synthesis?draft_id=your-draft-id)';
       loading = false;
       return;
     }

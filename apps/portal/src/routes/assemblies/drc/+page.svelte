@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { route, navigate } from '$lib/router';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import { api } from '$lib/api/client';
   import type { DrcReport, DrcFinding, DrcFix, DrcDomain } from '$lib/types/api';
   import { telemetry } from '$lib/stores/telemetry';
@@ -9,7 +10,7 @@
   export let mainHeading: HTMLElement | undefined = undefined;
 
   // Query parameter
-  $: assemblyId = $route.params.assembly_id;
+  $: assemblyId = $page.url.searchParams.get('assembly_id');
 
   // State
   let loading = true;
@@ -56,7 +57,7 @@
 
   async function loadDrcReport() {
     if (!assemblyId) {
-      error = 'No assembly_id provided in URL. Please navigate to this page with a valid assembly_id parameter (e.g., #/assemblies/drc?assembly_id=your-assembly-id)';
+      error = 'No assembly_id provided in URL. Please navigate to this page with a valid assembly_id parameter (e.g., /assemblies/drc?assembly_id=your-assembly-id)';
       loading = false;
       return;
     }
@@ -164,7 +165,7 @@
   function continueToLayout() {
     if (canContinue && assemblyId) {
       telemetry.track('drc.continue', { assembly_id: assemblyId });
-      navigate(`/assemblies/layout?assembly_id=${assemblyId}`);
+      goto(`/assemblies/layout?assembly_id=${assemblyId}`);
     }
   }
 
