@@ -1,5 +1,5 @@
 import { CablePlatformClient, type ApiResponse } from '@cable-platform/client-sdk';
-import type { CableDesign, DRCResult, SynthesisProposal, DrcReport } from '../types/api';
+import type { SynthesisProposal, DrcReport } from '../types/api';
 
 // Configure SDK with base URL
 const BASE_URL = (import.meta as { env?: Record<string, string> }).env?.VITE_API_BASE_URL ?? 'http://localhost:8080';
@@ -33,11 +33,6 @@ class ApiClient {
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
     }
-  }
-
-  async runDRC(body: CableDesign): Promise<ApiResponse<DRCResult>> {
-    // TODO: Add runDRC to CablePlatformClient
-    return { ok: false, error: 'Not implemented' };
   }
 
   async proposeSynthesis(draftId: string): Promise<ApiResponse<SynthesisProposal>> {

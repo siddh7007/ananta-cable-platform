@@ -1,10 +1,43 @@
 // API types for the Cable Platform frontend
 // These should eventually be generated from OpenAPI schemas
 
-// DRC types (matching Python models from services/drc/models.py)
+// DRC types (matching OpenAPI schemas from packages/contracts/openapi.yaml)
 export type DrcSeverity = 'info' | 'warning' | 'error';
 export type DrcStatus = 'pass' | 'warning' | 'error';
+export type DrcDomain = 'mechanical' | 'electrical' | 'standards' | 'labeling' | 'consistency';
+export type DrcFixEffect = 'non_destructive' | 'substitution' | 're_synthesis_required';
 
+export interface DrcFinding {
+  id: string;
+  severity: DrcSeverity;
+  domain: DrcDomain;
+  code: string;
+  message: string;
+  where?: string;
+  refs?: string[];
+}
+
+export interface DrcFix {
+  id: string;
+  label: string;
+  description: string;
+  applies_to: string[]; // Array of finding IDs
+  effect: DrcFixEffect;
+}
+
+export interface DrcReport {
+  assembly_id: string;
+  ruleset_id: string;
+  version: string;
+  passed: boolean;
+  errors: number;
+  warnings: number;
+  findings: DrcFinding[];
+  fixes: DrcFix[];
+  generated_at: string;
+}
+
+// Legacy/simplified types for backward compatibility
 export interface DrcIssue {
   type: string;
   severity: DrcSeverity;
