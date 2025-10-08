@@ -25,6 +25,12 @@
       <h2>Synthesis</h2>
       <p>Generate optimized cable assemblies</p>
     </a>
+
+    <a href="/assemblies/drc?assembly_id=asm-test-ribbon-001" class="card demo-card">
+      <h2>📐 Test Drawing Generation</h2>
+      <p>View the new drawing generation feature with a test assembly</p>
+      <span class="badge">NEW</span>
+    </a>
   </div>
 </main>
 
@@ -77,5 +83,27 @@
   .card p {
     color: #666;
     margin: 0;
+  }
+
+  .demo-card {
+    position: relative;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .demo-card h2, .demo-card p {
+    color: white;
+  }
+
+  .badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #fbbf24;
+    color: #78350f;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
   }
 </style>
