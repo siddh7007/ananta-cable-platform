@@ -16,12 +16,17 @@ function inchesToMm(inches) {
 /**
  * Maps AssemblySchema (from synthesis/DRC) to RenderDSL for renderer service
  */
-export function assemblyToRenderDSL(schema, templatePackId) {
+export function assemblyToRenderDSL(schema, _templatePackId) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cable = schema.cable;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const conductors = schema.conductors;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const endpoints = schema.endpoints;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const shield = schema.shield;
     const wirelist = schema.wirelist || [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const labels = schema.labels;
     // Determine cable type
     let cableDsl;
@@ -61,13 +66,15 @@ export function assemblyToRenderDSL(schema, templatePackId) {
     };
     // Build nets from wirelist
     const nets = wirelist.map((row, index) => {
-        let color = row.color;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const wireRow = row;
+        let color = wireRow.color;
         // For power cables without explicit colors, apply locale mapping
         if (!color && cable.type === 'power_cable') {
             const locale = (cable.locale || 'NA');
             const colorMap = POWER_COLORS[locale] || POWER_COLORS.NA;
             // Map circuit names to colors
-            const circuit = (row.circuit || '').toLowerCase();
+            const circuit = (wireRow.circuit || '').toLowerCase();
             if (circuit.includes('+') || circuit.includes('pos') || circuit.includes('vcc')) {
                 color = colorMap.positive;
             }
@@ -84,16 +91,17 @@ export function assemblyToRenderDSL(schema, templatePackId) {
             }
         }
         return {
-            circuit: row.circuit || `Net${index + 1}`,
-            endA_pin: row.endA_pin || String(index + 1),
-            endB_pin: row.endB_pin || String(index + 1),
+            circuit: wireRow.circuit || `Net${index + 1}`,
+            endA_pin: wireRow.endA_pin || String(index + 1),
+            endB_pin: wireRow.endB_pin || String(index + 1),
             color,
-            shield: row.shield || 'none',
+            shield: wireRow.shield || 'none',
         };
     });
     // Extract labels from schema
     const labelsDsl = [];
     if (labels && Array.isArray(labels.callouts)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         labels.callouts.forEach((label) => {
             // Convert inch offsets to mm
             const offset_x = label.offset_x ? inchesToMm(label.offset_x) : 0;

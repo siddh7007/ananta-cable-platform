@@ -88,6 +88,7 @@ export async function renderRoutes(fastify) {
             }
             try {
                 // Load assembly schema
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 let assemblyRecord;
                 let schema;
                 if (providedSchema) {
@@ -152,6 +153,7 @@ export async function renderRoutes(fastify) {
                 // Call renderer service
                 const rendererURL = getRendererServiceURL();
                 fastify.log.info({ rendererURL, assemblyId }, 'Calling renderer service');
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 let renderResult;
                 let svgContent;
                 // In test mode, return mock response directly

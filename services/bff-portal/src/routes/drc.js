@@ -168,7 +168,7 @@ export async function drcRoutes(fastify, options = {}) {
                     });
                 }
                 const availableFixes = new Set((latestReport.fixes ?? []).map(fix => fix.id));
-                const missingFixes = fix_ids.filter(fixId => !availableFixes.has(fixId));
+                const missingFixes = fix_ids.filter((fixId) => !availableFixes.has(fixId));
                 if (missingFixes.length > 0) {
                     return reply.status(400).send({
                         code: 'FIX_NOT_AVAILABLE',
@@ -200,9 +200,10 @@ export async function drcRoutes(fastify, options = {}) {
                         details: validateApplyResponse.errors,
                     });
                 }
-                const designSchema = extractDesignSchema(applyResponse.schema);
-                await assembliesDao.updateAssemblySchema(assembly_id, designSchema, applyResponse.schema_hash);
-                await drcDao.upsertReport(applyResponse.drc);
+                const typedApplyResponse = applyResponse;
+                const designSchema = extractDesignSchema(typedApplyResponse.schema);
+                await assembliesDao.updateAssemblySchema(assembly_id, designSchema, typedApplyResponse.schema_hash);
+                await drcDao.upsertReport(typedApplyResponse.drc);
                 return reply.status(200).send(applyResponse);
             }
             catch (error) {

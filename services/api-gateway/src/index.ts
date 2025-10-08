@@ -98,8 +98,19 @@ required("AUTH0_DOMAIN");
 required("AUTH0_AUDIENCE");
 
 // Register route plugins
-await server.register(import('./routes/drc.js'));
-await server.register(import('./routes/synthesis.js'));
+const drcModule = await import('./routes/drc.js');
+const synthesisModule = await import('./routes/synthesis.js');
+const renderModule = await import('./routes/render.js');
+
+await server.register(drcModule.default);
+await server.register(synthesisModule.default);
+await server.register(renderModule.default);
+
+// Log all registered routes for debugging
+server.ready(() => {
+  console.log('Registered routes:');
+  console.log(server.printRoutes());
+});
 
 // Global error handler
 server.setErrorHandler((err, _req, reply) => {

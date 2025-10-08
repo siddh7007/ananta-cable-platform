@@ -22,6 +22,8 @@ services:
       AUTH0_DOMAIN: ${AUTH0_DOMAIN}
       AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
       DEV_AUTH_BYPASS: ${DEV_AUTH_BYPASS:-true}
+      BFF_PORTAL_URL: http://bff-portal:4001
+      RENDERER_SERVICE_URL: http://renderer:5002
     ports: ["8080:8080"]
     depends_on: [bff-portal, drc]
 
@@ -32,6 +34,7 @@ services:
       - .env.local
     environment:
       PORT: 4001
+      HOST: 0.0.0.0
       DATABASE_URL: "postgresql://postgres:${SUPABASE_POSTGRES_PASSWORD:-postgres}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-appdb}"
       DRC_SERVICE_URL: "http://drc:8000"
     ports: ["8081:4001"]

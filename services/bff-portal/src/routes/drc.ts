@@ -143,7 +143,7 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
         });
       }
 
-      const { assembly_id, ruleset_id } = body;
+      const { assembly_id, ruleset_id } = body as { assembly_id: string; ruleset_id: string };
 
       try {
         const assemblyRecord = await assembliesDao.getAssemblySchema(assembly_id);
@@ -179,7 +179,8 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
           });
         }
 
-        await drcDao.upsertReport(drcReport);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await drcDao.upsertReport(drcReport as any);
         return reply.status(200).send(drcReport);
       } catch (error) {
         request.log.error({ err: error }, 'Failed to run DRC');
@@ -201,7 +202,7 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
         });
       }
 
-      const { assembly_id, fix_ids, ruleset_id } = body;
+      const { assembly_id, fix_ids, ruleset_id } = body as { assembly_id: string; fix_ids: string[]; ruleset_id: string };
 
       try {
         const assemblyRecord = await assembliesDao.getAssemblySchema(assembly_id);
@@ -218,7 +219,7 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
         }
 
         const availableFixes = new Set((latestReport.fixes ?? []).map(fix => fix.id));
-        const missingFixes = fix_ids.filter(fixId => !availableFixes.has(fixId));
+        const missingFixes = fix_ids.filter((fixId: string) => !availableFixes.has(fixId));
         if (missingFixes.length > 0) {
           return reply.status(400).send({
             code: 'FIX_NOT_AVAILABLE',
@@ -254,9 +255,11 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
           });
         }
 
-        const designSchema = extractDesignSchema(applyResponse.schema);
-        await assembliesDao.updateAssemblySchema(assembly_id, designSchema, applyResponse.schema_hash);
-        await drcDao.upsertReport(applyResponse.drc);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const typedApplyResponse = applyResponse as { schema: any; schema_hash: string; drc: any };
+        const designSchema = extractDesignSchema(typedApplyResponse.schema);
+        await assembliesDao.updateAssemblySchema(assembly_id, designSchema, typedApplyResponse.schema_hash);
+        await drcDao.upsertReport(typedApplyResponse.drc);
 
         return reply.status(200).send(applyResponse);
       } catch (error) {
