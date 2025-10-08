@@ -1,97 +1,76 @@
-// Types for the portal app
-export interface PartRef {
-  mpn: string;
-  family: string;
-  series: string;
-  notes?: string;
-}
+// API types for the Cable Platform frontend
+// These should eventually be generated from OpenAPI schemas
 
-export interface WirelistRow {
-  wire_id: string;
-  from: string;
-  to: string;
-  color?: string;
-  awg?: number;
-  length_m?: number;
-}
+// DRC types (matching Python models from services/drc/models.py)
+export type DrcSeverity = 'info' | 'warning' | 'error';
+export type DrcStatus = 'pass' | 'warning' | 'error';
 
-export interface BomLine {
-  part_ref: PartRef;
-  qty: number;
-  role: 'primary' | 'alternate';
-  reason: string;
-}
-
-export interface SynthesisProposal {
-  proposal_id: string;
-  draft_id: string;
-  cable: {
-    primary: PartRef;
-    alternates: PartRef[];
-  };
-  conductors: {
-    count: number;
-    awg?: number;
-    color_map?: Record<string, string>;
-  };
-  endpoints: {
-    endA: {
-      connector: PartRef;
-      termination: string;
-      contacts?: {
-        primary: PartRef;
-        alternates: PartRef[];
-      };
-      accessories: PartRef[];
-    };
-    endB: {
-      connector: PartRef;
-      termination: string;
-      contacts?: {
-        primary: PartRef;
-        alternates: PartRef[];
-      };
-      accessories: PartRef[];
-    };
-  };
-  shield: {
-    type: string;
-    drain_policy: string;
-  };
-  wirelist: WirelistRow[];
-  bom: BomLine[];
-  warnings: string[];
-  errors: string[];
-  explain: string[];
+export interface DrcIssue {
+  type: string;
+  severity: DrcSeverity;
+  message: string;
+  location: string;
+  suggestion?: string;
 }
 
 export interface DrcResult {
-  status: 'pass' | 'warning' | 'error';
-  issues: Array<{
-    severity: 'info' | 'warning' | 'error';
-    message: string;
-    location: string;
-  }>;
+  status: DrcStatus;
+  issues: DrcIssue[];
   summary: string;
 }
 
-export type CableDesign = {
+// Legacy aliases for backward compatibility
+export type DRCFinding = DrcIssue;
+export type DRCReport = DrcResult;
+
+// Connector types
+export interface ConnectorSummary {
+  mpn: string;
+  manufacturer?: string;
+  positions?: number;
+  type?: string;
+}
+
+export interface ConnectorMetadata {
+  mpn: string;
+  manufacturer: string;
+  series: string;
+  positions: number;
+  pitch_mm?: number;
+  current_rating_a?: number;
+  voltage_rating_v?: number;
+}
+
+export type TerminationType = 'crimp' | 'solder' | 'idc' | 'wire_to_board';
+
+// Assembly types
+export interface Endpoint {
+  connector: ConnectorSummary;
+  termination: TerminationType;
+  label?: string;
+}
+
+export interface AssemblyStep1 {
   id: string;
   name: string;
-  cores: number;
-};
+  endpoints: Record<string, Endpoint>;
+  conductor_count?: number;
+  conductor_awg?: number;
+}
 
-export type DRCResult = {
-  design_id: string;
-  findings: Array<{
-    code: string;
-    message: string;
-    severity: 'info' | 'warn' | 'error';
-    path?: string;
-  }>;
-  severity_summary: {
-    info?: number;
-    warn?: number;
-    error?: number;
-  };
-};
+export interface SynthesisProposal {
+  assembly_id: string;
+  cable_type: string;
+  cable_length_mm: number;
+  conductor_awg: number;
+  conductor_count: number;
+  shield_type?: string;
+  endpoints: Record<string, Endpoint>;
+}
+
+// Region type
+export interface Region {
+  code: string;
+  name: string;
+  locale: string;
+}

@@ -8,15 +8,20 @@ export async function up() {
       schema_hash TEXT NOT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_assemblies_schema_draft_id ON assemblies_schema(draft_id);
-    CREATE INDEX IF NOT EXISTS idx_assemblies_schema_hash ON assemblies_schema(schema_hash);
-    CREATE INDEX IF NOT EXISTS idx_assemblies_schema_created_at ON assemblies_schema(created_at);
+    )
+  `;
+    await sql `
+    CREATE INDEX IF NOT EXISTS idx_assemblies_schema_draft_id ON assemblies_schema(draft_id)
+  `;
+    await sql `
+    CREATE INDEX IF NOT EXISTS idx_assemblies_schema_hash ON assemblies_schema(schema_hash)
+  `;
+    await sql `
+    CREATE INDEX IF NOT EXISTS idx_assemblies_schema_created_at ON assemblies_schema(created_at)
   `;
 }
 export async function down() {
     await sql `
-    DROP TABLE IF EXISTS assemblies_schema;
+    DROP TABLE IF EXISTS assemblies_schema
   `;
 }

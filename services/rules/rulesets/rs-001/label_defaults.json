@@ -1,0 +1,19 @@
+{
+  "description": "Default label settings and requirements",
+  "data": {
+    "offset_mm": 30,
+    "ul94_v0_required": true,
+    "font_size_mm": 2.5,
+    "min_spacing_mm": 5,
+    "materials": {
+      "polyester": {
+        "temp_range_c": [-40, 120],
+        "chemical_resistance": "good"
+      },
+      "vinyl": {
+        "temp_range_c": [-30, 80],
+        "chemical_resistance": "fair"
+      }
+    }
+  }
+}

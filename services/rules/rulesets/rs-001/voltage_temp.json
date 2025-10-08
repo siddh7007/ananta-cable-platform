@@ -1,0 +1,33 @@
+{
+  "description": "Minimum voltage and temperature ratings by AWG",
+  "data": {
+    "18": {
+      "voltage_v": 300,
+      "temp_c": 80
+    },
+    "20": {
+      "voltage_v": 300,
+      "temp_c": 80
+    },
+    "22": {
+      "voltage_v": 300,
+      "temp_c": 80
+    },
+    "24": {
+      "voltage_v": 300,
+      "temp_c": 80
+    },
+    "26": {
+      "voltage_v": 150,
+      "temp_c": 60
+    },
+    "28": {
+      "voltage_v": 150,
+      "temp_c": 60
+    },
+    "30": {
+      "voltage_v": 100,
+      "temp_c": 60
+    }
+  }
+}

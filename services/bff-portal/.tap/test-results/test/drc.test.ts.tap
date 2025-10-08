@@ -1,0 +1,97 @@
+TAP version 14
+{"level":30,"time":1759906179692,"pid":193844,"hostname":"Sevadas","msg":"Database initialized (seeding disabled)"}
+Registering DRC routes...
+DRC routes being registered...
+DRC GET /v1/drc/rulesets registered
+About to register POST /v1/drc/run
+POST /v1/drc/run registration completed
+DRC POST /v1/drc/run registered
+Registering POST /v1/drc/apply-fixes
+DRC POST /v1/drc/apply-fixes registered
+DRC routes registered successfully
+Registered routes: └── (empty root node)
+    ├── /
+    │   └── v1/
+    │       ├── md/
+    │       │   ├── search/connectors (GET, HEAD)
+    │       │   └── connector/
+    │       │       └── :mpn (GET, HEAD)
+    │       ├── ass
+    │       │   ├── emblies/draft (POST)
+    │       │   │   └── /
+    │       │   │       └── :draftId (GET, HEAD)
+    │       │   └── ist/locale-colors (GET, HEAD)
+    │       ├── presets/notes-packs (GET, HEAD)
+    │       ├── synthesis/
+    │       │   ├── propose (POST)
+    │       │   ├── recompute (POST)
+    │       │   └── accept (POST)
+    │       └── drc/
+    │           ├── preview (POST)
+    │           ├── r
+    │           │   ├── u
+    │           │   │   ├── lesets (GET, HEAD)
+    │           │   │   └── n (POST)
+    │           │   └── eport/
+    │           │       └── :assembly_id (GET, HEAD)
+    │           └── apply-fixes (POST)
+    └── * (OPTIONS)
+
+DRC routes registered successfully
+# Subtest: DRC routes
+    not ok 1 - password authentication failed for user "user"
+      ---
+      stack: |
+        ErrorResponse (../../node_modules/.pnpm/postgres@3.4.7/node_modules/postgres/src/connection.js:794:26)
+        handle (../../node_modules/.pnpm/postgres@3.4.7/node_modules/postgres/src/connection.js:480:6)
+        Socket.data (../../node_modules/.pnpm/postgres@3.4.7/node_modules/postgres/src/connection.js:315:9)
+        cachedError (../../node_modules/.pnpm/postgres@3.4.7/node_modules/postgres/src/query.js:170:23)
+        new Query (../../node_modules/.pnpm/postgres@3.4.7/node_modules/postgres/src/query.js:36:24)
+        sql (../../node_modules/.pnpm/postgres@3.4.7/node_modules/postgres/src/index.js:112:11)
+        Test.<anonymous> (test/drc.test.ts:21:12)
+      at:
+        fileName: ..\..\node_modules\.pnpm\postgres@3.4.7\node_modules\postgres\src\connection.js
+        lineNumber: 794
+        columnNumber: 26
+        functionName: ErrorResponse
+      type: PostgresError
+      severity_local: FATAL
+      severity: FATAL
+      code: 28P01
+      file: auth.c
+      line: "334"
+      routine: auth_failed
+      tapCaught: returnedPromiseRejection
+      source: |2
+          function ErrorResponse(x) {
+            query && (query.cursorFn || query.describeFirst) && write(Sync)
+            const error = Errors.postgres(parseError(x))
+        -------------------------^
+            query && query.retried
+              ? errored(query.retried)
+      ...
+    
+    1..1
+not ok 1 - DRC routes # time=103.197ms
+  ---
+  at:
+    fileName: test\drc.test.ts
+    lineNumber: 8
+    columnNumber: 1
+    isToplevel: true
+    generated:
+      fileName: test/drc.test.ts
+      lineNumber: 6
+      columnNumber: 1
+  source: "import { sql } from '../src/db.js';\r
+  
+    \r
+  
+    test('DRC routes', async (t) => {\r
+  
+    ^
+  
+    \  const app = await build();\n"
+  ...
+
+1..1

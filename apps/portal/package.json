@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@cable-platform/client-sdk": "workspace:*",
+    "@cable-platform/contracts": "workspace:*",
     "@cable-platform/validation": "workspace:*",
     "svelte": "^4.2.19"
   },

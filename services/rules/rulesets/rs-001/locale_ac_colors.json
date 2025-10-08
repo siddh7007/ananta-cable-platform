@@ -1,0 +1,20 @@
+{
+  "description": "AC power conductor color mappings by locale",
+  "data": {
+    "us": {
+      "description": "United States (NEC)",
+      "1": "black",
+      "2": "white"
+    },
+    "eu": {
+      "description": "European Union (IEC)",
+      "1": "brown",
+      "2": "blue"
+    },
+    "jp": {
+      "description": "Japan",
+      "1": "black",
+      "2": "white"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "description": "Minimum bend radius multipliers by cable family",
+  "units": "multiplier",
+  "data": {
+    "round": {
+      "description": "Round cables: 8x outer diameter",
+      "multiplier": 8,
+      "reference": "OD"
+    },
+    "ribbon": {
+      "description": "Ribbon cables: 10x thickness",
+      "multiplier": 10,
+      "reference": "thickness"
+    },
+    "flat": {
+      "description": "Flat cables: 12x thickness",
+      "multiplier": 12,
+      "reference": "thickness"
+    },
+    "coaxial": {
+      "description": "Coaxial cables: 6x outer diameter",
+      "multiplier": 6,
+      "reference": "OD"
+    },
+    "standard": {
+      "description": "Standard round cables: 8x outer diameter",
+      "multiplier": 8,
+      "reference": "OD"
+    }
+  }
+}

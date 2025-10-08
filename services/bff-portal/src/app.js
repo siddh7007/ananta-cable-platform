@@ -1,11 +1,12 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { randomUUID } from "crypto";
-import { seedConnectors } from "./seed/connectors.js";
 import { connectorRoutes } from "./routes/connectors.js";
 import { assemblyRoutes } from "./routes/assemblies.js";
 import { presetsRoutes } from "./routes/presets.js";
 import { assistRoutes } from "./routes/assist.js";
+import { synthesisRoutes } from "./routes/synthesis.js";
+import { drcRoutes } from "./routes/drc.js";
 export async function build() {
     const server = Fastify({ logger: true });
     await server.register(cors, { origin: true });
@@ -21,7 +22,8 @@ export async function build() {
     });
     // Initialize database and seed data
     try {
-        // await seedConnectors(); // Temporarily disabled
+        // await seedConnectors();
+        // await seedMDMData();
         server.log.info('Database initialized (seeding disabled)');
     }
     catch (error) {
@@ -33,6 +35,10 @@ export async function build() {
     await server.register(assemblyRoutes);
     await server.register(presetsRoutes);
     await server.register(assistRoutes);
+    await server.register(synthesisRoutes);
+    console.log('Registering DRC routes...');
+    await server.register(drcRoutes);
+    console.log('DRC routes registered successfully');
     // Health endpoint
     server.get("/health", async () => ({
         status: "ok",

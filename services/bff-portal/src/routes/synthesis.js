@@ -71,7 +71,7 @@ export async function synthesisRoutes(fastify) {
                 }
                 // 2. Call FastAPI /synthesize/propose
                 const drcServiceUrl = process.env.DRC_SERVICE_URL || 'http://localhost:8000';
-                const response = await fetch(`${drcServiceUrl}/v1/synthesize/propose`, {
+                const response = await fetch(`${drcServiceUrl}/v1/synthesis/propose`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ export async function synthesisRoutes(fastify) {
                 if (locks) {
                     Object.assign(payload.step1_payload, locks);
                 }
-                const response = await fetch(`${drcServiceUrl}/v1/synthesize/propose`, {
+                const response = await fetch(`${drcServiceUrl}/v1/synthesis/propose`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

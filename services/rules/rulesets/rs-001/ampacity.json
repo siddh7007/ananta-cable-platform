@@ -1,0 +1,18 @@
+{
+  "description": "AWG to ampacity mapping at 30°C ambient temperature",
+  "units": "amps",
+  "temperature_c": 30,
+  "data": {
+    "30": 0.86,
+    "28": 1.4,
+    "26": 2.2,
+    "24": 3.5,
+    "22": 5.5,
+    "20": 8.8,
+    "18": 14,
+    "16": 22,
+    "14": 32,
+    "12": 41,
+    "10": 55
+  }
+}

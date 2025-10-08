@@ -86,6 +86,12 @@ class ConductorSpec(BaseModel):
     awg: Optional[int] = None
     color_map: Optional[List[str]] = None
     ribbon: Optional[dict] = None  # Simplified
+    current_rating: Optional[float] = None  # Amperes
+    od_mm: Optional[float] = None  # Outer diameter in mm
+    family: Optional[str] = None  # Cable family type
+    voltage_rating: Optional[float] = None  # Volts
+    temp_rating_c: Optional[float] = None  # Temperature rating in Celsius
+    ac_colors: Optional[List[str]] = None  # AC conductor colors
 
 # Endpoint with full specification
 class EndpointFull(BaseModel):
@@ -112,6 +118,8 @@ class SynthesisProposal(BaseModel):
     warnings: List[str]
     errors: List[str]
     explain: List[str]
+    bend_radius_mm: Optional[float] = None  # Bend radius in mm
+    locale: Optional[str] = None  # Locale for color standards
 
 # DRC preview response
 class DRCPreviewResponse(BaseModel):
@@ -125,7 +133,18 @@ DrcIssueType = Literal[
     "termination_type",
     "electrical_rating",
     "shielding_requirement",
-    "environmental_compatibility"
+    "environmental_compatibility",
+    "awg_not_supported",
+    "current_exceeds_ampacity",
+    "bend_radius_too_small",
+    "voltage_rating_exceeded",
+    "temperature_rating_exceeded",
+    "ac_color_mismatch",
+    "unsupported_locale",
+    "no_compatible_accessories",
+    "no_compatible_lugs",
+    "no_compatible_contacts",
+    "mdm_unavailable"
 ]
 
 DrcSeverity = Literal["info", "warning", "error"]

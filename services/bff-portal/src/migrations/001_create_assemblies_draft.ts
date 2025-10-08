@@ -10,16 +10,24 @@ export async function up() {
       status TEXT NOT NULL CHECK (status IN ('editing', 'ready_for_step2')),
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
-    );
+    )
+  `;
 
-    CREATE INDEX IF NOT EXISTS idx_assemblies_draft_user_id ON assemblies_draft(user_id);
-    CREATE INDEX IF NOT EXISTS idx_assemblies_draft_status ON assemblies_draft(status);
-    CREATE INDEX IF NOT EXISTS idx_assemblies_draft_updated_at ON assemblies_draft(updated_at);
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_assemblies_draft_user_id ON assemblies_draft(user_id)
+  `;
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_assemblies_draft_status ON assemblies_draft(status)
+  `;
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_assemblies_draft_updated_at ON assemblies_draft(updated_at)
   `;
 }
 
 export async function down() {
   await sql`
-    DROP TABLE IF EXISTS assemblies_draft;
+    DROP TABLE IF EXISTS assemblies_draft
   `;
 }

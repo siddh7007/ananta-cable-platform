@@ -8,4 +8,3 @@ COPY services/api-gateway ./services/api-gateway
 RUN pnpm --filter api-gateway install && pnpm --filter api-gateway build
 EXPOSE 8080
 CMD ["node","services/api-gateway/src/index.js"]
-              

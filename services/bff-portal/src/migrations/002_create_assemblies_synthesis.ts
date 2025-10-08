@@ -8,15 +8,20 @@ export async function up() {
       payload JSONB NOT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
-    );
+    )
+  `;
 
-    CREATE INDEX IF NOT EXISTS idx_assemblies_synthesis_draft_id ON assemblies_synthesis(draft_id);
-    CREATE INDEX IF NOT EXISTS idx_assemblies_synthesis_created_at ON assemblies_synthesis(created_at);
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_assemblies_synthesis_draft_id ON assemblies_synthesis(draft_id)
+  `;
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_assemblies_synthesis_created_at ON assemblies_synthesis(created_at)
   `;
 }
 
 export async function down() {
   await sql`
-    DROP TABLE IF EXISTS assemblies_synthesis;
+    DROP TABLE IF EXISTS assemblies_synthesis
   `;
 }

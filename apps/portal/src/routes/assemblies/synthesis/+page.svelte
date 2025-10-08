@@ -386,7 +386,9 @@
         class="btn btn-primary"
         on:click={handleAccept}
         disabled={loading || hasErrors()}
-        aria-label={hasErrors() ? 'Cannot continue due to errors' : 'Accept synthesis and continue to layout'}
+        aria-label={hasErrors()
+          ? 'Cannot continue due to errors'
+          : 'Accept synthesis and continue to layout'}
       >
         {loading ? 'Accepting...' : 'Continue'}
       </button>
@@ -511,7 +513,7 @@
     border-color: #007bff;
   }
 
-  .part-option input[type="radio"] {
+  .part-option input[type='radio'] {
     margin-top: 0.25rem;
     flex-shrink: 0;
   }

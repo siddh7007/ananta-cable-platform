@@ -90,4 +90,40 @@ export class AssembliesDAO {
 
     return result.length > 0;
   }
+
+  /**
+   * Get assembly schema by assembly_id
+   */
+  async getAssemblySchema(assemblyId: string): Promise<Record<string, unknown> | null> {
+    const result = await sql`
+      SELECT assembly_id, draft_id, schema, schema_hash, created_at, updated_at
+      FROM assemblies_schema
+      WHERE assembly_id = ${assemblyId}
+    `;
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    const row = result[0];
+    return {
+      assembly_id: row.assembly_id,
+      draft_id: row.draft_id,
+      schema: row.schema,
+      schema_hash: row.schema_hash,
+      created_at: row.created_at.toISOString(),
+      updated_at: row.updated_at.toISOString(),
+    };
+  }
+
+  /**
+   * Update assembly schema with new schema and hash
+   */
+  async updateAssemblySchema(assemblyId: string, schema: Record<string, unknown>, schemaHash: string): Promise<void> {
+    await sql`
+      UPDATE assemblies_schema
+      SET schema = ${JSON.stringify(schema)}, schema_hash = ${schemaHash}, updated_at = NOW()
+      WHERE assembly_id = ${assemblyId}
+    `;
+  }
 }
