@@ -57,7 +57,7 @@
   {:else if currentRoute.path === '/assemblies/synthesis'}
     <SynthesisReview bind:mainHeading />
   {:else if currentRoute.path === '/assemblies/drc'}
-    <DrcReview />
+    <DrcReview bind:mainHeading />
   {:else}
     <main>
       <h1 bind:this={mainHeading} tabindex="-1">Page Not Found</h1>

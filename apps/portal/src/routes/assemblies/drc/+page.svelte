@@ -1,13 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { route, navigate } from '$lib/router';
   import { api } from '$lib/api/client';
   import type { DrcReport, DrcFinding, DrcFix, DrcDomain } from '$lib/types/api';
   import { telemetry } from '$lib/stores/telemetry';
 
+  // Props for accessibility
+  export let mainHeading: HTMLElement | undefined = undefined;
+
   // Query parameter
-  $: assemblyId = $page.url.searchParams.get('assembly_id');
+  $: assemblyId = $route.params.assembly_id;
 
   // State
   let loading = true;
@@ -162,7 +164,7 @@
   function continueToLayout() {
     if (canContinue && assemblyId) {
       telemetry.track('drc.continue', { assembly_id: assemblyId });
-      goto(`#/assemblies/layout?assembly_id=${assemblyId}`);
+      navigate(`/assemblies/layout?assembly_id=${assemblyId}`);
     }
   }
 
@@ -186,7 +188,7 @@
   <!-- Sticky Header -->
   <header class="sticky-header">
     <div class="header-content">
-      <h1>DRC Review</h1>
+      <h1 bind:this={mainHeading} tabindex="-1">DRC Review</h1>
       {#if report}
         <div class="status-section">
           <span 
