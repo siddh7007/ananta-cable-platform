@@ -25,7 +25,8 @@ import type {
   NotesPack,
   LocaleColors,
   Region,
-  SynthesisProposal
+  SynthesisProposal,
+  DRCReport
 } from '../types/api';
 
 export interface ApiResponse<T> {
@@ -135,11 +136,33 @@ class CablePlatformClient {
     });
   }
 
-  async previewDrc(proposal: SynthesisProposal): Promise<ApiResponse<{ warnings: string[]; errors: string[] }>> {
-    return this.request<{ warnings: string[]; errors: string[] }>('/v1/drc/preview', {
+  async previewDrc(proposal: SynthesisProposal): Promise<ApiResponse<DRCReport>> {
+    return this.request<DRCReport>('/v1/drc/preview', {
       method: 'POST',
       body: JSON.stringify(proposal),
     });
+  }
+
+  async getDrcRulesets(): Promise<ApiResponse<{ rulesets: { id: string; version: string; created_at: string; notes?: string }[] }>> {
+    return this.request<{ rulesets: { id: string; version: string; created_at: string; notes?: string }[] }>('/v1/drc/rulesets');
+  }
+
+  async runDrc(assemblyId: string, rulesetId?: string): Promise<ApiResponse<DRCReport>> {
+    return this.request<DRCReport>('/v1/drc/run', {
+      method: 'POST',
+      body: JSON.stringify({ assembly_id: assemblyId, ruleset_id: rulesetId }),
+    });
+  }
+
+  async applyDrcFixes(assemblyId: string, fixIds: string[], rulesetId?: string): Promise<ApiResponse<{ assembly_id: string; schema_hash: string; drc: DRCReport }>> {
+    return this.request<{ assembly_id: string; schema_hash: string; drc: DRCReport }>('/v1/drc/apply-fixes', {
+      method: 'POST',
+      body: JSON.stringify({ assembly_id: assemblyId, fix_ids: fixIds, ruleset_id: rulesetId }),
+    });
+  }
+
+  async getDrcReport(assemblyId: string): Promise<ApiResponse<DRCReport>> {
+    return this.request<DRCReport>(\`/v1/drc/report/\${assemblyId}\`);
   }
 }
 

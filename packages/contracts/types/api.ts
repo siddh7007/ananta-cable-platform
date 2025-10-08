@@ -109,9 +109,33 @@ export interface SynthesisProposal {
   explain: string[];
 }
 
-export interface DrcResult {
-  status: 'pass' | 'warning' | 'error';
-  issues: { severity: 'info' | 'warning' | 'error'; message: string; location: string }[];
-  summary: string;
+export interface DRCFinding {
+  id: string;
+  severity: 'error' | 'warning' | 'info';
+  domain: 'mechanical' | 'electrical' | 'standards' | 'labeling' | 'consistency';
+  code: string;
+  message: string;
+  where?: string;
+  refs?: string[];
+}
+
+export interface DRCFix {
+  id: string;
+  label: string;
+  description: string;
+  applies_to: string[];
+  effect: 'non_destructive' | 'substitution' | 're_synthesis_required';
+}
+
+export interface DRCReport {
+  assembly_id: string;
+  ruleset_id: string;
+  version: string;
+  passed: boolean;
+  errors: number;
+  warnings: number;
+  findings: DRCFinding[];
+  fixes: DRCFix[];
+  generated_at: string;
 }
 

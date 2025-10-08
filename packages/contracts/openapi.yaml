@@ -246,9 +246,152 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DrcResult'
+                $ref: '#/components/schemas/DRCReport'
         '400':
           description: Invalid proposal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/drc/rulesets:
+    get:
+      summary: Get available DRC rulesets
+      responses:
+        '200':
+          description: List of available DRC rulesets
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - rulesets
+                properties:
+                  rulesets:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - version
+                        - created_at
+                      properties:
+                        id:
+                          type: string
+                        version:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                        notes:
+                          type: string
+
+  /v1/drc/run:
+    post:
+      summary: Run DRC on an assembly
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - assembly_id
+              properties:
+                assembly_id:
+                  type: string
+                ruleset_id:
+                  type: string
+      responses:
+        '200':
+          description: DRC report generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DRCReport'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Assembly not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/drc/apply-fixes:
+    post:
+      summary: Apply DRC fixes to an assembly
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - assembly_id
+                - fix_ids
+              properties:
+                assembly_id:
+                  type: string
+                fix_ids:
+                  type: array
+                  items:
+                    type: string
+                ruleset_id:
+                  type: string
+      responses:
+        '200':
+          description: Fixes applied successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - assembly_id
+                  - schema_hash
+                  - drc
+                properties:
+                  assembly_id:
+                    type: string
+                  schema_hash:
+                    type: string
+                  drc:
+                    $ref: '#/components/schemas/DRCReport'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Assembly not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/drc/report/{assembly_id}:
+    get:
+      summary: Get latest DRC report for an assembly
+      parameters:
+        - name: assembly_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Latest DRC report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DRCReport'
+        '404':
+          description: Assembly or report not found
           content:
             application/json:
               schema:
@@ -746,31 +889,92 @@ components:
           items:
             type: string
 
-    DrcResult:
+    DRCFinding:
       type: object
       required:
-        - status
-        - issues
-        - summary
+        - id
+        - severity
+        - domain
+        - code
+        - message
       properties:
-        status:
+        id:
           type: string
-          enum: [pass, warning, error]
-        issues:
+        severity:
+          type: string
+          enum: [error, warning, info]
+        domain:
+          type: string
+          enum: [mechanical, electrical, standards, labeling, consistency]
+        code:
+          type: string
+        message:
+          type: string
+        where:
+          type: string
+        refs:
           type: array
           items:
-            type: object
-            required:
-              - severity
-              - message
-              - location
-            properties:
-              severity:
-                type: string
-                enum: [info, warning, error]
-              message:
-                type: string
-              location:
-                type: string
-        summary:
+            type: string
+
+    DRCFix:
+      type: object
+      required:
+        - id
+        - label
+        - description
+        - applies_to
+        - effect
+      properties:
+        id:
           type: string
+        label:
+          type: string
+        description:
+          type: string
+        applies_to:
+          type: array
+          items:
+            type: string
+        effect:
+          type: string
+          enum: [non_destructive, substitution, re_synthesis_required]
+
+    DRCReport:
+      type: object
+      required:
+        - assembly_id
+        - ruleset_id
+        - version
+        - passed
+        - errors
+        - warnings
+        - findings
+        - fixes
+        - generated_at
+      properties:
+        assembly_id:
+          type: string
+        ruleset_id:
+          type: string
+        version:
+          type: string
+        passed:
+          type: boolean
+        errors:
+          type: integer
+          minimum: 0
+        warnings:
+          type: integer
+          minimum: 0
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/DRCFinding'
+        fixes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DRCFix'
+        generated_at:
+          type: string
+          format: date-time
