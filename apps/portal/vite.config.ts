@@ -1,14 +1,20 @@
-import { defineConfig } from "vite";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
-import sveltePreprocess from "svelte-preprocess";
-import path from "path";
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
-  plugins: [svelte({ preprocess: sveltePreprocess() })],
-  resolve: {
-    alias: {
-      '$lib': path.resolve('./src/lib')
-    }
+  plugins: [sveltekit()],
+  
+  server: { 
+    host: true, 
+    port: 5173 
   },
-  server: { host: true, port: 5173 }
+  
+  // Optimize workspace dependencies
+  optimizeDeps: {
+    include: [
+      '@cable-platform/client-sdk',
+      '@cable-platform/contracts',
+      '@cable-platform/validation'
+    ]
+  }
 });

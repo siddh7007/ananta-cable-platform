@@ -9,3 +9,7 @@ dist
 .envrc
 
 .tap/
+
+# SvelteKit
+.svelte-kit/
+build/
