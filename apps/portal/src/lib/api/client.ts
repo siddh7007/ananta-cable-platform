@@ -10,13 +10,29 @@ const sdkApi = new CablePlatformClient(BASE_URL);
 // API client singleton
 class ApiClient {
   async getHealth(): Promise<ApiResponse<{ status: string }>> {
-    // TODO: Add getHealth to CablePlatformClient
-    return { ok: false, error: 'Not implemented' };
+    try {
+      const response = await fetch(`${BASE_URL}/health`);
+      if (!response.ok) {
+        return { ok: false, error: `HTTP ${response.status}` };
+      }
+      const data = await response.json();
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
+    }
   }
 
   async getMe(): Promise<ApiResponse<{ sub: string; roles?: string[] }>> {
-    // TODO: Add getMe to CablePlatformClient
-    return { ok: false, error: 'Not implemented' };
+    try {
+      const response = await fetch(`${BASE_URL}/v1/me`);
+      if (!response.ok) {
+        return { ok: false, error: `HTTP ${response.status}` };
+      }
+      const data = await response.json();
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
+    }
   }
 
   async runDRC(body: CableDesign): Promise<ApiResponse<DRCResult>> {
@@ -41,15 +57,48 @@ class ApiClient {
   }
 
   async getDrcReport(assemblyId: string): Promise<ApiResponse<DrcReport>> {
-    return sdkApi.getDrcReport(assemblyId);
+    try {
+      const response = await fetch(`${BASE_URL}/v1/assemblies/${assemblyId}/drc`);
+      if (!response.ok) {
+        return { ok: false, error: `HTTP ${response.status}` };
+      }
+      const data = await response.json();
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
+    }
   }
 
   async runDrc(assemblyId: string): Promise<ApiResponse<DrcReport>> {
-    return sdkApi.runDrc(assemblyId);
+    try {
+      const response = await fetch(`${BASE_URL}/v1/assemblies/${assemblyId}/drc`, {
+        method: 'POST'
+      });
+      if (!response.ok) {
+        return { ok: false, error: `HTTP ${response.status}` };
+      }
+      const data = await response.json();
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
+    }
   }
 
   async applyDrcFixes(assemblyId: string, fixIds: string[]): Promise<ApiResponse<DrcReport>> {
-    return sdkApi.applyDrcFixes(assemblyId, fixIds);
+    try {
+      const response = await fetch(`${BASE_URL}/v1/assemblies/${assemblyId}/drc/fixes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fixIds })
+      });
+      if (!response.ok) {
+        return { ok: false, error: `HTTP ${response.status}` };
+      }
+      const data = await response.json();
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
+    }
   }
 }
 
