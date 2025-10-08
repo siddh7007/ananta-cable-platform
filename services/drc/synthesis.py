@@ -201,8 +201,6 @@ class SynthesisEngine:
             return 16
         else:
             return 14
-            "custom": 4
-        }
         return type_defaults.get(step1.type, 2)
 
     def _calculate_conductors(self, step1: AssemblyStep1) -> ConductorSpec:
@@ -364,7 +362,7 @@ class SynthesisEngine:
                 notes=f"Ring lug for {awg} AWG wire, {stud_size} stud"
             )
 
-                return {"primary": primary, "alternates": alternates}
+        return {"primary": primary, "alternates": alternates}
 
     def _determine_connector_family(self, step1: AssemblyStep1) -> str:
         """Determine connector family from endpoints."""

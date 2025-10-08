@@ -12,7 +12,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Load schemas at runtime to avoid JSON import issues
-const synthesisProposalSchema = JSON.parse(readFileSync(join(__dirname, '../../../../packages/contracts/openapi.json'), 'utf8')).components.schemas.SynthesisProposal;
+// const synthesisProposalSchema = JSON.parse(readFileSync(join(__dirname, '../../../../packages/contracts/openapi.json'), 'utf8')).components.schemas.SynthesisProposal;
+// Using a basic schema for now to avoid $ref resolution issues
+const synthesisProposalSchema = {
+  type: 'object',
+  properties: {
+    proposal_id: { type: 'string' },
+    draft_id: { type: 'string' },
+    cable: { type: 'object' },
+    conductors: { type: 'object' },
+    endpoints: { type: 'object' },
+    shield: { type: 'object' },
+    wirelist: { type: 'array' },
+    bom: { type: 'array' },
+    warnings: { type: 'array', items: { type: 'string' } },
+    errors: { type: 'array', items: { type: 'string' } },
+    explain: { type: 'array', items: { type: 'string' } }
+  },
+  required: ['proposal_id', 'draft_id', 'cable', 'conductors', 'endpoints', 'shield', 'wirelist', 'bom', 'warnings', 'errors', 'explain']
+};
 
 const synthesisRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
     // POST /v1/synthesis/propose - Generate synthesis proposal

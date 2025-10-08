@@ -27,9 +27,9 @@ export async function build() {
 
   // Initialize database and seed data
   try {
-    await seedConnectors();
-    await seedMDMData();
-    server.log.info('Database initialized and seeded');
+    // await seedConnectors();
+    // await seedMDMData();
+    server.log.info('Database initialized (seeding disabled)');
   } catch (error) {
     server.log.error(`Failed to initialize database: ${error}`);
     throw error;

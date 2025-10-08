@@ -5,6 +5,7 @@
   import Home from './routes/Home.svelte';
   import DRC from './routes/DRC.svelte';
   import Synthesis from './routes/Synthesis.svelte';
+  import SynthesisReview from './routes/assemblies/synthesis/+page.svelte';
 
   let currentRoute = { path: '/', params: {} };
   let mainHeading: HTMLElement;
@@ -29,6 +30,7 @@
       '/': 'Home - Cable Platform Portal',
       '/drc': 'DRC - Cable Platform Portal',
       '/synthesis': 'Synthesis Review - Cable Platform Portal',
+      '/assemblies/synthesis': 'Synthesis Review - Cable Platform Portal',
     };
     document.title = titles[path as keyof typeof titles] || 'Cable Platform Portal';
   }
@@ -50,6 +52,8 @@
     <DRC bind:mainHeading />
   {:else if currentRoute.path === '/synthesis'}
     <Synthesis bind:mainHeading />
+  {:else if currentRoute.path === '/assemblies/synthesis'}
+    <SynthesisReview bind:mainHeading />
   {:else}
     <main>
       <h1 bind:this={mainHeading} tabindex="-1">Page Not Found</h1>

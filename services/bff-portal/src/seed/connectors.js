@@ -41,27 +41,34 @@ export const CONNECTOR_SEED_DATA = [
     }
 ];
 export async function seedConnectors() {
-    // Create connectors table if it doesn't exist
-    await sql `
-    CREATE TABLE IF NOT EXISTS connectors (
-      mpn TEXT PRIMARY KEY,
-      family TEXT NOT NULL,
-      series TEXT NOT NULL,
-      positions INTEGER NOT NULL,
-      pitch_in REAL NOT NULL,
-      termination TEXT NOT NULL,
-      gender TEXT NOT NULL,
-      keying TEXT NOT NULL,
-      compatible_contacts_awg JSONB NOT NULL,
-      backshell_strain_relief BOOLEAN NOT NULL,
-      pin1_semantics TEXT NOT NULL,
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    );
+    // Check if table exists
+    const tableExists = await sql`SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_name = 'connectors'
+    )`;
 
-    CREATE INDEX IF NOT EXISTS idx_connectors_family ON connectors(family);
-    CREATE INDEX IF NOT EXISTS idx_connectors_series ON connectors(series);
-    CREATE INDEX IF NOT EXISTS idx_connectors_termination ON connectors(termination);
-  `;
+    if (!tableExists[0].exists) {
+        // Create connectors table
+        await sql`CREATE TABLE connectors (
+            mpn TEXT PRIMARY KEY,
+            family TEXT NOT NULL,
+            series TEXT NOT NULL,
+            positions INTEGER NOT NULL,
+            pitch_in REAL NOT NULL,
+            termination TEXT NOT NULL,
+            gender TEXT NOT NULL,
+            keying TEXT NOT NULL,
+            compatible_contacts_awg JSONB NOT NULL,
+            backshell_strain_relief BOOLEAN NOT NULL,
+            pin1_semantics TEXT NOT NULL,
+            created_at TIMESTAMPTZ DEFAULT NOW()
+        )`;
+
+        // Create indexes
+        await sql`CREATE INDEX idx_connectors_family ON connectors(family)`;
+        await sql`CREATE INDEX idx_connectors_series ON connectors(series)`;
+        await sql`CREATE INDEX idx_connectors_termination ON connectors(termination)`;
+    }
     // Insert seed data
     for (const connector of CONNECTOR_SEED_DATA) {
         await sql `
