@@ -3,6 +3,7 @@
 ## What We Just Did
 
 ### 1. Rebuilt Portal Container ✅
+
 ```bash
 docker-compose build portal     # Rebuilt with new UI code
 docker-compose up -d portal     # Restarted with new image
@@ -12,6 +13,7 @@ docker-compose up -d portal     # Restarted with new image
 **Status:** Successfully deployed
 
 ### 2. Verified Changes Are Live ✅
+
 ```bash
 curl http://localhost:5173 | grep "Test Drawing Generation"
 # ✅ FOUND: Text is present in HTML
@@ -19,13 +21,13 @@ curl http://localhost:5173 | grep "Test Drawing Generation"
 
 ## 📦 Which Containers Needed Rebuilding?
 
-| Container | Rebuild Needed? | Why? | Status |
-|-----------|----------------|------|--------|
-| **Portal** | ✅ YES | UI changes (new home page card) | ✅ REBUILT |
-| **API Gateway** | ✅ ALREADY DONE | Render routes added earlier | ✅ UP TO DATE |
-| **BFF Portal** | ✅ ALREADY DONE | TypeScript fixes + HOST binding | ✅ UP TO DATE |
-| DRC | ❌ NO | No changes | ⏭️ SKIP |
-| Databases | ❌ NO | No changes | ⏭️ SKIP |
+| Container       | Rebuild Needed? | Why?                            | Status        |
+| --------------- | --------------- | ------------------------------- | ------------- |
+| **Portal**      | ✅ YES          | UI changes (new home page card) | ✅ REBUILT    |
+| **API Gateway** | ✅ ALREADY DONE | Render routes added earlier     | ✅ UP TO DATE |
+| **BFF Portal**  | ✅ ALREADY DONE | TypeScript fixes + HOST binding | ✅ UP TO DATE |
+| DRC             | ❌ NO           | No changes                      | ⏭️ SKIP       |
+| Databases       | ❌ NO           | No changes                      | ⏭️ SKIP       |
 
 ## 🎯 What You Should See NOW
 
@@ -34,7 +36,7 @@ curl http://localhost:5173 | grep "Test Drawing Generation"
 You should see **3 cards** in a grid:
 
 1. **Design Rule Check** (White card)
-2. **Synthesis** (White card)  
+2. **Synthesis** (White card)
 3. **📐 Test Drawing Generation** (Purple gradient card) ← **NEW!**
    - Has a yellow "NEW" badge in top-right
    - Purple gradient background (stands out!)
@@ -88,17 +90,20 @@ Or use the Simple Browser that just opened in VS Code!
 ### If You Don't See the Purple Card:
 
 1. **Hard Refresh**
+
    ```
    Ctrl + Shift + R (Windows)
    Cmd + Shift + R (Mac)
    ```
 
 2. **Check Container Logs**
+
    ```bash
    docker logs ananta-cable-platform-portal-1 --tail 20
    ```
 
 3. **Verify Rebuild Timestamp**
+
    ```bash
    docker inspect ananta-cable-platform-portal-1 | grep Created
    # Should show timestamp from just now
@@ -120,9 +125,10 @@ Or use the Simple Browser that just opened in VS Code!
 
 ## 📝 Summary
 
-**All Done!** The UI changes are now **live and visible** in the running Docker container. 
+**All Done!** The UI changes are now **live and visible** in the running Docker container.
 
 The purple "Test Drawing Generation" card is the **visual proof** that:
+
 1. ✅ Portal rebuilt with latest code
 2. ✅ New components deployed
 3. ✅ Styling applied
