@@ -1,0 +1,13 @@
+# Build outputs
+**/build/
+**/dist/
+**/.svelte-kit/
+
+# Dependencies
+**/node_modules/
+
+# Environment
+**/.env*
+
+# Generated files
+**/generated/
