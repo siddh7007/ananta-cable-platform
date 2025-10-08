@@ -5,7 +5,7 @@
 
   // New props for enhanced states
   export let isLoading: boolean = false;
-  export let emptyMessage: string = "No findings — your design passed!";
+  export let emptyMessage: string = 'No findings — your design passed!';
 
   // Filter state
   type FilterType = 'all' | 'error' | 'warn' | 'info';
@@ -85,13 +85,13 @@
 {:else if result.findings.length === 0}
   <section aria-labelledby="empty-heading">
     <div class="empty-state">
-      <h2 id="empty-heading" bind:this={resultsHeading} tabindex="-1">Results for: {result.design_id}</h2>
+      <h2 id="empty-heading" bind:this={resultsHeading} tabindex="-1">
+        Results for: {result.design_id}
+      </h2>
       <div class="empty-content">
         <span class="empty-icon" aria-hidden="true">✅</span>
         <p>{emptyMessage}</p>
-        <button class="run-again-btn" on:click={() => window.location.reload()}>
-          Run again
-        </button>
+        <button class="run-again-btn" on:click={() => window.location.reload()}> Run again </button>
       </div>
     </div>
   </section>
@@ -373,7 +373,11 @@
   }
 
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

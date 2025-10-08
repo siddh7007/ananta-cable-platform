@@ -108,7 +108,7 @@
 
     // If user selected an alternate, move it to front
     if (selectedMpn && selectedMpn !== primary.mpn) {
-      const selectedIndex = options.findIndex(p => p.mpn === selectedMpn);
+      const selectedIndex = options.findIndex((p) => p.mpn === selectedMpn);
       if (selectedIndex > 0) {
         const selected = options.splice(selectedIndex, 1)[0];
         options.unshift(selected);
@@ -366,19 +366,11 @@
 
     <!-- Action Buttons -->
     <div class="actions">
-      <button
-        class="btn btn-secondary"
-        on:click={handleRecompute}
-        disabled={loading}
-      >
+      <button class="btn btn-secondary" on:click={handleRecompute} disabled={loading}>
         {loading ? 'Recomputing...' : 'Recompute'}
       </button>
 
-      <button
-        class="btn btn-primary"
-        on:click={handleAccept}
-        disabled={loading || hasErrors()}
-      >
+      <button class="btn btn-primary" on:click={handleAccept} disabled={loading || hasErrors()}>
         {loading ? 'Accepting...' : 'Continue'}
       </button>
     </div>
@@ -397,7 +389,8 @@
     margin-bottom: 2rem;
   }
 
-  .loading, .error {
+  .loading,
+  .error {
     text-align: center;
     padding: 2rem;
     border-radius: 8px;
@@ -429,7 +422,8 @@
     margin-bottom: 1rem;
   }
 
-  .warnings h3, .errors h3 {
+  .warnings h3,
+  .errors h3 {
     margin-top: 0;
     color: #856404;
   }
@@ -456,7 +450,7 @@
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .card h3 {
@@ -495,7 +489,7 @@
     border-color: #007bff;
   }
 
-  .part-option input[type="radio"] {
+  .part-option input[type='radio'] {
     margin-top: 0.25rem;
     flex-shrink: 0;
   }
@@ -547,19 +541,23 @@
     border-radius: 6px;
   }
 
-  .wirelist-table, .bom-table {
+  .wirelist-table,
+  .bom-table {
     width: 100%;
     border-collapse: collapse;
   }
 
-  .wirelist-table th, .wirelist-table td,
-  .bom-table th, .bom-table td {
+  .wirelist-table th,
+  .wirelist-table td,
+  .bom-table th,
+  .bom-table td {
     padding: 0.5rem;
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
   }
 
-  .wirelist-table th, .bom-table th {
+  .wirelist-table th,
+  .bom-table th {
     background: #f8f9fa;
     font-weight: 600;
     position: sticky;

@@ -82,7 +82,7 @@
       case 'upstream_unavailable':
         return 'DRC service is unavailable. Try again shortly.';
       case 'upstream_invalid_payload':
-        return 'Unexpected response from DRC. We\'ve logged this.';
+        return "Unexpected response from DRC. We've logged this.";
       default:
         return error || 'An unexpected error occurred.';
     }
@@ -100,7 +100,7 @@
     validateBusy = true;
     try {
       // Simulate async validation (could be AJV schema validation)
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const validation = validateCableDesign(form);
       if (!validation.ok) {
@@ -149,7 +149,11 @@
           resultsHeading.focus();
         }
       } else {
-        submitError = mapErrorToMessage(response.error || 'unknown_error', response.status, response.details);
+        submitError = mapErrorToMessage(
+          response.error || 'unknown_error',
+          response.status,
+          response.details,
+        );
         // Focus error banner
         if (errorBanner) {
           errorBanner.focus();
@@ -192,7 +196,10 @@
           required
           aria-invalid={errors.id ? 'true' : 'false'}
           aria-describedby={errors.id ? 'id-error' : undefined}
-          on:input={() => { validateField('id'); clearSubmitError(); }}
+          on:input={() => {
+            validateField('id');
+            clearSubmitError();
+          }}
           on:blur={() => validateField('id')}
           disabled={submitting}
           bind:this={firstErrorField}
@@ -201,10 +208,7 @@
             : '#ccc'}; border-radius: 4px;"
         />
         {#if errors.id}
-          <span
-            id="id-error"
-            style="color: #dc3545; font-size: 0.875rem;">{errors.id}</span
-          >
+          <span id="id-error" style="color: #dc3545; font-size: 0.875rem;">{errors.id}</span>
         {/if}
       </div>
 
@@ -218,7 +222,10 @@
           required
           aria-invalid={errors.name ? 'true' : 'false'}
           aria-describedby={errors.name ? 'name-error' : undefined}
-          on:input={() => { validateField('name'); clearSubmitError(); }}
+          on:input={() => {
+            validateField('name');
+            clearSubmitError();
+          }}
           on:blur={() => validateField('name')}
           disabled={submitting}
           style="width: 100%; padding: 0.5rem; border: 1px solid {errors.name
@@ -240,7 +247,10 @@
           required
           aria-invalid={errors.cores ? 'true' : 'false'}
           aria-describedby={errors.cores ? 'cores-error' : undefined}
-          on:input={() => { validateField('cores'); clearSubmitError(); }}
+          on:input={() => {
+            validateField('cores');
+            clearSubmitError();
+          }}
           on:blur={() => validateField('cores')}
           disabled={submitting}
           style="width: 100%; padding: 0.5rem; border: 1px solid {errors.cores
@@ -284,7 +294,11 @@
       {#if submitError.includes('logged this') || submitError.includes('details')}
         <details>
           <summary>Details</summary>
-          <pre>{JSON.stringify({ error: submitError, timestamp: new Date().toISOString() }, null, 2)}</pre>
+          <pre>{JSON.stringify(
+              { error: submitError, timestamp: new Date().toISOString() },
+              null,
+              2,
+            )}</pre>
         </details>
       {/if}
     </div>
@@ -295,7 +309,7 @@
       {result}
       bind:resultsHeading
       isLoading={false}
-      emptyMessage={result.findings.length === 0 ? "No findings — your design passed!" : ""}
+      emptyMessage={result.findings.length === 0 ? 'No findings — your design passed!' : ''}
     />
   {/if}
 </main>
@@ -309,7 +323,7 @@
     border: 1px solid #dee2e6;
     border-radius: 4px;
     padding: 0.5rem 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
   }
 
@@ -320,8 +334,12 @@
   }
 
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .banner {
