@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 import Fastify from 'fastify';
 import { test } from 'tap';
+import type { DRCReport } from '@cable-platform/contracts/types/api';
 import { drcRoutes, type DrcRouteOptions } from '../src/routes/drc.ts';
 
 type AssemblyRecord = {
@@ -23,8 +24,8 @@ type AssembliesDaoLike = {
 };
 
 type DrcDaoLike = {
-  upsertReport(report: any): Promise<void>;
-  getReport(assemblyId: string): Promise<any | null>;
+  upsertReport(report: DRCReport): Promise<void>;
+  getReport(assemblyId: string): Promise<DRCReport | null>;
 };
 
 class AssembliesStub implements AssembliesDaoLike {
@@ -57,9 +58,9 @@ class AssembliesStub implements AssembliesDaoLike {
 }
 
 class DrcReportsStub implements DrcDaoLike {
-  private reports = new Map<string, any>();
+  private reports = new Map<string, DRCReport>();
 
-  async upsertReport(report: any) {
+  async upsertReport(report: DRCReport) {
     this.reports.set(report.assembly_id, structuredClone(report));
   }
 
