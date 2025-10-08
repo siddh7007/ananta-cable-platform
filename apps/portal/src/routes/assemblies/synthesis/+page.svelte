@@ -24,7 +24,7 @@
 
   onMount(async () => {
     if (!draftId) {
-      error = 'No draft_id provided in URL parameters';
+      error = 'No draft_id provided in URL. Please navigate to this page with a valid draft_id parameter (e.g., #/assemblies/synthesis?draft_id=your-draft-id)';
       loading = false;
       return;
     }
@@ -130,6 +130,9 @@
     <div class="error" role="alert">
       <h2>Error</h2>
       <p>{error}</p>
+      <p>
+        <a href="#/">← Return to Home</a>
+      </p>
     </div>
   {:else if proposal}
     <!-- Warnings Banner -->
