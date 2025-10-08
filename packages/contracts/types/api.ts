@@ -109,6 +109,34 @@ export interface SynthesisProposal {
   explain: string[];
 }
 
+export interface DRCRuleset {
+  id: string;
+  version: string;
+  created_at: string;
+  notes?: string;
+}
+
+export interface DRCRulesetsResponse {
+  rulesets: DRCRuleset[];
+}
+
+export interface DRCRunRequest {
+  assembly_id: string;
+  ruleset_id?: string;
+}
+
+export interface DRCApplyFixesRequest {
+  assembly_id: string;
+  fix_ids: string[];
+  ruleset_id?: string;
+}
+
+export interface DRCApplyFixesResponse {
+  assembly_id: string;
+  schema_hash: string;
+  drc: DRCReport;
+}
+
 export interface DRCFinding {
   id: string;
   severity: 'error' | 'warning' | 'info';

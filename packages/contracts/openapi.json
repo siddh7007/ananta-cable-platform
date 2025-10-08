@@ -410,38 +410,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "rulesets"
-                  ],
-                  "properties": {
-                    "rulesets": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "id",
-                          "version",
-                          "created_at"
-                        ],
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "version": {
-                            "type": "string"
-                          },
-                          "created_at": {
-                            "type": "string",
-                            "format": "date-time"
-                          },
-                          "notes": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/DRCRulesetsResponse"
                 }
               }
             }
@@ -457,18 +426,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "assembly_id"
-                ],
-                "properties": {
-                  "assembly_id": {
-                    "type": "string"
-                  },
-                  "ruleset_id": {
-                    "type": "string"
-                  }
-                }
+                "$ref": "#/components/schemas/DRCRunRequest"
               }
             }
           }
@@ -515,25 +473,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "assembly_id",
-                  "fix_ids"
-                ],
-                "properties": {
-                  "assembly_id": {
-                    "type": "string"
-                  },
-                  "fix_ids": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "ruleset_id": {
-                    "type": "string"
-                  }
-                }
+                "$ref": "#/components/schemas/DRCApplyFixesRequest"
               }
             }
           }
@@ -544,23 +484,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "assembly_id",
-                    "schema_hash",
-                    "drc"
-                  ],
-                  "properties": {
-                    "assembly_id": {
-                      "type": "string"
-                    },
-                    "schema_hash": {
-                      "type": "string"
-                    },
-                    "drc": {
-                      "$ref": "#/components/schemas/DRCReport"
-                    }
-                  }
+                  "$ref": "#/components/schemas/DRCApplyFixesResponse"
                 }
               }
             }
@@ -1379,6 +1303,97 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "DRCRuleset": {
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "DRCRulesetsResponse": {
+        "type": "object",
+        "required": [
+          "rulesets"
+        ],
+        "properties": {
+          "rulesets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DRCRuleset"
+            }
+          }
+        }
+      },
+      "DRCRunRequest": {
+        "type": "object",
+        "required": [
+          "assembly_id"
+        ],
+        "properties": {
+          "assembly_id": {
+            "type": "string"
+          },
+          "ruleset_id": {
+            "type": "string"
+          }
+        }
+      },
+      "DRCApplyFixesRequest": {
+        "type": "object",
+        "required": [
+          "assembly_id",
+          "fix_ids"
+        ],
+        "properties": {
+          "assembly_id": {
+            "type": "string"
+          },
+          "fix_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ruleset_id": {
+            "type": "string"
+          }
+        }
+      },
+      "DRCApplyFixesResponse": {
+        "type": "object",
+        "required": [
+          "assembly_id",
+          "schema_hash",
+          "drc"
+        ],
+        "properties": {
+          "assembly_id": {
+            "type": "string"
+          },
+          "schema_hash": {
+            "type": "string"
+          },
+          "drc": {
+            "$ref": "#/components/schemas/DRCReport"
           }
         }
       },
