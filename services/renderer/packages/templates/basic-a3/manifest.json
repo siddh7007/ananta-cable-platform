@@ -1,0 +1,26 @@
+{
+  "id": "basic-a3",
+  "version": "1.0.0",
+  "name": "Basic A3 Template",
+  "paper": "A3",
+  "dimensions": {
+    "width_mm": 420,
+    "height_mm": 297
+  },
+  "margins": {
+    "top": 20,
+    "right": 20,
+    "bottom": 30,
+    "left": 20
+  },
+  "styles": {
+    "lineWidth": 0.35,
+    "fontSize": 3.5,
+    "font": "DIN-Regular",
+    "colors": {
+      "primary": "#000000",
+      "secondary": "#666666",
+      "accent": "#FF0000"
+    }
+  }
+}

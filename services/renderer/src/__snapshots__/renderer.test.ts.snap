@@ -1,0 +1,151 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Renderer > Broken Dimension > renders broken dimension glyph when needed 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297">
+  <metadata>
+    <assembly id="asm_broken_dim" schema="hash_broken"/>
+    <template id="basic-a3" version="1.0.0"/>
+  </metadata>
+  <defs>
+    <marker id="pin1-tri" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+      <path d="M 0,0 L 4,2 L 0,4 Z" fill="black"/>
+    </marker>
+  </defs>
+  <style>
+    .connector { fill: none; stroke: black; stroke-width: 0.35; }
+    .wire { fill: none; stroke-width: 0.25; }
+    .dimension { fill: none; stroke: black; stroke-width: 0.2; }
+    .text { font-family: DIN-Regular; font-size: 3.5px; fill: black; }
+    .label { font-size: 2.8000000000000003px; }
+  </style>
+  <!-- Connectors -->
+  <rect id="asm_broken_dim-endA" class="connector" x="60.00" y="136.00" width="20.00" height="15.00"/>
+  <rect id="asm_broken_dim-endB" class="connector" x="340.00" y="136.00" width="20.00" height="15.00"/>
+  <!-- Pin-1 Indicators -->
+  <circle id="asm_broken_dim-pin1-L" cx="57.00" cy="138.00" r="1" fill="black"/>
+  <circle id="asm_broken_dim-pin1-R" cx="363.00" cy="138.00" r="1" fill="black"/>
+  <!-- Wires -->
+  <path id="asm_broken_dim-net-A" class="wire" d="M 80.00,131.50 L 340.00,131.50" stroke="black"/>
+  <path id="asm_broken_dim-net-B" class="wire" d="M 80.00,139.50 L 340.00,139.50" stroke="black"/>
+  <path id="asm_broken_dim-net-C" class="wire" d="M 80.00,147.50 L 340.00,147.50" stroke="black"/>
+  <path id="asm_broken_dim-net-D" class="wire" d="M 80.00,155.50 L 340.00,155.50" stroke="black"/>
+  <!-- Dimensions -->
+  <g id="asm_broken_dim-dim-oal" class="dimension">
+    <line x1="60.00" y1="178.50" x2="205.00" y2="178.50"/>
+    <line x1="215.00" y1="178.50" x2="360.00" y2="178.50"/>
+    <path d="M 205.00,176.50 L 210.00,180.50 L 215.00,176.50" fill="none" stroke="black" stroke-width="0.2"/>
+    <line x1="60.00" y1="173.50" x2="60.00" y2="180.50"/>
+    <line x1="360.00" y1="173.50" x2="360.00" y2="180.50"/>
+    <text x="210.00" y="176.50" class="text" text-anchor="middle">2500 ±15 mm</text>
+  </g>
+  <!-- Notes -->
+  <text x="20.00" y="287.00" class="text label">Notes: STD</text>
+</svg>"
+`;
+
+exports[`Renderer > Ribbon Cable with IDC > renders 12-way ribbon with red stripe and pin-1 indicators 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297">
+  <metadata>
+    <assembly id="asm_ribbon_12way" schema="hash123abc"/>
+    <template id="basic-a3" version="1.0.0"/>
+  </metadata>
+  <defs>
+    <marker id="pin1-tri" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+      <path d="M 0,0 L 4,2 L 0,4 Z" fill="black"/>
+    </marker>
+    <pattern id="red-stripe" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect width="1" height="2" fill="red"/>
+    </pattern>
+  </defs>
+  <style>
+    .connector { fill: none; stroke: black; stroke-width: 0.35; }
+    .wire { fill: none; stroke-width: 0.25; }
+    .dimension { fill: none; stroke: black; stroke-width: 0.2; }
+    .text { font-family: DIN-Regular; font-size: 3.5px; fill: black; }
+    .label { font-size: 2.8000000000000003px; }
+  </style>
+  <!-- Connectors -->
+  <rect id="asm_ribbon_12way-endA" class="connector" x="60.00" y="136.00" width="20.00" height="15.00"/>
+  <rect id="asm_ribbon_12way-endB" class="connector" x="340.00" y="136.00" width="20.00" height="15.00"/>
+  <!-- Pin-1 Indicators -->
+  <circle id="asm_ribbon_12way-pin1-L" cx="57.00" cy="138.00" r="1" fill="black"/>
+  <circle id="asm_ribbon_12way-pin1-R" cx="363.00" cy="138.00" r="1" fill="black"/>
+  <!-- Wires -->
+  <path id="asm_ribbon_12way-net-D0" class="wire" d="M 80.00,136.51 L 340.00,136.51" stroke="brown"/>
+  <path id="asm_ribbon_12way-net-D1" class="wire" d="M 80.00,137.78 L 340.00,137.78" stroke="red"/>
+  <path id="asm_ribbon_12way-net-D2" class="wire" d="M 80.00,139.05 L 340.00,139.05" stroke="orange"/>
+  <path id="asm_ribbon_12way-net-D3" class="wire" d="M 80.00,140.32 L 340.00,140.32" stroke="yellow"/>
+  <path id="asm_ribbon_12way-net-D4" class="wire" d="M 80.00,141.59 L 340.00,141.59" stroke="green"/>
+  <path id="asm_ribbon_12way-net-D5" class="wire" d="M 80.00,142.86 L 340.00,142.86" stroke="blue"/>
+  <path id="asm_ribbon_12way-net-D6" class="wire" d="M 80.00,144.13 L 340.00,144.13" stroke="violet"/>
+  <path id="asm_ribbon_12way-net-D7" class="wire" d="M 80.00,145.40 L 340.00,145.40" stroke="gray"/>
+  <path id="asm_ribbon_12way-net-D8" class="wire" d="M 80.00,146.67 L 340.00,146.67" stroke="white"/>
+  <path id="asm_ribbon_12way-net-D9" class="wire" d="M 80.00,147.94 L 340.00,147.94" stroke="black"/>
+  <path id="asm_ribbon_12way-net-D10" class="wire" d="M 80.00,149.21 L 340.00,149.21" stroke="pink"/>
+  <path id="asm_ribbon_12way-net-D11" class="wire" d="M 80.00,150.48 L 340.00,150.48" stroke="turquoise"/>
+  <!-- Red Stripe -->
+  <rect id="asm_ribbon_12way-red-stripe" x="80.00" y="136.51" width="260.00" height="1" fill="url(#red-stripe)"/>
+  <!-- Dimensions -->
+  <g id="asm_ribbon_12way-dim-oal" class="dimension">
+    <line x1="60.00" y1="178.50" x2="360.00" y2="178.50"/>
+    <line x1="60.00" y1="173.50" x2="60.00" y2="180.50"/>
+    <line x1="360.00" y1="173.50" x2="360.00" y2="180.50"/>
+    <text x="210.00" y="176.50" class="text" text-anchor="middle">1250 ±5 mm</text>
+  </g>
+  <!-- Labels -->
+  <text id="asm_ribbon_12way-label-0" x="210.00" y="113.50" class="text label">RIBBON CABLE ASSY</text>
+  <!-- Notes -->
+  <text x="20.00" y="287.00" class="text label">Notes: IPC-620-CLASS-2</text>
+  <!-- QR Code -->
+  <rect id="asm_ribbon_12way-qr" x="390.00" y="267.00" width="20" height="20" fill="white" stroke="black" stroke-width="0.2"/>
+  <text x="400.00" y="279.00" class="text label" text-anchor="middle" font-size="2">QR</text>
+</svg>"
+`;
+
+exports[`Renderer > Round Cable with Labels > renders 2-conductor power cable with labels and dimension 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297">
+  <metadata>
+    <assembly id="asm_power_2cond" schema="hash789ghi"/>
+    <template id="basic-a3" version="1.0.0"/>
+  </metadata>
+  <defs>
+    <marker id="pin1-tri" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+      <path d="M 0,0 L 4,2 L 0,4 Z" fill="black"/>
+    </marker>
+  </defs>
+  <style>
+    .connector { fill: none; stroke: black; stroke-width: 0.35; }
+    .wire { fill: none; stroke-width: 0.25; }
+    .dimension { fill: none; stroke: black; stroke-width: 0.2; }
+    .text { font-family: DIN-Regular; font-size: 3.5px; fill: black; }
+    .label { font-size: 2.8000000000000003px; }
+  </style>
+  <!-- Connectors -->
+  <rect id="asm_power_2cond-endA" class="connector" x="60.00" y="136.00" width="20.00" height="15.00"/>
+  <rect id="asm_power_2cond-endB" class="connector" x="340.00" y="136.00" width="20.00" height="15.00"/>
+  <!-- Pin-1 Indicators -->
+  <circle id="asm_power_2cond-pin1-L" cx="57.00" cy="138.00" r="1" fill="black"/>
+  <circle id="asm_power_2cond-pin1-R" cx="363.00" cy="138.00" r="1" fill="black"/>
+  <!-- Wires -->
+  <path id="asm_power_2cond-net-+48V" class="wire" d="M 80.00,136.83 L 340.00,136.83" stroke="red"/>
+  <path id="asm_power_2cond-net-RTN" class="wire" d="M 80.00,150.17 L 340.00,150.17" stroke="black"/>
+  <!-- Dimensions -->
+  <g id="asm_power_2cond-dim-oal" class="dimension">
+    <line x1="60.00" y1="178.50" x2="360.00" y2="178.50"/>
+    <line x1="60.00" y1="173.50" x2="60.00" y2="180.50"/>
+    <line x1="360.00" y1="173.50" x2="360.00" y2="180.50"/>
+    <text x="210.00" y="176.50" class="text" text-anchor="middle">800 ±10 mm</text>
+  </g>
+  <!-- Labels -->
+  <text id="asm_power_2cond-label-0" x="60.00" y="126.00" class="text label">+48V POWER</text>
+  <text id="asm_power_2cond-label-1" x="340.00" y="126.00" class="text label">LOAD</text>
+  <!-- Notes -->
+  <text x="20.00" y="287.00" class="text label">Notes: UL-LISTED</text>
+  <!-- QR Code -->
+  <rect id="asm_power_2cond-qr" x="390.00" y="267.00" width="20" height="20" fill="white" stroke="black" stroke-width="0.2"/>
+  <text x="400.00" y="279.00" class="text label" text-anchor="middle" font-size="2">QR</text>
+</svg>"
+`;
