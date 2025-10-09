@@ -4,7 +4,8 @@ import type {
   DrcReport,
   TemplatePack,
   RenderRequest,
-  RenderResponse
+  RenderResponse,
+  AssemblyStep1
 } from '../types/api';
 
 // Configure SDK with base URL
@@ -51,6 +52,23 @@ class ApiClient {
 
   async acceptSynthesis(proposalId: string, locks?: Record<string, string>): Promise<ApiResponse<{ assembly_id: string; schema_hash: string }>> {
     return sdkApi.acceptSynthesis(proposalId, locks ? Object.values(locks) : undefined);
+  }
+
+  async createDraft(draft: AssemblyStep1): Promise<ApiResponse<{ draft_id: string; status: string; updated_at: string }>> {
+    try {
+      const response = await fetch(`${BASE_URL}/v1/assemblies/draft`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(draft)
+      });
+      if (!response.ok) {
+        return { ok: false, error: `HTTP ${response.status}` };
+      }
+      const data = await response.json();
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
+    }
   }
 
   async previewDrc(proposal: SynthesisProposal): Promise<ApiResponse<{ warnings: string[]; errors: string[] }>> {
