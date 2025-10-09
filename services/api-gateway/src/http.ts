@@ -34,13 +34,20 @@ export async function fetchWithTimeout(
   }
 }
 
+export interface RetryResult {
+  response: Response;
+  retryCount: number;
+}
+
 export async function fetchWithRetry(
   url: string,
   options: RequestInit = {},
   maxRetries: number = 1,
-  timeoutMs: number = 5000
-): Promise<Response> {
+  timeoutMs: number = 5000,
+  baseBackoffMs: number = 1000
+): Promise<RetryResult> {
   let lastError: Error;
+  let retryCount = 0;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -48,18 +55,22 @@ export async function fetchWithRetry(
 
       // Don't retry on 4xx errors (client errors)
       if (response.status >= 400 && response.status < 500) {
-        return response;
+        return { response, retryCount };
       }
 
       // Retry on 5xx errors or network issues
       if (response.status >= 500) {
         if (attempt < maxRetries) {
+          retryCount++;
+          // Jittered exponential backoff: baseBackoffMs * 2^attempt + random jitter
+          const backoffMs = baseBackoffMs * Math.pow(2, attempt) + Math.random() * 1000;
+          await new Promise(resolve => setTimeout(resolve, backoffMs));
           continue;
         }
-        return response;
+        return { response, retryCount };
       }
 
-      return response;
+      return { response, retryCount };
     } catch (error) {
       lastError = error as Error;
 
@@ -67,6 +78,11 @@ export async function fetchWithRetry(
       if (attempt >= maxRetries) {
         throw lastError;
       }
+
+      // Retry on timeout or network errors with jittered backoff
+      retryCount++;
+      const backoffMs = baseBackoffMs * Math.pow(2, attempt) + Math.random() * 1000;
+      await new Promise(resolve => setTimeout(resolve, backoffMs));
     }
   }
 

@@ -4,7 +4,7 @@ import { dirname, join } from 'path';
 import type { FastifyRequest, FastifyReply, FastifyPluginCallback } from 'fastify';
 import { authGuard } from '../auth.js';
 import { validateCableDesign, validateDRCResult } from '@cable-platform/validation';
-import { fetchWithRetry, HttpError } from '../http.js';
+import { fetchWithRetry, RetryResult, HttpError } from '../http.js';
 import { withChildSpan } from '../otel.js';
 import { trace } from '@opentelemetry/api';
 import { BadRequest, UpstreamUnavailable, UpstreamInvalidPayload, UpstreamBadRequest, UnsupportedMediaType } from '../errors.js';
@@ -57,7 +57,7 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
     try {
       // Make upstream call with timeout and retry
       const startTime = process.hrtime.bigint();
-      const response = await withChildSpan('drc.run', {
+      const retryResult: RetryResult = await withChildSpan('drc.run', {
         'http.method': 'POST',
         'http.target': '/v1/drc/run',
         'upstream.url': 'http://drc:8000/v1/drc/run',
@@ -72,9 +72,12 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
             body: JSON.stringify(validation.data),
           },
           1, // 1 retry
-          5000 // 5s timeout
+          5000, // 5s timeout
+          1000 // 1s base backoff
         );
       });
+
+      const { response, retryCount } = retryResult;
 
       // Calculate upstream latency and add span attributes
       const upstreamLatencyMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
@@ -82,7 +85,20 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
       if (span) {
         span.setAttribute('http.status_code', response.status);
         span.setAttribute('upstream.latency_ms', upstreamLatencyMs);
-        span.setAttribute('retry.count', 1); // We always do 1 retry attempt
+        span.setAttribute('retry.count', retryCount);
+        span.setAttribute('upstream.retried', retryCount > 0);
+      }
+
+      // Log retry metrics
+      if (retryCount > 0) {
+        fastify.log.info({
+          msg: 'DRC upstream retry occurred',
+          requestId,
+          retryCount,
+          upstreamLatencyMs,
+          finalStatus: response.status,
+          userSub: req.user?.sub
+        });
       }
 
       // Handle different upstream response codes
