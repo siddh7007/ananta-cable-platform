@@ -1,8 +1,22 @@
-FROM python:3.11-slim
+# syntax=docker/dockerfile:1.7
+
+FROM python:3.11-slim AS base
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 WORKDIR /app
+
+FROM base AS requirements
 COPY services/drc/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY services/drc .
-COPY services/rules ../rules
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip && \
+    pip wheel --no-cache-dir --wheel-dir=/tmp/wheels -r requirements.txt
+
+FROM base AS runtime
+COPY services/drc/requirements.txt .
+COPY --from=requirements /tmp/wheels /tmp/wheels
+RUN pip install --no-cache-dir --no-index --find-links=/tmp/wheels -r requirements.txt && rm -rf /tmp/wheels
+COPY services/drc/ .
+COPY services/rules ./rules
+COPY shared/rulesets ./shared/rulesets
 EXPOSE 8000
 CMD ["uvicorn","main:app","--host","0.0.0.0","--port","8000"]

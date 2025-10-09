@@ -1,36 +1,40 @@
-# Build stage
-FROM node:20-alpine AS builder
-WORKDIR /app
+# syntax=docker/dockerfile:1.7
 
-# Copy workspace files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
-COPY apps/portal ./apps/portal
+ARG NODE_VERSION=20-alpine
+
+FROM node:${NODE_VERSION} AS base
+ENV PNPM_HOME="/pnpm"
+ENV PNPM_STORE_PATH="/pnpm/store"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV HUSKY=0
+WORKDIR /workspace
+RUN apk add --no-cache libc6-compat && corepack enable
+
+FROM base AS deps
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
+COPY packages ./packages
 COPY shared ./shared
+COPY apps/portal/package.json apps/portal/package.json
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm fetch --filter portal...
 
-# Install dependencies and build SvelteKit app
-RUN corepack enable && \
-    pnpm i --filter portal... && \
-    pnpm --filter portal build
+FROM base AS builder
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
+COPY packages ./packages
+COPY shared ./shared
+COPY apps/portal ./apps/portal
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm --filter @cable-platform/validation... build
+RUN pnpm --filter @cable-platform/contracts... build
+RUN pnpm --filter portal... build
+RUN pnpm deploy --filter portal --prod /opt/app
+RUN rm -rf /opt/app/tests /opt/app/src /opt/app/playwright-report
 
-# Production stage
-FROM node:20-alpine
-WORKDIR /app
-
-# Copy built app and dependencies
-COPY --from=builder /app/apps/portal/build ./build
-COPY --from=builder /app/apps/portal/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-
-# Set production environment
+FROM node:${NODE_VERSION} AS runner
 ENV NODE_ENV=production
 ENV PORT=3000
-
-# Expose port
+WORKDIR /app
+COPY --from=builder /opt/app/ ./
 EXPOSE 3000
-
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
-
-# Run the SvelteKit Node.js server
+  CMD node -e "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 CMD ["node", "build"]
