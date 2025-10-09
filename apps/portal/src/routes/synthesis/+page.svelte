@@ -2,13 +2,23 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { api } from '$lib/api/client.js';
-  import type { SynthesisProposal, PartRef } from '$lib/types/api.js';
+  import type { SynthesisProposal, PartRef } from '@cable-platform/client-sdk';
+  import ErrorCard from '$lib/components/ErrorCard.svelte';
 
-  let mainHeading: HTMLElement;
   let proposal: SynthesisProposal | null = null;
   let loading = true;
   let error: string | null = null;
   let locks: Record<string, string> = {}; // section -> mpn
+
+  // Form state for creating new synthesis
+  let showForm = true; // Temporarily set to true for debugging
+  let formData = {
+    conductors: 4,
+    cableType: 'round_shielded',
+    endA: { family: 'JST PH', positions: 4 },
+    endB: { family: 'JST PH', positions: 4 },
+    length: 300,
+  };
 
   // Telemetry store (simplified)
   let telemetry: string[] = [];
@@ -17,6 +27,74 @@
     const entry = `${new Date().toISOString()}: ${event}${data ? ` - ${JSON.stringify(data)}` : ''}`;
     telemetry = [...telemetry, entry];
     console.log('Telemetry:', entry);
+  }
+
+  async function submitSynthesisForm() {
+    loading = true;
+    error = null;
+
+    try {
+      emitTelemetry('synthesis.form.submit', formData);
+
+      // Create a basic AssemblyStep1 payload from form data
+      const draftPayload = {
+        step: 1,
+        status: 'ready_for_step2',
+        payload: {
+          type: formData.cableType,
+          length_mm: formData.length,
+          tolerance_mm: 10, // Default tolerance
+          environment: {
+            temp_min_c: -20,
+            temp_max_c: 80,
+            flex_class: 'static',
+          },
+          electrical: {
+            per_circuit: [],
+          },
+          emi: {
+            shield: 'none',
+            drain_policy: 'isolated',
+          },
+          locale: 'us',
+          compliance: {
+            ipc_class: '2',
+            ul94_v0_labels: true,
+            rohs_reach: true,
+          },
+          endA: {
+            selector: {
+              family: formData.endA.family,
+              positions: formData.endA.positions,
+            },
+            termination: 'crimp',
+          },
+          endB: {
+            selector: {
+              family: formData.endB.family,
+              positions: formData.endB.positions,
+            },
+            termination: 'crimp',
+          },
+          notes_pack_id: 'STD-NOTES-IPC620-ROHS-REACH',
+        },
+      };
+
+      const draftResponse = await api.createDraft(draftPayload);
+
+      if (draftResponse.ok && draftResponse.data) {
+        // Navigate to the synthesis results with the new draft_id
+        const newDraftId = draftResponse.data.draft_id;
+        window.location.href = `/synthesis?draft_id=${newDraftId}`;
+      } else {
+        error = draftResponse.error || 'Failed to create assembly draft';
+      }
+    } catch (err) {
+      error = 'Network error occurred while creating synthesis';
+      console.error(err);
+    } finally {
+      loading = false;
+    }
   }
 
   // Get draft_id from URL params
@@ -28,7 +106,7 @@
     draftId = params.get('draft_id');
 
     if (!draftId) {
-      error = 'No draft_id provided in URL (expected ?draft_id=...)';
+      showForm = true;
       loading = false;
       return;
     }
@@ -127,15 +205,178 @@
   <title>Synthesis - Ananta Cable Platform</title>
 </svelte:head>
 
-<main bind:this={mainHeading} tabindex="-1">
-  <h1>Synthesis Review</h1>
+<main>
+  <h1 id="main" tabindex="-1">Synthesis Review</h1>
 
   {#if loading}
     <div class="loading">Generating synthesis proposal...</div>
+  {:else if showForm || (!draftId && !error)}
+    <div class="synthesis-form">
+      <h2>📋 Create Synthesis Proposal</h2>
+      <p class="form-subtitle">
+        Generate optimized cable assembly proposals from your requirements
+      </p>
+
+      <form on:submit|preventDefault={submitSynthesisForm} class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="conductors">Number of Conductors:</label>
+            <input
+              id="conductors"
+              type="number"
+              min="1"
+              max="50"
+              bind:value={formData.conductors}
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="cableType">Cable Type:</label>
+            <select id="cableType" bind:value={formData.cableType} required>
+              <option value="round_shielded">Round Shielded</option>
+              <option value="flat_ribbon">Flat Ribbon</option>
+              <option value="coaxial">Coaxial</option>
+              <option value="twisted_pair">Twisted Pair</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="length">Length (mm):</label>
+            <input
+              id="length"
+              type="number"
+              min="50"
+              max="10000"
+              bind:value={formData.length}
+              required
+            />
+          </div>
+        </div>
+
+        <div class="connector-section">
+          <h3>Connector Specifications</h3>
+
+          <div class="connector-grid">
+            <div class="connector-card">
+              <h4>End A</h4>
+              <div class="form-group">
+                <label for="endA-family">Family:</label>
+                <input
+                  id="endA-family"
+                  type="text"
+                  placeholder="e.g., JST PH"
+                  bind:value={formData.endA.family}
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="endA-positions">Positions:</label>
+                <input
+                  id="endA-positions"
+                  type="number"
+                  min="1"
+                  max="50"
+                  bind:value={formData.endA.positions}
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="connector-card">
+              <h4>End B</h4>
+              <div class="form-group">
+                <label for="endB-family">Family:</label>
+                <input
+                  id="endB-family"
+                  type="text"
+                  placeholder="e.g., JST PH"
+                  bind:value={formData.endB.family}
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="endB-positions">Positions:</label>
+                <input
+                  id="endB-positions"
+                  type="number"
+                  min="1"
+                  max="50"
+                  bind:value={formData.endB.positions}
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {#if error}
+          <ErrorCard
+            title="Form Submission Failed"
+            message={error}
+            suggestions={[
+              'Check that all form fields are filled correctly',
+              'Verify connector family names match available parts',
+              'Try using simpler values and submit again',
+              'Contact support if the problem persists',
+            ]}
+            showBackButton={false}
+          />
+        {/if}
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            on:click={() => (window.location.href = '/')}
+          >
+            ← Back to Home
+          </button>
+          <button type="submit" class="btn btn-primary" disabled={loading}>
+            {#if loading}
+              Creating Proposal...
+            {:else}
+              Generate Proposal
+            {/if}
+          </button>
+        </div>
+      </form>
+    </div>
   {:else if error}
-    <div class="error">
-      <h2>Error</h2>
-      <p>{error}</p>
+    <div class="error-instructions">
+      <h2>📋 Synthesis</h2>
+      <p class="error-subtitle">Generate optimized cable assembly proposals</p>
+
+      <div class="instructions-card">
+        <h3>How to use Synthesis:</h3>
+        <ol>
+          <li>Create a draft assembly with your requirements</li>
+          <li>
+            Navigate to the synthesis page with a draft ID:
+            <code>/synthesis?draft_id=your-draft-id</code>
+          </li>
+          <li>Review the proposed parts and alternatives</li>
+          <li>Select preferred components from the options</li>
+          <li>Accept the proposal to create the assembly</li>
+        </ol>
+      </div>
+
+      <div class="api-info">
+        <h3>For API Users:</h3>
+        <p>Send a POST request to create a draft and get your draft_id:</p>
+        <pre>{@html `POST /api/v1/synthesis/drafts
+Content-Type: application/json
+
+{
+  "requirements": {...},
+  "specifications": {...}
+}`}</pre>
+      </div>
+
+      <div class="navigation-actions">
+        <a href="/" class="btn btn-secondary">← Back to Home</a>
+        <a href="/drc" class="btn btn-primary">Try DRC Instead</a>
+      </div>
     </div>
   {:else if proposal}
     <!-- Warnings Banner -->
@@ -398,7 +639,8 @@
   }
 
   .loading,
-  .error {
+  .error,
+  .error-instructions {
     text-align: center;
     padding: 2rem;
     border-radius: 8px;
@@ -412,6 +654,82 @@
   .error {
     background: #ffebee;
     color: #c62828;
+  }
+
+  .error-instructions {
+    background: #fff;
+    color: #333;
+    text-align: left;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .error-subtitle {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  .instructions-card {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .instructions-card h3 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  .instructions-card ol {
+    padding-left: 1.5rem;
+    line-height: 1.8;
+  }
+
+  .instructions-card code {
+    background: #e3f2fd;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #0066cc;
+    font-family: 'Consolas', 'Monaco', monospace;
+  }
+
+  .api-info {
+    background: #f0f8ff;
+    border: 1px solid #cce5ff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .api-info h3 {
+    margin-top: 0;
+    color: #0066cc;
+  }
+
+  .api-info pre {
+    background: #263238;
+    color: #aed581;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .navigation-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .navigation-actions .btn {
+    text-decoration: none;
+    display: inline-block;
   }
 
   .warnings {
@@ -643,6 +961,142 @@
 
     .explain-column {
       order: -1;
+    }
+  }
+
+  /* Synthesis Form Styles */
+  .synthesis-form {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .form-subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .form-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+
+  .connector-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+
+  .connector-section h3 {
+    margin: 0 0 1.5rem 0;
+    color: #333;
+    font-size: 1.2rem;
+  }
+
+  .connector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .connector-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .connector-card h4 {
+    margin: 0 0 1rem 0;
+    color: #495057;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+  }
+
+  .error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid #f5c6cb;
+    margin: 1rem 0;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .form-actions .btn {
+    flex: 1;
+    max-width: 200px;
+  }
+
+  @media (max-width: 768px) {
+    .form-card {
+      padding: 1.5rem;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .connector-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .form-actions .btn {
+      max-width: none;
     }
   }
 </style>

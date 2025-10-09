@@ -2,6 +2,7 @@
   import { api } from '$lib/api/client';
   import type { DrcResult } from '$lib/types/api';
   import DRCResults from '$lib/components/DRCResults.svelte';
+  import ErrorCard from '$lib/components/ErrorCard.svelte';
 
   // Form data type
   type FormData = {
@@ -47,7 +48,6 @@
   let submitError: string | null = null;
 
   // Props
-  let mainHeading: HTMLElement;
   let firstErrorField: HTMLElement;
 
   // For focus management in results
@@ -180,7 +180,7 @@
 </svelte:head>
 
 <main>
-  <h1 bind:this={mainHeading} tabindex="-1">Design Rule Check (DRC)</h1>
+  <h1 id="main" tabindex="-1">Design Rule Check (DRC)</h1>
 
   {#if validateBusy}
     <div class="validation-status" aria-live="polite">
@@ -286,26 +286,17 @@
   </form>
 
   {#if submitError}
-    <div
-      class="banner error"
-      role="alert"
-      aria-live="assertive"
-      bind:this={errorBanner}
-      tabindex="-1"
-    >
-      <h3>Error</h3>
-      <p>{submitError}</p>
-      {#if submitError.includes('logged this') || submitError.includes('details')}
-        <details>
-          <summary>Details</summary>
-          <pre>{JSON.stringify(
-              { error: submitError, timestamp: new Date().toISOString() },
-              null,
-              2,
-            )}</pre>
-        </details>
-      {/if}
-    </div>
+    <ErrorCard
+      title="DRC Check Failed"
+      message={submitError}
+      suggestions={[
+        'Check that all form fields are filled correctly',
+        'Verify the design ID exists in the system',
+        'Try refreshing the page and submitting again',
+        'Contact support if the problem persists',
+      ]}
+      actionButton={{ label: 'Try DRC Again', url: '/drc' }}
+    />
   {/if}
 
   {#if result}

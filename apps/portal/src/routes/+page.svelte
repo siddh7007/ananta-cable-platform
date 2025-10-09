@@ -1,5 +1,4 @@
 <script lang="ts">
-  let mainHeading: HTMLElement | undefined = undefined;
 </script>
 
 <svelte:head>
@@ -7,7 +6,7 @@
 </svelte:head>
 
 <main class="home-page">
-  <h1 bind:this={mainHeading} tabindex="-1">Welcome to Cable Platform</h1>
+  <h1 id="main" tabindex="-1">Welcome to Cable Platform</h1>
 
   <p class="lead">Design, synthesize, and verify cable assemblies with confidence.</p>
 
@@ -22,22 +21,21 @@
       <p>Generate optimized cable assemblies</p>
     </a>
 
-    <div class="card demo-card">
+    <a href="/drc" class="card demo-card">
       <h2>📐 Drawing Generation</h2>
       <p>Generate technical drawings from DRC-validated assemblies</p>
       <span class="badge">NEW</span>
       <div class="demo-instructions">
-        <strong>How to use:</strong>
-        <ol>
-          <li>Navigate to an assembly's DRC page</li>
-          <li>Ensure the assembly has a passing DRC report</li>
-          <li>Click "Generate Drawing" button</li>
-        </ol>
+        <strong>👉 Click here to get started!</strong>
+        <p class="quick-start">
+          Run a Design Rule Check (DRC) on your cable assembly first. Once your design passes
+          validation, you'll see the "Generate Drawing" button.
+        </p>
         <p class="demo-note">
-          💡 <em>Example:</em> <code>/assemblies/drc?assembly_id=your-assembly-id</code>
+          💡 Takes less than 2 minutes to validate and generate your first drawing
         </p>
       </div>
-    </div>
+    </a>
   </div>
 </main>
 
@@ -82,6 +80,12 @@
     transform: translateY(-4px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     text-decoration: none;
+    cursor: pointer;
+  }
+
+  .demo-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
   }
 
   .card h2 {

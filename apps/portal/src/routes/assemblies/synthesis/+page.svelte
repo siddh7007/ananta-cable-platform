@@ -5,7 +5,6 @@
   import { api } from '$lib/api/client';
   import type { SynthesisProposal } from '$lib/types/api';
 
-  let mainHeading: HTMLElement;
   let proposal: SynthesisProposal | null = null;
   let loading = true;
   let error: string | null = null;
@@ -121,8 +120,8 @@
   }
 </script>
 
-<main bind:this={mainHeading} tabindex="-1">
-  <h1>Synthesis Review</h1>
+<main>
+  <h1 id="main" tabindex="-1">Synthesis Review</h1>
 
   {#if loading}
     <div class="loading" role="status" aria-label="Generating synthesis proposal">

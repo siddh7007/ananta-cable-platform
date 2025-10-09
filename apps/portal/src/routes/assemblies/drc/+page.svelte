@@ -17,9 +17,6 @@
   import SvgPreview from '$lib/components/SvgPreview.svelte';
   import ManifestPanel from '$lib/components/ManifestPanel.svelte';
 
-  // Props for accessibility
-  export let mainHeading: HTMLElement | undefined = undefined;
-
   // Query parameter
   $: assemblyId = $page.url.searchParams.get('assembly_id');
 
@@ -308,7 +305,7 @@
   <!-- Sticky Header -->
   <header class="sticky-header">
     <div class="header-content">
-      <h1 bind:this={mainHeading} tabindex="-1">DRC Review</h1>
+      <h1 id="main" tabindex="-1">DRC Review</h1>
       {#if report}
         <div class="status-section">
           <span
