@@ -32,7 +32,14 @@ export async function buildServer() {
     return getAjv().compile(schema);
   });
 
-  await server.register(cors, { origin: true });
+  // CORS configuration
+  const PORTAL_ORIGIN = process.env.PORTAL_ORIGIN ?? "http://localhost:5173";
+  await server.register(cors, {
+    origin: PORTAL_ORIGIN,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: true
+  });
 
   // Attach request logging hooks
   attachRequestLogging(server);

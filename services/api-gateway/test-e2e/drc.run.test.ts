@@ -3,13 +3,22 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
 import drcRoutes from '../src/routes/drc.js';
-import sampleDesign from '../../../shared/testing/fixtures/sample-design.json' assert { type: 'json' };
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const sampleDesign = require('../../../shared/testing/fixtures/sample-design.json');
 
 test('DRC run endpoint E2E tests', async (t) => {
   const server = Fastify({ logger: false });
 
   // Register plugins (minimal setup for testing)
-  await server.register(cors, { origin: true });
+  const PORTAL_ORIGIN = process.env.PORTAL_ORIGIN ?? "http://localhost:5173";
+  await server.register(cors, {
+    origin: PORTAL_ORIGIN,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: true
+  });
   await server.register(rateLimit, {
     max: 100,
     timeWindow: 60000,
@@ -77,6 +86,25 @@ test('DRC run endpoint E2E tests', async (t) => {
       t.equal(response.status, 415, 'Should return 415 for wrong content type');
       const data = await response.json();
       t.equal(data.error, 'unsupported_media_type', 'Should return unsupported_media_type error');
+    });
+
+    // Test 4: CORS preflight request should return 200
+    await t.test('CORS preflight returns 200 with proper headers', async (t) => {
+      const response = await fetch(`${baseUrl}/v1/drc/run`, {
+        method: 'OPTIONS',
+        headers: {
+          'origin': 'http://localhost:5173',
+          'access-control-request-method': 'POST',
+          'access-control-request-headers': 'content-type,authorization'
+        }
+      });
+
+      t.equal(response.status, 200, 'Should return 200 for preflight');
+      t.equal(response.headers.get('access-control-allow-origin'), 'http://localhost:5173', 'Should allow portal origin');
+      t.equal(response.headers.get('access-control-allow-methods'), 'GET,POST,PUT,DELETE,OPTIONS', 'Should allow standard methods');
+      t.equal(response.headers.get('access-control-allow-headers'), 'Content-Type,Authorization,X-Requested-With', 'Should allow standard headers');
+      t.equal(response.headers.get('access-control-allow-credentials'), 'true', 'Should allow credentials');
+      t.equal(response.headers.get('vary'), 'Origin', 'Should include Vary: Origin header');
     });
 
   } finally {
