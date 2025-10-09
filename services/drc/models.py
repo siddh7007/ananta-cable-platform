@@ -92,6 +92,7 @@ class ConductorSpec(BaseModel):
     voltage_rating: Optional[float] = None  # Volts
     temp_rating_c: Optional[float] = None  # Temperature rating in Celsius
     ac_colors: Optional[List[str]] = None  # AC conductor colors
+    length_mm: Optional[float] = None  # Conductor length in mm
 
 # Endpoint with full specification
 class EndpointFull(BaseModel):
@@ -120,6 +121,7 @@ class SynthesisProposal(BaseModel):
     explain: List[str]
     bend_radius_mm: Optional[float] = None  # Bend radius in mm
     locale: Optional[str] = None  # Locale for color standards
+    environment: Optional[str] = None  # Operating environment (indoor, outdoor, etc.)
 
 # DRC preview response
 class DRCPreviewResponse(BaseModel):
@@ -172,3 +174,18 @@ class RulesManifest(BaseModel):
     pack_version: str
     rules: List[dict]  # List of rule definitions
     metadata: dict  # IPC620 set metadata
+
+# DRC run request (legacy format)
+class DrcRunRequest(BaseModel):
+    id: Optional[str] = None
+    name: Optional[str] = None
+    cores: Optional[List[dict]] = None
+    # Allow additional fields for flexibility
+    class Config:
+        extra = "allow"
+
+# DRC run response (legacy format)
+class DrcRunResponse(BaseModel):
+    design_id: str
+    findings: List[dict]  # Keep as dict for legacy compatibility
+    severity_summary: dict  # {"info": int, "warn": int, "error": int}

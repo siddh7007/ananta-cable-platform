@@ -1,10 +1,17 @@
 from fastapi import FastAPI, HTTPException
 from typing import Optional
-from models import AssemblyStep1, SynthesisProposal, DrcResult, RulesManifest
+from models import AssemblyStep1, SynthesisProposal, DrcResult, RulesManifest, DrcRunRequest, DrcRunResponse
 from synthesis import SynthesisEngine
 from drc import DrcEngine
 
-app = FastAPI(title="DRC Service", version="0.1.0")
+app = FastAPI(
+    title="DRC Service",
+    version="0.1.0",
+    description="Design Rule Check service for cable platform validation",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
+)
 
 # Initialize engines
 synthesis_engine = SynthesisEngine()
@@ -33,14 +40,14 @@ def preview_drc(proposal: SynthesisProposal):
         raise HTTPException(status_code=400, detail=f"DRC validation failed: {str(e)}")
 
 # Legacy endpoint for compatibility
-@app.post("/v1/drc/run")
-def run_drc_legacy(design: dict):
+@app.post("/v1/drc/run", response_model=DrcRunResponse)
+def run_drc_legacy(design: DrcRunRequest):
     """Legacy DRC endpoint - returns empty findings for now."""
-    return {
-        "design_id": design.get("id", "unknown"),
-        "findings": [],
-        "severity_summary": {"info": 0, "warn": 0, "error": 0}
-    }
+    return DrcRunResponse(
+        design_id=design.id or "unknown",
+        findings=[],
+        severity_summary={"info": 0, "warn": 0, "error": 0}
+    )
 
 @app.get("/v1/drc/rules/manifest", response_model=RulesManifest)
 def get_rules_manifest():
