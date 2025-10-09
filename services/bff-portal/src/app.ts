@@ -11,6 +11,7 @@ import { synthesisRoutes } from "./routes/synthesis.js";
 import { drcRoutes } from "./routes/drc.js";
 import { renderRoutes } from "./routes/render.js";
 import { vendorRoutes } from "./routes/vendor.js";
+import { dashboardRoutes } from "./routes/dashboard.js";
 
 export async function build() {
   const server = Fastify({ logger: true });
@@ -53,6 +54,9 @@ export async function build() {
   console.log('Registering vendor routes...');
   await server.register(vendorRoutes);
   console.log('Vendor routes registered successfully');
+  console.log('Registering dashboard routes...');
+  await server.register(dashboardRoutes);
+  console.log('Dashboard routes registered successfully');
 
   // Health endpoint
   server.get("/health", async () => ({

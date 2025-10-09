@@ -1,157 +1,300 @@
 <script lang="ts">
+  import { formatMoney } from '$lib/format';
+  import type { DashboardData, HealthStatus } from './+page';
+
+  // Load data from +page.ts
+  export let data: DashboardData;
+
+  // Helper to get status badge class
+  function getStatusClass(status: HealthStatus): string {
+    switch (status) {
+      case 'ok':
+        return 'status-ok';
+      case 'degraded':
+        return 'status-degraded';
+      case 'fail':
+        return 'status-fail';
+      default:
+        return 'status-fail';
+    }
+  }
+
+  // Helper to get status text
+  function getStatusText(status: HealthStatus): string {
+    switch (status) {
+      case 'ok':
+        return 'Operational';
+      case 'degraded':
+        return 'Degraded';
+      case 'fail':
+        return 'Unavailable';
+      default:
+        return 'Unknown';
+    }
+  }
 </script>
 
 <svelte:head>
-  <title>Home - Cable Platform Portal</title>
+  <title>Dashboard - Cable Platform Portal</title>
 </svelte:head>
 
-<main class="home-page">
-  <h1 id="main" tabindex="-1">Welcome to Cable Platform</h1>
+<main class="dashboard-page">
+  <h1>Dashboard</h1>
 
-  <p class="lead">Design, synthesize, and verify cable assemblies with confidence.</p>
-
-  <div class="quick-links">
-    <a href="/drc" class="card">
-      <h2>Design Rule Check</h2>
-      <p>Verify your cable designs against industry standards</p>
-    </a>
-
-    <a href="/synthesis" class="card">
-      <h2>Synthesis</h2>
-      <p>Generate optimized cable assemblies</p>
-    </a>
-
-    <a href="/drc" class="card demo-card">
-      <h2>📐 Drawing Generation</h2>
-      <p>Generate technical drawings from DRC-validated assemblies</p>
-      <span class="badge">NEW</span>
-      <div class="demo-instructions">
-        <strong>👉 Click here to get started!</strong>
-        <p class="quick-start">
-          Run a Design Rule Check (DRC) on your cable assembly first. Once your design passes
-          validation, you'll see the "Generate Drawing" button.
-        </p>
-        <p class="demo-note">
-          💡 Takes less than 2 minutes to validate and generate your first drawing
-        </p>
+  <div class="dashboard-grid">
+    <!-- System Health Tile -->
+    <section class="dashboard-tile" aria-labelledby="health-heading">
+      <h2 id="health-heading">System Health</h2>
+      <div class="tile-content">
+        <div class="health-badge {getStatusClass(data.health.status)}">
+          {getStatusText(data.health.status)}
+        </div>
+        {#if data.health.version}
+          <p class="health-version">Version: {data.health.version}</p>
+        {/if}
+        <a href="/ready" class="view-details-link">View details</a>
       </div>
-    </a>
+    </section>
+
+    <!-- Recent Projects Tile -->
+    <section class="dashboard-tile" aria-labelledby="projects-heading">
+      <h2 id="projects-heading">Recent Projects</h2>
+      <div class="tile-content">
+        {#if data.projects.length === 0}
+          <p class="empty-state">No items yet</p>
+        {:else}
+          <ul>
+            {#each data.projects as project}
+              <li>
+                <a href="/projects/{project.id}">
+                  {project.name}
+                  {#if project.updatedAt}
+                    <span class="timestamp">Updated: {new Date(project.updatedAt).toLocaleDateString()}</span>
+                  {/if}
+                </a>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
+    </section>
+
+    <!-- Latest Quotes Tile -->
+    <section class="dashboard-tile" aria-labelledby="quotes-heading">
+      <h2 id="quotes-heading">Latest Quotes</h2>
+      <div class="tile-content">
+        {#if data.quotes.length === 0}
+          <p class="empty-state">No items yet</p>
+        {:else}
+          <ul>
+            {#each data.quotes as quote}
+              <li>
+                <a href="/quotes/{quote.id}">
+                  Quote #{quote.id}
+                  {#if quote.total != null}
+                    <span class="quote-total">{formatMoney(quote.total)}</span>
+                  {/if}
+                  {#if quote.createdAt}
+                    <span class="timestamp">{new Date(quote.createdAt).toLocaleDateString()}</span>
+                  {/if}
+                </a>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
+    </section>
+
+    <!-- Recent Orders Tile -->
+    <section class="dashboard-tile" aria-labelledby="orders-heading">
+      <h2 id="orders-heading">Recent Orders</h2>
+      <div class="tile-content">
+        {#if data.orders.length === 0}
+          <p class="empty-state">No items yet</p>
+        {:else}
+          <ul>
+            {#each data.orders as order}
+              <li>
+                <a href="/orders/{order.id}">
+                  Order #{order.id}
+                  {#if order.status}
+                    <span class="order-status status-{order.status.toLowerCase()}">{order.status}</span>
+                  {/if}
+                  {#if order.createdAt}
+                    <span class="timestamp">{new Date(order.createdAt).toLocaleDateString()}</span>
+                  {/if}
+                </a>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
+    </section>
   </div>
 </main>
 
 <style>
-  .home-page {
-    max-width: 1200px;
+  .dashboard-page {
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 3rem 1rem;
+    padding: 2rem 1rem;
   }
 
   h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #1a202c;
   }
 
-  .lead {
-    font-size: 1.25rem;
-    color: #666;
-    margin-bottom: 3rem;
-  }
-
-  .quick-links {
+  .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+    gap: 1.5rem;
   }
 
-  .card {
+  .dashboard-tile {
     background: white;
-    padding: 2rem;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition:
-      transform 0.2s,
-      box-shadow 0.2s;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .dashboard-tile h2 {
+    font-size: 1.25rem;
+    margin: 0 0 1rem 0;
+    color: #2d3748;
+    font-weight: 600;
+  }
+
+  .tile-content {
+    color: #4a5568;
+  }
+
+  /* Health status badges */
+  .health-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .status-ok {
+    background-color: #c6f6d5;
+    color: #22543d;
+    border: 1px solid #9ae6b4;
+  }
+
+  .status-degraded {
+    background-color: #fef3c7;
+    color: #78350f;
+    border: 1px solid #fcd34d;
+  }
+
+  .status-fail {
+    background-color: #fed7d7;
+    color: #742a2a;
+    border: 1px solid #fc8181;
+  }
+
+  .health-version {
+    font-size: 0.875rem;
+    color: #718096;
+    margin: 0.5rem 0;
+  }
+
+  .view-details-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    color: #3182ce;
     text-decoration: none;
-    color: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
   }
 
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    text-decoration: none;
-    cursor: pointer;
+  .view-details-link:hover {
+    text-decoration: underline;
   }
 
-  .demo-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  .view-details-link:focus-visible {
+    outline: 2px solid #3182ce;
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 
-  .card h2 {
-    margin-bottom: 0.5rem;
-    color: #2c3e50;
-  }
-
-  .card p {
-    color: #666;
+  /* Lists */
+  ul {
+    list-style: none;
+    padding: 0;
     margin: 0;
   }
 
-  .demo-card {
-    position: relative;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+  li {
+    margin-bottom: 0.75rem;
   }
 
-  .demo-card h2,
-  .demo-card p {
-    color: white;
+  li:last-child {
+    margin-bottom: 0;
   }
 
-  .badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: #fbbf24;
-    color: #78350f;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: bold;
-  }
-
-  .demo-instructions {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    font-size: 0.9rem;
-  }
-
-  .demo-instructions strong {
+  li a {
     display: block;
-    margin-bottom: 0.5rem;
-  }
-
-  .demo-instructions ol {
-    margin: 0.5rem 0;
-    padding-left: 1.5rem;
-  }
-
-  .demo-instructions li {
-    margin: 0.25rem 0;
-  }
-
-  .demo-note {
-    margin-top: 1rem;
-    font-size: 0.85rem;
-    opacity: 0.9;
-  }
-
-  .demo-note code {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 0.2rem 0.4rem;
+    color: #2d3748;
+    text-decoration: none;
+    padding: 0.5rem;
     border-radius: 4px;
-    font-size: 0.8rem;
+    transition: background-color 0.2s;
+  }
+
+  li a:hover {
+    background-color: #f7fafc;
+  }
+
+  li a:focus-visible {
+    outline: 2px solid #3182ce;
+    outline-offset: 2px;
+  }
+
+  /* Metadata spans */
+  .timestamp,
+  .quote-total,
+  .order-status {
+    display: block;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .timestamp {
+    color: #a0aec0;
+  }
+
+  .quote-total {
+    color: #2d3748;
+    font-weight: 600;
+  }
+
+  .order-status {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    background-color: #e2e8f0;
+    color: #4a5568;
+  }
+
+  /* Empty state */
+  .empty-state {
+    color: #a0aec0;
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
