@@ -71,6 +71,12 @@ export class Internal extends HttpError {
   }
 }
 
+export class UnsupportedMediaType extends HttpError {
+  constructor(msg = 'unsupported media type') {
+    super('unsupported_media_type', 415, msg);
+  }
+}
+
 export interface ErrorResponse {
   error: string;
   message: string;

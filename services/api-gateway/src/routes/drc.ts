@@ -7,7 +7,7 @@ import { validateCableDesign, validateDRCResult } from '@cable-platform/validati
 import { fetchWithRetry, HttpError } from '../http.js';
 import { withChildSpan } from '../otel.js';
 import { trace } from '@opentelemetry/api';
-import { BadRequest, UpstreamUnavailable, UpstreamInvalidPayload, UpstreamBadRequest } from '../errors.js';
+import { BadRequest, UpstreamUnavailable, UpstreamInvalidPayload, UpstreamBadRequest, UnsupportedMediaType } from '../errors.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,7 +34,7 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
     // Validate Content-Type
     const contentType = req.headers['content-type'];
     if (!contentType || !contentType.includes('application/json')) {
-      throw new BadRequest('unsupported media type');
+      throw new UnsupportedMediaType('Content-Type must be application/json');
     }
 
     // Validate request body

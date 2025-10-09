@@ -8,6 +8,7 @@ import { getAjv } from "@cable-platform/validation";
 import { getLoggerConfig, attachRequestLogging } from "./logging.js";
 import { initOtelIfEnabled } from "./otel.js";
 import { toResponse, UpstreamUnavailable } from './errors.js';
+import { enforceJsonContentNegotiation } from './content-negotiation.js';
 
 // Initialize OpenTelemetry if enabled (must be done before any other imports that might use tracing)
 initOtelIfEnabled();
@@ -43,6 +44,9 @@ export async function buildServer() {
 
   // Attach request logging hooks
   attachRequestLogging(server);
+
+  // Enforce JSON content negotiation
+  server.addHook('preHandler', enforceJsonContentNegotiation);
 
   // Rate limiting configuration
   const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60000);
