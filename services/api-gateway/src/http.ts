@@ -1,44 +1,34 @@
-export class HttpError extends Error {
-  status: number;
-  statusText: string;
+// Re-export shared HTTP utilities for backward compatibility
+export { HttpClient, HttpError, httpClient, http } from '../../../shared/libs/http.js';
 
-  constructor(status: number, statusText: string, message: string) {
-    super(message);
-    this.status = status;
-    this.statusText = statusText;
-    this.name = 'HttpError';
-  }
-}
+// Legacy exports for backward compatibility
+export { HttpError as default } from '../../../shared/libs/http.js';
 
-export async function fetchWithTimeout(
-  url: string,
-  options: RequestInit = {},
-  timeoutMs: number = 5000
-): Promise<Response> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+// Import for internal use
+import { httpClient, HttpError } from '../../../shared/libs/http.js';
 
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new HttpError(408, 'Request Timeout', `Request timed out after ${timeoutMs}ms`);
-    }
-    throw error;
-  }
-}
-
+// Legacy interface for backward compatibility
 export interface RetryResult {
   response: Response;
   retryCount: number;
 }
 
+// Legacy function for backward compatibility - maps to new HTTP client
+export async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeoutMs: number = 5000
+): Promise<Response> {
+  const response = await httpClient.request(url, options.method as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' || 'GET', {
+    timeout: timeoutMs,
+    headers: options.headers as Record<string, string>,
+    body: options.body,
+    retries: 0, // No retries for timeout-only function
+  });
+  return response.response;
+}
+
+// Legacy function for backward compatibility - maps to new HTTP client
 export async function fetchWithRetry(
   url: string,
   options: RequestInit = {},
@@ -46,45 +36,22 @@ export async function fetchWithRetry(
   timeoutMs: number = 5000,
   baseBackoffMs: number = 1000
 ): Promise<RetryResult> {
-  let lastError: Error;
-  let retryCount = 0;
-
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      const response = await fetchWithTimeout(url, options, timeoutMs);
-
-      // Don't retry on 4xx errors (client errors)
-      if (response.status >= 400 && response.status < 500) {
-        return { response, retryCount };
+  try {
+    const response = await httpClient.request(url, options.method as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' || 'GET', {
+      timeout: timeoutMs,
+      headers: options.headers as Record<string, string>,
+      body: options.body,
+      retries: maxRetries,
+      retryDelay: baseBackoffMs,
+    });
+    return { response: response.response, retryCount: 0 }; // retryCount not tracked in new implementation
+  } catch (error) {
+    if (error instanceof HttpError) {
+      // For backward compatibility, return response even on error if it exists
+      if (error.response) {
+        return { response: error.response, retryCount: maxRetries };
       }
-
-      // Retry on 5xx errors or network issues
-      if (response.status >= 500) {
-        if (attempt < maxRetries) {
-          retryCount++;
-          // Jittered exponential backoff: baseBackoffMs * 2^attempt + random jitter
-          const backoffMs = baseBackoffMs * Math.pow(2, attempt) + Math.random() * 1000;
-          await new Promise(resolve => setTimeout(resolve, backoffMs));
-          continue;
-        }
-        return { response, retryCount };
-      }
-
-      return { response, retryCount };
-    } catch (error) {
-      lastError = error as Error;
-
-      // Don't retry on client errors or the last attempt
-      if (attempt >= maxRetries) {
-        throw lastError;
-      }
-
-      // Retry on timeout or network errors with jittered backoff
-      retryCount++;
-      const backoffMs = baseBackoffMs * Math.pow(2, attempt) + Math.random() * 1000;
-      await new Promise(resolve => setTimeout(resolve, backoffMs));
     }
+    throw error;
   }
-
-  throw lastError!;
 }

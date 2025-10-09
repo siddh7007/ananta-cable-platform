@@ -1,57 +1,38 @@
-export class HttpError extends Error {
-    status;
-    statusText;
-    constructor(status, statusText, message) {
-        super(message);
-        this.status = status;
-        this.statusText = statusText;
-        this.name = 'HttpError';
-    }
-}
+// Re-export shared HTTP utilities for backward compatibility
+export { HttpClient, HttpError, httpClient, http } from '../../../shared/libs/http.js';
+// Legacy exports for backward compatibility
+export { HttpError as default } from '../../../shared/libs/http.js';
+// Import for internal use
+import { httpClient, HttpError } from '../../../shared/libs/http.js';
+// Legacy function for backward compatibility - maps to new HTTP client
 export async function fetchWithTimeout(url, options = {}, timeoutMs = 5000) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    const response = await httpClient.request(url, options.method || 'GET', {
+        timeout: timeoutMs,
+        headers: options.headers,
+        body: options.body,
+        retries: 0, // No retries for timeout-only function
+    });
+    return response.response;
+}
+// Legacy function for backward compatibility - maps to new HTTP client
+export async function fetchWithRetry(url, options = {}, maxRetries = 1, timeoutMs = 5000, baseBackoffMs = 1000) {
     try {
-        const response = await fetch(url, {
-            ...options,
-            signal: controller.signal,
+        const response = await httpClient.request(url, options.method || 'GET', {
+            timeout: timeoutMs,
+            headers: options.headers,
+            body: options.body,
+            retries: maxRetries,
+            retryDelay: baseBackoffMs,
         });
-        clearTimeout(timeoutId);
-        return response;
+        return { response: response.response, retryCount: 0 }; // retryCount not tracked in new implementation
     }
     catch (error) {
-        clearTimeout(timeoutId);
-        if (error instanceof Error && error.name === 'AbortError') {
-            throw new HttpError(408, 'Request Timeout', `Request timed out after ${timeoutMs}ms`);
+        if (error instanceof HttpError) {
+            // For backward compatibility, return response even on error if it exists
+            if (error.response) {
+                return { response: error.response, retryCount: maxRetries };
+            }
         }
         throw error;
     }
-}
-export async function fetchWithRetry(url, options = {}, maxRetries = 1, timeoutMs = 5000) {
-    let lastError;
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        try {
-            const response = await fetchWithTimeout(url, options, timeoutMs);
-            // Don't retry on 4xx errors (client errors)
-            if (response.status >= 400 && response.status < 500) {
-                return response;
-            }
-            // Retry on 5xx errors or network issues
-            if (response.status >= 500) {
-                if (attempt < maxRetries) {
-                    continue;
-                }
-                return response;
-            }
-            return response;
-        }
-        catch (error) {
-            lastError = error;
-            // Don't retry on client errors or the last attempt
-            if (attempt >= maxRetries) {
-                throw lastError;
-            }
-        }
-    }
-    throw lastError;
 }

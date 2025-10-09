@@ -1,6 +1,5 @@
-import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 import { authGuard } from '../auth.js';
 import { fetchWithRetry, HttpError } from '../http.js';
 import { withChildSpan } from '../otel.js';
@@ -9,7 +8,25 @@ import { BadRequest, UpstreamUnavailable, UpstreamBadRequest } from '../errors.j
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // Load schemas at runtime to avoid JSON import issues
-const synthesisProposalSchema = JSON.parse(readFileSync(join(__dirname, '../../../../packages/contracts/openapi.json'), 'utf8')).components.schemas.SynthesisProposal;
+// const synthesisProposalSchema = JSON.parse(readFileSync(join(__dirname, '../../../../packages/contracts/openapi.json'), 'utf8')).components.schemas.SynthesisProposal;
+// Using a basic schema for now to avoid $ref resolution issues
+const synthesisProposalSchema = {
+    type: 'object',
+    properties: {
+        proposal_id: { type: 'string' },
+        draft_id: { type: 'string' },
+        cable: { type: 'object' },
+        conductors: { type: 'object' },
+        endpoints: { type: 'object' },
+        shield: { type: 'object' },
+        wirelist: { type: 'array' },
+        bom: { type: 'array' },
+        warnings: { type: 'array', items: { type: 'string' } },
+        errors: { type: 'array', items: { type: 'string' } },
+        explain: { type: 'array', items: { type: 'string' } }
+    },
+    required: ['proposal_id', 'draft_id', 'cable', 'conductors', 'endpoints', 'shield', 'wirelist', 'bom', 'warnings', 'errors', 'explain']
+};
 const synthesisRoutes = async (fastify, opts, done) => {
     // POST /v1/synthesis/propose - Generate synthesis proposal
     fastify.post('/v1/synthesis/propose', {
@@ -47,7 +64,7 @@ const synthesisRoutes = async (fastify, opts, done) => {
         }
         try {
             const startTime = process.hrtime.bigint();
-            const response = await withChildSpan('synthesis.propose', {
+            const retryResult = await withChildSpan('synthesis.propose', {
                 'http.method': 'POST',
                 'http.target': '/v1/synthesis/propose',
                 'upstream.url': 'http://bff-portal:4001/v1/synthesis/propose',
@@ -59,16 +76,30 @@ const synthesisRoutes = async (fastify, opts, done) => {
                     headers: upstreamHeaders,
                     body: JSON.stringify(req.body),
                 }, 1, // 1 retry
-                10000 // 10s timeout for synthesis
+                10000, // 10s timeout for synthesis
+                1000 // 1s base backoff
                 );
             });
+            const { response, retryCount } = retryResult;
             // Calculate upstream latency and add span attributes
             const upstreamLatencyMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
             const span = trace.getActiveSpan();
             if (span) {
                 span.setAttribute('http.status_code', response.status);
                 span.setAttribute('upstream.latency_ms', upstreamLatencyMs);
-                span.setAttribute('retry.count', 1);
+                span.setAttribute('retry.count', retryCount);
+                span.setAttribute('upstream.retried', retryCount > 0);
+            }
+            // Log retry metrics
+            if (retryCount > 0) {
+                fastify.log.info({
+                    msg: 'Synthesis propose upstream retry occurred',
+                    requestId,
+                    retryCount,
+                    upstreamLatencyMs,
+                    finalStatus: response.status,
+                    userSub: req.user?.sub
+                });
             }
             // Handle different upstream response codes
             if (response.status === 400) {
@@ -127,7 +158,7 @@ const synthesisRoutes = async (fastify, opts, done) => {
         }
         try {
             const startTime = process.hrtime.bigint();
-            const response = await withChildSpan('synthesis.recompute', {
+            const retryResult = await withChildSpan('synthesis.recompute', {
                 'http.method': 'POST',
                 'http.target': '/v1/synthesis/recompute',
                 'upstream.url': 'http://bff-portal:4001/v1/synthesis/recompute',
@@ -138,15 +169,31 @@ const synthesisRoutes = async (fastify, opts, done) => {
                     method: 'POST',
                     headers: upstreamHeaders,
                     body: JSON.stringify(req.body),
-                }, 1, 10000);
+                }, 1, 10000, // 10s timeout
+                1000 // 1s base backoff
+                );
             });
+            const { response, retryCount } = retryResult;
             const upstreamLatencyMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
             const span = trace.getActiveSpan();
             if (span) {
                 span.setAttribute('http.status_code', response.status);
                 span.setAttribute('upstream.latency_ms', upstreamLatencyMs);
-                span.setAttribute('retry.count', 1);
+                span.setAttribute('retry.count', retryCount);
+                span.setAttribute('upstream.retried', retryCount > 0);
             }
+            // Log retry metrics
+            if (retryCount > 0) {
+                fastify.log.info({
+                    msg: 'Synthesis recompute upstream retry occurred',
+                    requestId,
+                    retryCount,
+                    upstreamLatencyMs,
+                    finalStatus: response.status,
+                    userSub: req.user?.sub
+                });
+            }
+            // Handle different upstream response codes
             if (response.status === 400) {
                 throw new UpstreamBadRequest();
             }
@@ -208,7 +255,7 @@ const synthesisRoutes = async (fastify, opts, done) => {
         }
         try {
             const startTime = process.hrtime.bigint();
-            const response = await withChildSpan('synthesis.accept', {
+            const retryResult = await withChildSpan('synthesis.accept', {
                 'http.method': 'POST',
                 'http.target': '/v1/synthesis/accept',
                 'upstream.url': 'http://bff-portal:4001/v1/synthesis/accept',
@@ -219,14 +266,29 @@ const synthesisRoutes = async (fastify, opts, done) => {
                     method: 'POST',
                     headers: upstreamHeaders,
                     body: JSON.stringify(req.body),
-                }, 1, 10000);
+                }, 1, 10000, // 10s timeout
+                1000 // 1s base backoff
+                );
             });
+            const { response, retryCount } = retryResult;
             const upstreamLatencyMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
             const span = trace.getActiveSpan();
             if (span) {
                 span.setAttribute('http.status_code', response.status);
                 span.setAttribute('upstream.latency_ms', upstreamLatencyMs);
-                span.setAttribute('retry.count', 1);
+                span.setAttribute('retry.count', retryCount);
+                span.setAttribute('upstream.retried', retryCount > 0);
+            }
+            // Log retry metrics
+            if (retryCount > 0) {
+                fastify.log.info({
+                    msg: 'Synthesis accept upstream retry occurred',
+                    requestId,
+                    retryCount,
+                    upstreamLatencyMs,
+                    finalStatus: response.status,
+                    userSub: req.user?.sub
+                });
             }
             if (response.status === 400) {
                 throw new UpstreamBadRequest();

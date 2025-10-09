@@ -112,10 +112,12 @@ required("AUTH0_AUDIENCE");
 const drcModule = await import('./routes/drc.js');
 const synthesisModule = await import('./routes/synthesis.js');
 const renderModule = await import('./routes/render.js');
+const vendorModule = await import('./routes/vendor.js');
 
 await server.register(drcModule.default);
 await server.register(synthesisModule.default);
 await server.register(renderModule.default);
+await server.register(vendorModule.default);
 
 // Log all registered routes for debugging
 server.ready(() => {

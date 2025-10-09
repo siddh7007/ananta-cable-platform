@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { DRCDao } from '../dao/drc.js';
 import { AssembliesDAO } from '../dao/assemblies.js';
 import { getAjv } from '@cable-platform/validation';
+import { httpClient, HttpClient } from '../lib/http.js';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -23,7 +24,7 @@ type AssemblySchemaRecord = {
 export interface DrcRouteOptions {
   drcDao?: Pick<DRCDao, 'upsertReport' | 'getReport'>;
   assembliesDao?: Pick<AssembliesDAO, 'getAssemblySchema' | 'updateAssemblySchema'>;
-  fetchImpl?: typeof fetch;
+  httpClient?: Pick<HttpClient, 'get' | 'post' | 'put' | 'patch' | 'delete'>;
 }
 
 const ajv = getAjv();
@@ -100,19 +101,19 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
   const {
     drcDao = new DRCDao(),
     assembliesDao = new AssembliesDAO(),
-    fetchImpl = fetch,
+    httpClient: client = httpClient,
   } = options;
 
   fastify.get('/v1/drc/rulesets', {
     preHandler: requireAuth,
     handler: async (request, reply) => {
       try {
-        const response = await fetchImpl(buildRulesServiceUrl('/drc/rulesets'));
-        if (!response.ok) {
+        const response = await client.get(buildRulesServiceUrl('/drc/rulesets'));
+        if (!response.response.ok) {
           return reply.status(response.status).send({ error: 'Failed to fetch rulesets' });
         }
 
-        const payload = await response.json();
+        const payload = response.data;
         if (!validateRulesetsResponse(payload)) {
           const message = ajv.errorsText(validateRulesetsResponse.errors);
           return reply.status(502).send({
@@ -158,18 +159,14 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
           ...(ruleset_id ? { ruleset_id } : {}),
         };
 
-        const response = await fetchImpl(buildRulesServiceUrl('/drc/run'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+        const response = await client.post(buildRulesServiceUrl('/drc/run'), payload);
 
-        if (!response.ok) {
-          const errorBody = await response.json().catch(() => null);
+        if (!response.response.ok) {
+          const errorBody = response.data;
           return reply.status(response.status).send(errorBody ?? { error: 'DRC run failed' });
         }
 
-        const drcReport = await response.json();
+        const drcReport = response.data;
         if (!validateReport(drcReport)) {
           const message = ajv.errorsText(validateReport.errors);
           return reply.status(502).send({
@@ -234,18 +231,14 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
           schema: assemblyPayload,
           ...(ruleset_id ? { ruleset_id } : {}),
         };
-        const response = await fetchImpl(buildRulesServiceUrl('/drc/apply-fixes'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestPayload),
-        });
+        const response = await client.post(buildRulesServiceUrl('/drc/apply-fixes'), requestPayload);
 
-        if (!response.ok) {
-          const errorBody = await response.json().catch(() => null);
+        if (!response.response.ok) {
+          const errorBody = response.data;
           return reply.status(response.status).send(errorBody ?? { error: 'Apply fixes failed' });
         }
 
-        const applyResponse = await response.json();
+        const applyResponse = response.data;
         if (!validateApplyResponse(applyResponse)) {
           const message = ajv.errorsText(validateApplyResponse.errors);
           return reply.status(502).send({

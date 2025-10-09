@@ -17,12 +17,14 @@ const renderRoutes: FastifyPluginCallback = (fastify, opts, done) => {
     },
     async (req, reply) => {
       try {
+        const requestId = req.headers['x-request-id'] as string;
         console.log('[Render Routes] Proxying template-packs request to:', `${BFF_PORTAL_URL}/v1/template-packs`);
         const response = await fetch(`${BFF_PORTAL_URL}/v1/template-packs`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': req.headers.authorization || '',
+            'x-request-id': requestId,
           },
         });
         
@@ -49,12 +51,14 @@ const renderRoutes: FastifyPluginCallback = (fastify, opts, done) => {
     },
     async (req, reply) => {
       try {
+        const requestId = req.headers['x-request-id'] as string;
         console.log('[Render Routes] Proxying render request to:', `${BFF_PORTAL_URL}/v1/render`);
         const response = await fetch(`${BFF_PORTAL_URL}/v1/render`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': req.headers.authorization || '',
+            'x-request-id': requestId,
           },
           body: JSON.stringify(req.body),
         });

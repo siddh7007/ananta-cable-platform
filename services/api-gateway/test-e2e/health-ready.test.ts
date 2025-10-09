@@ -2,18 +2,28 @@ import { test } from 'tap';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
+import { attachRequestLogging } from '../src/logging.js';
 // Note: Not importing drcRoutes to avoid JSON import issues in test environment
 
 test('Health and Readiness endpoints E2E tests', async (t) => {
   const server = Fastify({ logger: false });
 
   // Register plugins (minimal setup for testing)
-  await server.register(cors, { origin: true });
+  const PORTAL_ORIGIN = process.env.PORTAL_ORIGIN ?? "http://localhost:5173";
+  await server.register(cors, {
+    origin: PORTAL_ORIGIN,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: true
+  });
   await server.register(rateLimit, {
     max: 100,
     timeWindow: 60000,
     global: false,
   });
+
+  // Attach request logging (includes x-request-id generation)
+  attachRequestLogging(server);
 
   // Add health and readiness endpoints (minimal implementation for testing)
   server.get("/health", async () => ({
@@ -89,6 +99,17 @@ test('Health and Readiness endpoints E2E tests', async (t) => {
 
       const readyResponse = await fetch(`${baseUrl}/ready`);
       t.equal(readyResponse.headers.get('cache-control'), 'no-store', 'Ready should have no-store cache-control');
+    });
+
+    // Test 4: x-request-id header presence
+    await t.test('x-request-id header is present in responses', async (t) => {
+      const response = await fetch(`${baseUrl}/health`);
+      t.ok(response.headers.get('x-request-id'), 'Should include x-request-id header');
+      
+      // Verify it's a valid UUID v4 format
+      const requestId = response.headers.get('x-request-id');
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      t.ok(uuidRegex.test(requestId!), 'Should be a valid UUID v4');
     });
 
   } finally {

@@ -1,0 +1,482 @@
+TAP version 14
+# Subtest: DRC run endpoint E2E tests
+    # Subtest: Valid payload returns 200 with design_id
+        not ok 1 - Should require authentication
+          ---
+          compare: ===
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 53
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 44
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:53:9)
+          source: "\r
+          
+            \      // Should fail auth first (since we don't have real tokens in test)\r
+          
+            \      t.equal(response.status, 401, 'Should require authentication');\r
+          
+            --------^
+          
+            \    });\n"
+          diff: |
+            --- expected
+            +++ actual
+            @@ -1,1 +1,1 @@
+            -401
+            +404
+          ...
+        
+        1..1
+    not ok 1 - Valid payload returns 200 with design_id # time=64.634ms
+      ---
+      at:
+        fileName: test-e2e\drc.run.test.ts
+        lineNumber: 41
+        columnNumber: 13
+        typeName: Test
+        generated:
+          fileName: test-e2e/drc.run.test.ts
+          lineNumber: 33
+          columnNumber: 17
+      source: "  try {\r
+      
+        \    // Test 1: Valid payload should return 200 with design_id\r
+      
+        \    await t.test('Valid payload returns 200 with design_id', async (t) => {\r
+      
+        ------------^
+      
+        \      // For this test, we'll test the validation logic (auth will fail
+        first)\r
+      
+        \      const response = await fetch(`${baseUrl}/v1/drc/run`, {\n"
+      ...
+    
+    # Subtest: Invalid payload returns 400 with bad_request error
+        not ok 1 - Should return 400 for invalid payload
+          ---
+          compare: ===
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 70
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 58
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:70:9)
+          source: "\r
+          
+            \      // Should fail validation before auth\r
+          
+            \      t.equal(response.status, 400, 'Should return 400 for invalid
+            payload');\r
+          
+            --------^
+          
+            \      const data = await response.json();\r
+          
+            \      t.equal(data.error, 'bad_request', 'Should return bad_request
+            error');\n"
+          diff: |
+            --- expected
+            +++ actual
+            @@ -1,1 +1,1 @@
+            -400
+            +404
+          ...
+        
+        not ok 2 - Should return bad_request error
+          ---
+          compare: ===
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 72
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 60
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:72:9)
+          source: "      t.equal(response.status, 400, 'Should return 400 for invalid
+            payload');\r
+          
+            \      const data = await response.json();\r
+          
+            \      t.equal(data.error, 'bad_request', 'Should return bad_request
+            error');\r
+          
+            --------^
+          
+            \      t.ok(data.details, 'Should include validation details');\r
+          
+            \    });\n"
+          diff: |
+            --- expected
+            +++ actual
+            @@ -1,1 +1,1 @@
+            -bad_request
+            +Not Found
+          ...
+        
+        not ok 3 - Should include validation details
+          ---
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 73
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 61
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:73:9)
+          source: "      const data = await response.json();\r
+          
+            \      t.equal(data.error, 'bad_request', 'Should return bad_request
+            error');\r
+          
+            \      t.ok(data.details, 'Should include validation details');\r
+          
+            --------^
+          
+            \    });\n"
+          ...
+        
+        1..3
+    not ok 2 - Invalid payload returns 400 with bad_request error # time=19.89ms
+      ---
+      at:
+        fileName: test-e2e\drc.run.test.ts
+        lineNumber: 57
+        columnNumber: 13
+        typeName: Test
+        generated:
+          fileName: test-e2e/drc.run.test.ts
+          lineNumber: 47
+          columnNumber: 17
+      source: "\r
+      
+        \    // Test 2: Invalid payload (cores: 0) should return 400\r
+      
+        \    await t.test('Invalid payload returns 400 with bad_request error', async
+        (t) => {\r
+      
+        ------------^
+      
+        \      const invalidDesign = { ...sampleDesign, cores: 0 };\n"
+      ...
+    
+    # Subtest: Wrong content type returns 415
+        not ok 1 - Should return 415 for wrong content type
+          ---
+          compare: ===
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 87
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 73
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:87:9)
+          source: "      });\r
+          
+            \r
+          
+            \      t.equal(response.status, 415, 'Should return 415 for wrong content
+            type');\r
+          
+            --------^
+          
+            \      const data = await response.json();\r
+          
+            \      t.equal(data.error, 'unsupported_media_type', 'Should return
+            unsupported_media_type error');\n"
+          diff: |
+            --- expected
+            +++ actual
+            @@ -1,1 +1,1 @@
+            -415
+            +404
+          ...
+        
+        not ok 2 - Should return unsupported_media_type error
+          ---
+          compare: ===
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 89
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 75
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:89:9)
+          source: "      t.equal(response.status, 415, 'Should return 415 for wrong
+            content type');\r
+          
+            \      const data = await response.json();\r
+          
+            \      t.equal(data.error, 'unsupported_media_type', 'Should return
+            unsupported_media_type error');\r
+          
+            --------^
+          
+            \    });\n"
+          diff: |
+            --- expected
+            +++ actual
+            @@ -1,1 +1,1 @@
+            -unsupported_media_type
+            +Not Found
+          ...
+        
+        1..2
+    not ok 3 - Wrong content type returns 415 # time=15.942ms
+      ---
+      at:
+        fileName: test-e2e\drc.run.test.ts
+        lineNumber: 77
+        columnNumber: 13
+        typeName: Test
+        generated:
+          fileName: test-e2e/drc.run.test.ts
+          lineNumber: 64
+          columnNumber: 17
+      source: "\r
+      
+        \    // Test 3: Wrong content type should return 415\r
+      
+        \    await t.test('Wrong content type returns 415', async (t) => {\r
+      
+        ------------^
+      
+        \      const response = await fetch(`${baseUrl}/v1/drc/run`, {\r
+      
+        \        method: 'POST',\n"
+      ...
+    
+    # Subtest: CORS preflight returns 200 with proper headers
+        not ok 1 - Should return 200 for preflight
+          ---
+          compare: ===
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 103
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 87
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:103:9)
+          source: "      });\r
+          
+            \r
+          
+            \      t.equal(response.status, 200, 'Should return 200 for preflight');\r
+          
+            --------^
+          
+            \      t.equal(response.headers.get('access-control-allow-origin'),
+            'http://localhost:5173', 'Should allow portal origin');\r
+          
+            \      t.equal(response.headers.get('access-control-allow-methods'),
+            'GET,POST,PUT,DELETE,OPTIONS', 'Should allow standard methods');\n"
+          diff: |
+            --- expected
+            +++ actual
+            @@ -1,1 +1,1 @@
+            -200
+            +204
+          ...
+        
+        ok 2 - Should allow portal origin
+        not ok 3 - Should allow standard methods
+          ---
+          compare: ===
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 105
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 89
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:105:9)
+          source: "      t.equal(response.status, 200, 'Should return 200 for
+            preflight');\r
+          
+            \      t.equal(response.headers.get('access-control-allow-origin'),
+            'http://localhost:5173', 'Should allow portal origin');\r
+          
+            \      t.equal(response.headers.get('access-control-allow-methods'),
+            'GET,POST,PUT,DELETE,OPTIONS', 'Should allow standard methods');\r
+          
+            --------^
+          
+            \      t.equal(response.headers.get('access-control-allow-headers'),
+            'Content-Type,Authorization,X-Requested-With', 'Should allow standard
+            headers');\r
+          
+            \      t.equal(response.headers.get('access-control-allow-credentials'),
+            'true', 'Should allow credentials');\n"
+          diff: |
+            --- expected
+            +++ actual
+            @@ -1,1 +1,1 @@
+            -GET,POST,PUT,DELETE,OPTIONS
+            +GET, POST, PUT, DELETE, OPTIONS
+          ...
+        
+        not ok 4 - Should allow standard headers
+          ---
+          compare: ===
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 106
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 90
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:106:9)
+          source: "      t.equal(response.headers.get('access-control-allow-origin'),
+            'http://localhost:5173', 'Should allow portal origin');\r
+          
+            \      t.equal(response.headers.get('access-control-allow-methods'),
+            'GET,POST,PUT,DELETE,OPTIONS', 'Should allow standard methods');\r
+          
+            \      t.equal(response.headers.get('access-control-allow-headers'),
+            'Content-Type,Authorization,X-Requested-With', 'Should allow standard
+            headers');\r
+          
+            --------^
+          
+            \      t.equal(response.headers.get('access-control-allow-credentials'),
+            'true', 'Should allow credentials');\r
+          
+            \      t.equal(response.headers.get('vary'), 'Origin', 'Should include Vary:
+            Origin header');\n"
+          diff: |
+            --- expected
+            +++ actual
+            @@ -1,1 +1,1 @@
+            -Content-Type,Authorization,X-Requested-With
+            +Content-Type, Authorization, X-Requested-With
+          ...
+        
+        ok 5 - Should allow credentials
+        not ok 6 - Should include Vary: Origin header
+          ---
+          compare: ===
+          at:
+            fileName: test-e2e\drc.run.test.ts
+            lineNumber: 108
+            columnNumber: 9
+            typeName: Test
+            generated:
+              fileName: test-e2e/drc.run.test.ts
+              lineNumber: 92
+              columnNumber: 15
+          stack: |
+            Test.<anonymous> (test-e2e/drc.run.test.ts:108:9)
+          source: "      t.equal(response.headers.get('access-control-allow-headers'),
+            'Content-Type,Authorization,X-Requested-With', 'Should allow standard
+            headers');\r
+          
+            \      t.equal(response.headers.get('access-control-allow-credentials'),
+            'true', 'Should allow credentials');\r
+          
+            \      t.equal(response.headers.get('vary'), 'Origin', 'Should include Vary:
+            Origin header');\r
+          
+            --------^
+          
+            \    });\n"
+          diff: |
+            --- expected
+            +++ actual
+            @@ -1,1 +1,1 @@
+            -Origin
+            +null
+          ...
+        
+        1..6
+    not ok 4 - CORS preflight returns 200 with proper headers # time=26.972ms
+      ---
+      at:
+        fileName: test-e2e\drc.run.test.ts
+        lineNumber: 93
+        columnNumber: 13
+        typeName: Test
+        generated:
+          fileName: test-e2e/drc.run.test.ts
+          lineNumber: 78
+          columnNumber: 17
+      source: "\r
+      
+        \    // Test 4: CORS preflight request should return 200\r
+      
+        \    await t.test('CORS preflight returns 200 with proper headers', async (t)
+        => {\r
+      
+        ------------^
+      
+        \      const response = await fetch(`${baseUrl}/v1/drc/run`, {\r
+      
+        \        method: 'OPTIONS',\n"
+      ...
+    
+    # Subtest: x-request-id header is present in DRC responses
+        ok 1 - Should include x-request-id header
+        ok 2 - Should be a valid UUID v4
+        1..2
+    ok 5 - x-request-id header is present in DRC responses # time=2.439ms
+    
+    1..5
+not ok 1 - DRC run endpoint E2E tests # time=178.603ms
+  ---
+  at:
+    fileName: test-e2e\drc.run.test.ts
+    lineNumber: 12
+    columnNumber: 1
+    isToplevel: true
+    generated:
+      fileName: test-e2e/drc.run.test.ts
+      lineNumber: 9
+      columnNumber: 1
+  source: "const sampleDesign =
+    require('../../../shared/testing/fixtures/sample-design.json');\r
+  
+    \r
+  
+    test('DRC run endpoint E2E tests', async (t) => {\r
+  
+    ^
+  
+    \  const server = Fastify({ logger: false });\n"
+  ...
+
+1..1

@@ -1,0 +1,29 @@
+TAP version 14
+# Subtest: Rate limiting works correctly
+    ok 1 - Request 1 should succeed
+    ok 2 - should be equal
+    ok 3 - Request 2 should succeed
+    ok 4 - should be equal
+    ok 5 - Request 3 should succeed
+    ok 6 - should be equal
+    ok 7 - Request should be rate limited
+    ok 8 - Should return default rate limit error
+    ok 9 - Should have retry-after header
+    ok 10 - Should have x-ratelimit-limit header
+    ok 11 - Should have x-ratelimit-remaining header
+    ok 12 - Should have retry-after header
+    1..12
+ok 1 - Rate limiting works correctly # time=99.649ms
+
+# Subtest: Health endpoint is not rate limited
+    ok 1 - Health request 1 should succeed
+    ok 2 - Health request 2 should succeed
+    ok 3 - Health request 3 should succeed
+    ok 4 - Health request 4 should succeed
+    ok 5 - Health request 5 should succeed
+    ok 6 - First protected request should succeed
+    ok 7 - Second protected request should be rate limited
+    1..7
+ok 2 - Health endpoint is not rate limited # time=31.328ms
+
+1..2

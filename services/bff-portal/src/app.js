@@ -8,6 +8,7 @@ import { assistRoutes } from "./routes/assist.js";
 import { synthesisRoutes } from "./routes/synthesis.js";
 import { drcRoutes } from "./routes/drc.js";
 import { renderRoutes } from "./routes/render.js";
+import { vendorRoutes } from "./routes/vendor.js";
 export async function build() {
     const server = Fastify({ logger: true });
     await server.register(cors, { origin: true });
@@ -43,6 +44,9 @@ export async function build() {
     console.log('Registering render routes...');
     await server.register(renderRoutes);
     console.log('Render routes registered successfully');
+    console.log('Registering vendor routes...');
+    await server.register(vendorRoutes);
+    console.log('Vendor routes registered successfully');
     // Health endpoint
     server.get("/health", async () => ({
         status: "ok",

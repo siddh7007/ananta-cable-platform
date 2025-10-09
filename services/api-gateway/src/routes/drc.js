@@ -6,7 +6,7 @@ import { validateCableDesign, validateDRCResult } from '@cable-platform/validati
 import { fetchWithRetry, HttpError } from '../http.js';
 import { withChildSpan } from '../otel.js';
 import { trace } from '@opentelemetry/api';
-import { BadRequest, UpstreamUnavailable, UpstreamInvalidPayload, UpstreamBadRequest } from '../errors.js';
+import { BadRequest, UpstreamUnavailable, UpstreamInvalidPayload, UpstreamBadRequest, UnsupportedMediaType } from '../errors.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // Load schemas at runtime to avoid JSON import issues
@@ -29,7 +29,7 @@ const drcRoutes = async (fastify, opts, done) => {
         // Validate Content-Type
         const contentType = req.headers['content-type'];
         if (!contentType || !contentType.includes('application/json')) {
-            throw new BadRequest('unsupported media type');
+            throw new UnsupportedMediaType('Content-Type must be application/json');
         }
         // Validate request body
         const validation = validateCableDesign(req.body);
@@ -48,7 +48,7 @@ const drcRoutes = async (fastify, opts, done) => {
         try {
             // Make upstream call with timeout and retry
             const startTime = process.hrtime.bigint();
-            const response = await withChildSpan('drc.run', {
+            const retryResult = await withChildSpan('drc.run', {
                 'http.method': 'POST',
                 'http.target': '/v1/drc/run',
                 'upstream.url': 'http://drc:8000/v1/drc/run',
@@ -60,16 +60,30 @@ const drcRoutes = async (fastify, opts, done) => {
                     headers: upstreamHeaders,
                     body: JSON.stringify(validation.data),
                 }, 1, // 1 retry
-                5000 // 5s timeout
+                5000, // 5s timeout
+                1000 // 1s base backoff
                 );
             });
+            const { response, retryCount } = retryResult;
             // Calculate upstream latency and add span attributes
             const upstreamLatencyMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
             const span = trace.getActiveSpan();
             if (span) {
                 span.setAttribute('http.status_code', response.status);
                 span.setAttribute('upstream.latency_ms', upstreamLatencyMs);
-                span.setAttribute('retry.count', 1); // We always do 1 retry attempt
+                span.setAttribute('retry.count', retryCount);
+                span.setAttribute('upstream.retried', retryCount > 0);
+            }
+            // Log retry metrics
+            if (retryCount > 0) {
+                fastify.log.info({
+                    msg: 'DRC upstream retry occurred',
+                    requestId,
+                    retryCount,
+                    upstreamLatencyMs,
+                    finalStatus: response.status,
+                    userSub: req.user?.sub
+                });
             }
             // Handle different upstream response codes
             if (response.status === 400) {

@@ -2,6 +2,7 @@ import { test } from 'tap';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
+import { attachRequestLogging } from '../src/logging.js';
 import drcRoutes from '../src/routes/drc.js';
 import { createRequire } from 'module';
 
@@ -25,8 +26,8 @@ test('DRC run endpoint E2E tests', async (t) => {
     global: false,
   });
 
-  // Register DRC routes
-  await server.register(drcRoutes);
+  // Attach request logging (includes x-request-id generation)
+  attachRequestLogging(server);
 
   // Start server
   await server.listen({ port: 0 });
@@ -105,6 +106,25 @@ test('DRC run endpoint E2E tests', async (t) => {
       t.equal(response.headers.get('access-control-allow-headers'), 'Content-Type,Authorization,X-Requested-With', 'Should allow standard headers');
       t.equal(response.headers.get('access-control-allow-credentials'), 'true', 'Should allow credentials');
       t.equal(response.headers.get('vary'), 'Origin', 'Should include Vary: Origin header');
+    });
+
+    // Test 5: x-request-id header presence
+    await t.test('x-request-id header is present in DRC responses', async (t) => {
+      const response = await fetch(`${baseUrl}/v1/drc/run`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'authorization': 'Bearer mock-token'
+        },
+        body: JSON.stringify(sampleDesign)
+      });
+
+      t.ok(response.headers.get('x-request-id'), 'Should include x-request-id header');
+      
+      // Verify it's a valid UUID v4 format
+      const requestId = response.headers.get('x-request-id');
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      t.ok(uuidRegex.test(requestId!), 'Should be a valid UUID v4');
     });
 
   } finally {

@@ -20,6 +20,6 @@ TAP version 14
     ok 18 - should be equal
     ok 19 - should be equal
     1..19
-ok 1 - Request/Response logging E2E test # time=180.819ms
+ok 1 - Request/Response logging E2E test # time=205.857ms
 
 1..1

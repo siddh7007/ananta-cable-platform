@@ -4,6 +4,7 @@ import Fastify from 'fastify';
 import { test } from 'tap';
 import type { DRCReport } from '@cable-platform/contracts/types/api';
 import { drcRoutes, type DrcRouteOptions } from '../src/routes/drc.ts';
+import { HttpClient, HttpResponse } from '../../../shared/libs/http.js';
 
 type AssemblyRecord = {
   assembly_id: string;
@@ -118,6 +119,79 @@ class FetchStub {
   }
 }
 
+type HttpHandler = (body?: unknown) => { status?: number; body?: unknown };
+
+class HttpClientStub {
+  private queue: Array<{ path: string; method: string; handler: HttpHandler }> = [];
+
+  reply(path: string, method: string, handler: HttpHandler | { status?: number; body?: unknown }) {
+    const wrapped = typeof handler === 'function' ? handler : () => handler;
+    this.queue.push({ path, method: method.toUpperCase(), handler: wrapped });
+  }
+
+  async request<T = unknown>(url: string, method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET', options: { body?: unknown } = {}): Promise<HttpResponse<T>> {
+    const parsedUrl = new URL(url);
+    const requestMethod = method.toUpperCase();
+    const match = this.queue.shift();
+    if (!match) {
+      throw new Error(`Unexpected HTTP request to ${parsedUrl.pathname}`);
+    }
+
+    if (match.path !== parsedUrl.pathname || match.method !== requestMethod) {
+      throw new Error(`Expected ${match.method} ${match.path} but received ${requestMethod} ${parsedUrl.pathname}`);
+    }
+
+    const { status = 200, body = null } = match.handler(options.body);
+    const mockResponse = {
+      ok: status >= 200 && status < 300,
+      status,
+      statusText: status === 200 ? 'OK' : 'Error',
+      headers: new Map(),
+      redirected: false,
+      type: 'basic' as ResponseType,
+      url: url,
+      clone: () => mockResponse,
+      json: async () => body,
+      text: async () => JSON.stringify(body),
+      arrayBuffer: async () => new ArrayBuffer(0),
+      blob: async () => new Blob(),
+      formData: async () => new FormData(),
+    } as unknown as Response;
+
+    return {
+      status,
+      statusText: status === 200 ? 'OK' : 'Error',
+      headers: {},
+      data: body as T,
+      response: mockResponse,
+    };
+  }
+
+  async get<T = unknown>(url: string, options?: { body?: unknown }): Promise<HttpResponse<T>> {
+    return this.request<T>(url, 'GET', options);
+  }
+
+  async post<T = unknown>(url: string, body?: unknown, options?: { body?: unknown }): Promise<HttpResponse<T>> {
+    return this.request<T>(url, 'POST', { ...options, body });
+  }
+
+  async put<T = unknown>(url: string, body?: unknown, options?: { body?: unknown }): Promise<HttpResponse<T>> {
+    return this.request<T>(url, 'PUT', { ...options, body });
+  }
+
+  async patch<T = unknown>(url: string, body?: unknown, options?: { body?: unknown }): Promise<HttpResponse<T>> {
+    return this.request<T>(url, 'PATCH', { ...options, body });
+  }
+
+  async delete<T = unknown>(url: string, options?: { body?: unknown }): Promise<HttpResponse<T>> {
+    return this.request<T>(url, 'DELETE', options);
+  }
+
+  ensureConsumed(t: test.Test) {
+    t.equal(this.queue.length, 0, 'all HTTP expectations should be consumed');
+  }
+}
+
 const AUTH_HEADER = { authorization: 'Bearer unit-test-token' };
 
 const BASE_SCHEMA = {
@@ -182,7 +256,7 @@ test('DRC BFF integration', async (t) => {
   t.test('POST /v1/drc/run stores report and returns payload', async (t) => {
     const assemblies = new AssembliesStub();
     const reports = new DrcReportsStub();
-    const fetchStub = new FetchStub();
+    const httpStub = new HttpClientStub();
 
     const assemblyId = 'test-drc-run';
     assemblies.set(buildAssemblyRecord(assemblyId, 'hash-run', { offset_mm: 10 }));
@@ -216,9 +290,9 @@ test('DRC BFF integration', async (t) => {
       generated_at: new Date().toISOString(),
     };
 
-    fetchStub.reply('/drc/run', 'POST', () => ({ body: drcReport }));
+    httpStub.reply('/drc/run', 'POST', () => ({ body: drcReport }));
 
-    const app = await createApp({ assembliesDao: assemblies, drcDao: reports, fetchImpl: fetchStub.fetch });
+    const app = await createApp({ assembliesDao: assemblies, drcDao: reports, httpClient: httpStub });
     t.teardown(() => app.close());
 
     const response = await app.inject({
@@ -232,7 +306,7 @@ test('DRC BFF integration', async (t) => {
     const payload = response.json();
     t.equal(payload.assembly_id, assemblyId);
     t.equal(payload.warnings, 1);
-    fetchStub.ensureConsumed(t);
+    httpStub.ensureConsumed(t);
 
     const stored = reports.snapshot(assemblyId);
     t.ok(stored);
@@ -242,7 +316,7 @@ test('DRC BFF integration', async (t) => {
   t.test('POST /v1/drc/apply-fixes updates schema and report', async (t) => {
     const assemblies = new AssembliesStub();
     const reports = new DrcReportsStub();
-    const fetchStub = new FetchStub();
+    const httpStub = new HttpClientStub();
 
     const assemblyId = 'test-drc-apply';
     assemblies.set(buildAssemblyRecord(assemblyId, 'hash-apply', null));
@@ -276,9 +350,9 @@ test('DRC BFF integration', async (t) => {
       generated_at: new Date().toISOString(),
     };
 
-    fetchStub.reply('/drc/run', 'POST', () => ({ body: runReport }));
+    httpStub.reply('/drc/run', 'POST', () => ({ body: runReport }));
 
-    const app = await createApp({ assembliesDao: assemblies, drcDao: reports, fetchImpl: fetchStub.fetch });
+    const app = await createApp({ assembliesDao: assemblies, drcDao: reports, httpClient: httpStub });
     t.teardown(() => app.close());
 
     await app.inject({
@@ -307,7 +381,7 @@ test('DRC BFF integration', async (t) => {
       },
     };
 
-    fetchStub.reply('/drc/apply-fixes', 'POST', () => ({ body: applyResponse }));
+    httpStub.reply('/drc/apply-fixes', 'POST', () => ({ body: applyResponse }));
 
     const response = await app.inject({
       method: 'POST',
@@ -323,7 +397,7 @@ test('DRC BFF integration', async (t) => {
     const payload = response.json();
     t.equal(payload.schema_hash, 'hash-apply-fixed');
     t.equal(payload.drc.warnings, 0);
-    fetchStub.ensureConsumed(t);
+    httpStub.ensureConsumed(t);
 
     const updatedAssembly = assemblies.snapshot(assemblyId);
     t.ok(updatedAssembly);
@@ -338,7 +412,7 @@ test('DRC BFF integration', async (t) => {
   t.test('POST /v1/drc/apply-fixes fails when fix id not present', async (t) => {
     const assemblies = new AssembliesStub();
     const reports = new DrcReportsStub();
-    const fetchStub = new FetchStub();
+    const httpStub = new HttpClientStub();
 
     const assemblyId = 'test-drc-missing-fix';
     assemblies.set(buildAssemblyRecord(assemblyId, 'hash-missing', { offset_mm: 25 }));
@@ -364,7 +438,7 @@ test('DRC BFF integration', async (t) => {
       generated_at: new Date().toISOString(),
     });
 
-    const app = await createApp({ assembliesDao: assemblies, drcDao: reports, fetchImpl: fetchStub.fetch });
+    const app = await createApp({ assembliesDao: assemblies, drcDao: reports, httpClient: httpStub });
     t.teardown(() => app.close());
 
     const response = await app.inject({
@@ -380,6 +454,6 @@ test('DRC BFF integration', async (t) => {
     t.equal(response.statusCode, 400);
     const payload = response.json();
     t.equal(payload.code, 'FIX_NOT_AVAILABLE');
-    fetchStub.ensureConsumed(t);
+    httpStub.ensureConsumed(t);
   });
 });
