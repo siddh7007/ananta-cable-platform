@@ -3,6 +3,7 @@
 ## Manual Testing Guide
 
 ### Prerequisites
+
 1. Backend services running:
    - BFF Portal: `http://localhost:8080`
    - Renderer Service: `http://localhost:15002`
@@ -18,6 +19,7 @@
 ### 1. Happy Path - SVG with Inline Preview
 
 **Steps:**
+
 1. Navigate to `/assemblies/drc?assembly_id=<valid-assembly-id>`
 2. Wait for DRC report to load
 3. Verify DRC passes (status: PASSED, 0 errors)
@@ -25,53 +27,18 @@
 5. Click "Generate Drawing" button
 6. **Expected**: Dialog opens with title "Generate Drawing"
 
-**In Dialog:**
-7. Verify template pack dropdown is populated
-8. Select "STD-A3-IPC620 v1.1.0 (A3)"
-9. Verify format defaults to SVG
-10. Verify "Preview inline" checkbox is checked
-11. Click "Generate Drawing" button
-12. **Expected**: Dialog closes, "Generating..." shows on button
+**In Dialog:** 7. Verify template pack dropdown is populated 8. Select "STD-A3-IPC620 v1.1.0 (A3)" 9. Verify format defaults to SVG 10. Verify "Preview inline" checkbox is checked 11. Click "Generate Drawing" button 12. **Expected**: Dialog closes, "Generating..." shows on button
 
-**After Render:**
-13. **Expected**: Full-screen SVG preview opens
-14. Verify drawing content is visible
-15. Test zoom controls:
-    - Click "+" button → drawing zooms in
-    - Click "−" button → drawing zooms out
-    - Click "↺" button → zoom resets to 100%
-    - Click "⛶" button → fits to screen
-16. Test mouse interactions:
-    - Scroll wheel → zooms in/out
-    - Click & drag → pans drawing
-17. Test keyboard shortcuts:
-    - Press "+" → zooms in
-    - Press "-" → zooms out
-    - Press "0" → resets zoom
-18. Click "↓ Download" button
-19. **Expected**: SVG file downloads as `<assembly-id>-<revision>.svg`
-20. Click "×" button
-21. **Expected**: Preview closes, success panel shows
+**After Render:** 13. **Expected**: Full-screen SVG preview opens 14. Verify drawing content is visible 15. Test zoom controls: - Click "+" button → drawing zooms in - Click "−" button → drawing zooms out - Click "↺" button → zoom resets to 100% - Click "⛶" button → fits to screen 16. Test mouse interactions: - Scroll wheel → zooms in/out - Click & drag → pans drawing 17. Test keyboard shortcuts: - Press "+" → zooms in - Press "-" → zooms out - Press "0" → resets zoom 18. Click "↓ Download" button 19. **Expected**: SVG file downloads as `<assembly-id>-<revision>.svg` 20. Click "×" button 21. **Expected**: Preview closes, success panel shows
 
-**Success Panel:**
-22. Verify "Drawing Generated Successfully!" heading
-23. Click "Render Details" to expand manifest
-24. Verify fields:
-    - Assembly ID matches
-    - Revision is shown
-    - Template Pack: STD-A3-IPC620@1.1.0
-    - Renderer Version is shown
-    - Schema Hash is shown
-    - Format badge shows "SVG"
-    - Generated At timestamp is current
-25. Click "Dismiss"
-26. **Expected**: Success panel disappears
+**Success Panel:** 22. Verify "Drawing Generated Successfully!" heading 23. Click "Render Details" to expand manifest 24. Verify fields: - Assembly ID matches - Revision is shown - Template Pack: STD-A3-IPC620@1.1.0 - Renderer Version is shown - Schema Hash is shown - Format badge shows "SVG" - Generated At timestamp is current 25. Click "Dismiss" 26. **Expected**: Success panel disappears
 
 ---
 
 ### 2. PDF Generation (URL Download)
 
 **Steps:**
+
 1. Navigate to DRC page with passed assembly
 2. Click "Generate Drawing"
 3. **In Dialog:**
@@ -90,6 +57,7 @@
 ### 3. Template Pack Loading
 
 **Steps:**
+
 1. Open "Generate Drawing" dialog
 2. **Expected**: "Loading template packs..." shows briefly
 3. **Expected**: Dropdown populates with template packs
@@ -103,6 +71,7 @@
 ### 4. DRC Not Passed (Button Hidden)
 
 **Steps:**
+
 1. Navigate to DRC page with assembly that has errors
 2. **Expected**: "Generate Drawing" button does NOT appear
 3. **Expected**: Only "Continue to Layout" button shows (disabled)
@@ -113,6 +82,7 @@
 ### 5. Keyboard Navigation
 
 **Steps:**
+
 1. Open "Generate Drawing" dialog
 2. Press Tab repeatedly
 3. **Expected**: Focus moves through:
@@ -126,16 +96,7 @@
 4. Press Escape
 5. **Expected**: Dialog closes
 
-**In Preview:**
-6. Generate SVG with inline preview
-7. Press "+" key
-8. **Expected**: Zoom increases
-9. Press "-" key
-10. **Expected**: Zoom decreases
-11. Press "0" key
-12. **Expected**: Zoom resets
-13. Press Escape
-14. **Expected**: Preview closes
+**In Preview:** 6. Generate SVG with inline preview 7. Press "+" key 8. **Expected**: Zoom increases 9. Press "-" key 10. **Expected**: Zoom decreases 11. Press "0" key 12. **Expected**: Zoom resets 13. Press Escape 14. **Expected**: Preview closes
 
 ---
 
@@ -144,6 +105,7 @@
 **Test Setup:** Stop BFF server or block /v1/template-packs endpoint
 
 **Steps:**
+
 1. Open "Generate Drawing" dialog
 2. **Expected**: Error message shows "Failed to load template packs"
 3. **Expected**: "Retry" button appears
@@ -158,6 +120,7 @@
 **Test Setup:** Stop renderer service or use invalid assembly ID
 
 **Steps:**
+
 1. Open dialog and select template pack
 2. Click "Generate Drawing"
 3. **Expected**: Dialog closes, button shows "Generating..."
@@ -171,6 +134,7 @@
 ### 8. Cached Render
 
 **Steps:**
+
 1. Generate drawing for an assembly
 2. Dismiss success panel
 3. Click "Generate Drawing" again
@@ -187,6 +151,7 @@
 **Test Device:** Chrome DevTools mobile emulation (iPhone 12 Pro)
 
 **Steps:**
+
 1. Navigate to DRC page
 2. Verify button layout:
    - "Continue to Layout" button full width
@@ -207,6 +172,7 @@
 **Test Tool:** NVDA or JAWS
 
 **Steps:**
+
 1. Navigate to DRC page with tab key
 2. Focus on "Generate Drawing" button
 3. **Expected**: Screen reader announces "Generate Drawing button"
@@ -228,6 +194,7 @@
 After each test, verify telemetry events in console:
 
 **Test 1 (SVG with inline):**
+
 ```javascript
 Telemetry: { event: 'render.openDialog', data: { assembly_id: '...' }, timestamp: ... }
 Telemetry: { event: 'render.submit', data: { assembly_id: '...', template_pack_id: 'STD-A3-IPC620@1.1.0', format: 'svg', inline: true }, timestamp: ... }
@@ -236,6 +203,7 @@ Telemetry: { event: 'render.download', data: { assembly_id: '...', format: 'svg'
 ```
 
 **Error Scenario:**
+
 ```javascript
 Telemetry: { event: 'render.loadTemplatesError', data: { assembly_id: '...', error: 'Failed to load template packs' }, timestamp: ... }
 Telemetry: { event: 'render.error', data: { assembly_id: '...', error: 'Failed to render drawing' }, timestamp: ... }
@@ -288,6 +256,7 @@ Telemetry: { event: 'render.error', data: { assembly_id: '...', error: 'Failed t
 ## Browser Compatibility
 
 Test in:
+
 - [ ] Chrome 120+
 - [ ] Firefox 120+
 - [ ] Safari 17+

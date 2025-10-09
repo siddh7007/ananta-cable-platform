@@ -21,6 +21,7 @@ The renderer service transforms cable assembly data (RenderDSL) into production-
 Render an assembly drawing.
 
 **Request:**
+
 ```json
 {
   "dsl": {
@@ -47,9 +48,7 @@ Render an assembly drawing.
       "type": "idc",
       "positions": 12
     },
-    "nets": [
-      { "circuit": "D0", "endA_pin": "1", "endB_pin": "1", "color": "brown" }
-    ],
+    "nets": [{ "circuit": "D0", "endA_pin": "1", "endB_pin": "1", "color": "brown" }],
     "labels": [],
     "notesPack": "IPC-620-CLASS-2",
     "qr": "https://example.com/asm_123"
@@ -60,6 +59,7 @@ Render an assembly drawing.
 ```
 
 **Response:**
+
 ```json
 {
   "svg": "<svg>...</svg>",
@@ -77,6 +77,7 @@ Render an assembly drawing.
 Health check endpoint.
 
 **Response:**
+
 ```json
 {
   "ok": true,
@@ -92,26 +93,31 @@ Prometheus-compatible metrics (stub).
 ## Rendering Pipeline
 
 ### 1. Topology Pass
+
 - Place endpoints (left/right or top/bottom)
 - Calculate grid dimensions
 - Position connector footprints
 
 ### 2. Routing Pass
+
 - Assign lanes for each net
 - Minimize crossings for ribbon cables
 - Calculate path coordinates
 
 ### 3. Collision Detection
+
 - Detect label overlaps
 - Nudge callouts to avoid collisions
 - Adjust dimension line positions
 
 ### 4. Dimensions Pass
+
 - Calculate OAL (Overall Length)
 - Add tolerance annotations (±tol)
 - Generate broken-dimension glyphs when needed
 
 ### 5. Decorations Pass
+
 - Add pin-1 indicators (triangles)
 - Add red stripe for ribbon cables
 - Add QR codes and notes
@@ -121,6 +127,7 @@ Prometheus-compatible metrics (stub).
 Template packs define drawing styles and are loaded from `packages/templates/`.
 
 **Structure:**
+
 ```
 packages/templates/
   basic-a3/
@@ -133,6 +140,7 @@ packages/templates/
 ```
 
 **manifest.json:**
+
 ```json
 {
   "id": "basic-a3",
@@ -179,6 +187,7 @@ pnpm --filter services/renderer start
 ## Testing
 
 The service includes snapshot tests for:
+
 - 12-way ribbon cable with IDC connectors
 - 2-conductor power cable with labels
 - Structural validation (element counts)
@@ -218,12 +227,14 @@ Request → Validation (Zod)
 ## Deterministic Output
 
 The renderer ensures deterministic output by:
+
 - Stable element IDs based on assembly data
 - Numeric normalization to 2 decimal places
 - Consistent ordering of elements
 - Reproducible random seeds (if needed)
 
 **Example IDs:**
+
 - `asm-123-pin1-L` - Left pin-1 indicator
 - `asm-123-net-D0` - Net D0 trace
 - `asm-123-dim-oal` - Overall length dimension

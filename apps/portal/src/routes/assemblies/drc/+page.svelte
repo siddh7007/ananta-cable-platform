@@ -3,14 +3,14 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { api } from '$lib/api/client';
-  import type { 
-    DrcReport, 
-    DrcFinding, 
-    DrcFix, 
+  import type {
+    DrcReport,
+    DrcFinding,
+    DrcFix,
     DrcDomain,
     RenderFormat,
     RenderManifest,
-    RenderResponse
+    RenderResponse,
   } from '$lib/types/api';
   import { telemetry } from '$lib/stores/telemetry';
   import RenderDialog from '$lib/components/RenderDialog.svelte';
@@ -52,7 +52,7 @@
       electrical: [],
       standards: [],
       labeling: [],
-      consistency: []
+      consistency: [],
     };
 
     for (const finding of findings) {
@@ -68,14 +68,15 @@
       electrical: 'Electrical',
       standards: 'Standards & Compliance',
       labeling: 'Labeling & Marking',
-      consistency: 'Design Consistency'
+      consistency: 'Design Consistency',
     };
     return labels[domain];
   }
 
   async function loadDrcReport() {
     if (!assemblyId) {
-      error = 'No assembly_id provided in URL. Please navigate to this page with a valid assembly_id parameter (e.g., /assemblies/drc?assembly_id=your-assembly-id)';
+      error =
+        'No assembly_id provided in URL. Please navigate to this page with a valid assembly_id parameter (e.g., /assemblies/drc?assembly_id=your-assembly-id)';
       loading = false;
       return;
     }
@@ -101,20 +102,19 @@
 
       // Track result
       if (report.passed) {
-        telemetry.track('drc.pass', { 
+        telemetry.track('drc.pass', {
           assembly_id: assemblyId,
           errors: report.errors,
-          warnings: report.warnings
+          warnings: report.warnings,
         });
       } else {
         telemetry.track('drc.fail', {
           assembly_id: assemblyId,
           errors: report.errors,
           warnings: report.warnings,
-          findings_count: report.findings.length
+          findings_count: report.findings.length,
         });
       }
-
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to load DRC report';
       telemetry.track('drc.error', { assembly_id: assemblyId, error: error });
@@ -130,10 +130,10 @@
       applyingFixes = true;
       const fixIds = Array.from(selectedFixIds);
 
-      telemetry.track('drc.applyFixes', { 
+      telemetry.track('drc.applyFixes', {
         assembly_id: assemblyId,
         fix_count: fixIds.length,
-        fix_ids: fixIds
+        fix_ids: fixIds,
       });
 
       const response = await api.applyDrcFixes(assemblyId, fixIds);
@@ -147,13 +147,12 @@
       selectedFixIds.clear();
       selectedFixIds = selectedFixIds; // Trigger reactivity
 
-      telemetry.track('drc.fixesApplied', { 
+      telemetry.track('drc.fixesApplied', {
         assembly_id: assemblyId,
         fix_count: fixIds.length,
         new_errors: report.errors,
-        new_warnings: report.warnings
+        new_warnings: report.warnings,
       });
-
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to apply fixes';
       telemetry.track('drc.applyFixesError', { assembly_id: assemblyId, error: error });
@@ -203,11 +202,13 @@
     showRenderDialog = false;
   }
 
-  async function handleRenderSubmit(event: CustomEvent<{ 
-    templatePackId: string; 
-    format: RenderFormat; 
-    inline: boolean 
-  }>) {
+  async function handleRenderSubmit(
+    event: CustomEvent<{
+      templatePackId: string;
+      format: RenderFormat;
+      inline: boolean;
+    }>,
+  ) {
     if (!assemblyId) return;
 
     const { templatePackId, format, inline } = event.detail;
@@ -221,7 +222,7 @@
         assembly_id: assemblyId,
         template_pack_id: templatePackId,
         format,
-        inline
+        inline,
       });
 
       if (!response.ok) {
@@ -235,19 +236,18 @@
         template_pack_id: templatePackId,
         format,
         inline,
-        cached: renderResult.cached
+        cached: renderResult.cached,
       });
 
       // Show inline preview if requested
       if (inline && renderResult.svg_content) {
         showPreview = true;
       }
-
     } catch (err) {
       renderError = err instanceof Error ? err.message : 'Failed to render drawing';
-      telemetry.track('render.error', { 
-        assembly_id: assemblyId, 
-        error: renderError 
+      telemetry.track('render.error', {
+        assembly_id: assemblyId,
+        error: renderError,
       });
     } finally {
       rendering = false;
@@ -276,16 +276,16 @@
       telemetry.track('render.download', {
         assembly_id: assemblyId,
         format: 'svg',
-        source: 'inline'
+        source: 'inline',
       });
     } else if (renderResult.url) {
       // Open URL in new tab
       window.open(renderResult.url, '_blank');
-      
+
       telemetry.track('render.download', {
         assembly_id: assemblyId,
         format: renderResult.manifest.format,
-        source: 'url'
+        source: 'url',
       });
     }
   }
@@ -311,9 +311,9 @@
       <h1 bind:this={mainHeading} tabindex="-1">DRC Review</h1>
       {#if report}
         <div class="status-section">
-          <span 
-            class="status-tag" 
-            class:passed={report.passed} 
+          <span
+            class="status-tag"
+            class:passed={report.passed}
             class:failed={!report.passed && report.errors > 0}
             class:warning={!report.passed && report.errors === 0 && report.warnings > 0}
           >
@@ -389,10 +389,10 @@
                   {#each findings as finding}
                     <li class="finding-item" role="listitem">
                       <div class="finding-header">
-                        <span 
-                          class="severity-chip" 
-                          class:severity-error={finding.severity === 'error'} 
-                          class:severity-warning={finding.severity === 'warning'} 
+                        <span
+                          class="severity-chip"
+                          class:severity-error={finding.severity === 'error'}
+                          class:severity-warning={finding.severity === 'warning'}
                           class:severity-info={finding.severity === 'info'}
                           role="status"
                           aria-label="{finding.severity} severity"
@@ -427,14 +427,18 @@
       {#if availableFixes.length > 0}
         <section class="fixes-section" aria-labelledby="fixes-heading">
           <h2 id="fixes-heading">Suggested Fixes</h2>
-          <p class="fixes-intro">Select fixes to apply automatically. Some fixes may require re-synthesis.</p>
+          <p class="fixes-intro">
+            Select fixes to apply automatically. Some fixes may require re-synthesis.
+          </p>
 
           <div class="fixes-controls">
-            <button 
-              type="button" 
+            <button
+              type="button"
               class="toggle-all-btn"
               on:click={toggleAllFixes}
-              aria-label={selectedFixIds.size === availableFixes.length ? 'Deselect all fixes' : 'Select all fixes'}
+              aria-label={selectedFixIds.size === availableFixes.length
+                ? 'Deselect all fixes'
+                : 'Select all fixes'}
             >
               {selectedFixIds.size === availableFixes.length ? 'Deselect All' : 'Select All'}
             </button>
@@ -458,7 +462,10 @@
                   <div class="fix-content">
                     <div class="fix-header">
                       <span class="fix-title">{fix.label}</span>
-                      <span class="fix-effect" class:effect-caution={fix.effect !== 'non_destructive'}>
+                      <span
+                        class="fix-effect"
+                        class:effect-caution={fix.effect !== 'non_destructive'}
+                      >
                         {fix.effect.replace(/_/g, ' ')}
                       </span>
                     </div>
@@ -477,7 +484,9 @@
               disabled={selectedFixIds.size === 0 || applyingFixes}
               on:click={applySelectedFixes}
             >
-              {applyingFixes ? 'Applying Fixes...' : `Apply Selected Fixes (${selectedFixIds.size})`}
+              {applyingFixes
+                ? 'Applying Fixes...'
+                : `Apply Selected Fixes (${selectedFixIds.size})`}
             </button>
           </div>
         </section>
@@ -491,11 +500,13 @@
             class="continue-btn"
             disabled={!canContinue}
             on:click={continueToLayout}
-            aria-label={canContinue ? 'Continue to layout editor' : 'Fix all errors before continuing'}
+            aria-label={canContinue
+              ? 'Continue to layout editor'
+              : 'Fix all errors before continuing'}
           >
             Continue to Layout
           </button>
-          
+
           {#if canContinue}
             <button
               type="button"
@@ -508,7 +519,7 @@
             </button>
           {/if}
         </div>
-        
+
         {#if !canContinue}
           <p class="continue-note">
             {#if report.errors > 0}
@@ -523,7 +534,8 @@
 
         {#if renderError}
           <div class="render-error" role="alert">
-            <strong>Render Error:</strong> {renderError}
+            <strong>Render Error:</strong>
+            {renderError}
             <button type="button" class="dismiss-btn" on:click={dismissRenderResult}>
               Dismiss
             </button>
@@ -533,20 +545,13 @@
         {#if renderResult && !showPreview}
           <div class="render-success">
             <h3>Drawing Generated Successfully!</h3>
-            
-            <ManifestPanel 
-              manifest={renderResult.manifest} 
-              cached={renderResult.cached} 
-            />
+
+            <ManifestPanel manifest={renderResult.manifest} cached={renderResult.cached} />
 
             {#if renderResult.url}
               <div class="download-section">
                 <p>Your drawing is ready for download:</p>
-                <button
-                  type="button"
-                  class="download-link-btn"
-                  on:click={downloadRenderedDrawing}
-                >
+                <button type="button" class="download-link-btn" on:click={downloadRenderedDrawing}>
                   ↓ Download {renderResult.manifest.format.toUpperCase()} Drawing
                 </button>
               </div>
@@ -685,7 +690,9 @@
   }
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .error-banner {

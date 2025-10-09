@@ -5,8 +5,9 @@
 All drawing generation functionality has been **implemented and verified** through automated tests:
 
 ### Backend (Fully Tested ✅)
+
 - ✅ POST `/v1/render` endpoint (55/60 tests passing)
-- ✅ GET `/v1/template-packs` endpoint  
+- ✅ GET `/v1/template-packs` endpoint
 - ✅ Assembly schema to RenderDSL conversion
 - ✅ File-based caching system (cache hits verified)
 - ✅ Multiple assembly types (ribbon, power, long cables)
@@ -14,6 +15,7 @@ All drawing generation functionality has been **implemented and verified** throu
 - ✅ Renderer service integration
 
 ### Frontend (Fully Implemented ✅)
+
 - ✅ `RenderDialog.svelte` - Template selection UI
 - ✅ `SvgPreview.svelte` - Drawing preview
 - ✅ `ManifestPanel.svelte` - JSON manifest display
@@ -21,6 +23,7 @@ All drawing generation functionality has been **implemented and verified** throu
 - ✅ Error handling and user feedback
 
 ### Services Running
+
 - ✅ **Renderer Service**: Port 5002 (RUNNING)
 - ✅ **Portal UI**: Port 5173 (RUNNING)
 - ✅ **API Gateway**: Port 8080 (RUNNING)
@@ -46,6 +49,7 @@ But requests return:
 Even with the API Gateway routing issue, you can test the Portal UI:
 
 ### Option 1: Visual Inspection (Immediate)
+
 1. Open Portal: http://localhost:5173
 2. Navigate to: `/assemblies/drc`
 3. **Look for**: "Generate Drawing" button on assemblies
@@ -53,12 +57,14 @@ Even with the API Gateway routing issue, you can test the Portal UI:
 5. **Visual confirmation**: UI components are all present
 
 ### Option 2: Browser DevTools Testing
+
 1. Open browser console (F12)
 2. Run this JavaScript:
+
 ```javascript
 // Test template packs endpoint directly
 fetch('http://localhost:8080/v1/template-packs')
-  .then(r => r.json())
+  .then((r) => r.json())
   .then(console.log)
   .catch(console.error);
 
@@ -67,13 +73,18 @@ fetch('http://localhost:8080/v1/render', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    dsl: { /* mock data */ },
-    templatePackId: 'basic-a3'
-  })
-}).then(r => r.json()).then(console.log);
+    dsl: {
+      /* mock data */
+    },
+    templatePackId: 'basic-a3',
+  }),
+})
+  .then((r) => r.json())
+  .then(console.log);
 ```
 
 ### Option 3: Direct Renderer Testing
+
 Since the Renderer service IS working, test it directly:
 
 ```powershell
@@ -103,6 +114,7 @@ curl.exe -X POST http://localhost:5002/render `
 ## 📁 What You Can See in the Portal
 
 ### 1. Assembly List (`/assemblies/drc`)
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Assembly: test-ribbon-001                    │
@@ -113,6 +125,7 @@ curl.exe -X POST http://localhost:5002/render `
 ```
 
 ### 2. Generate Drawing Dialog
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Generate Drawing                              [×]  │
@@ -130,6 +143,7 @@ curl.exe -X POST http://localhost:5002/render `
 ```
 
 ### 3. Drawing Preview (After Generate)
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Drawing Preview                               [×]  │
@@ -173,6 +187,7 @@ Test Results: 55/60 assertions passed (91.7%)
 - 30 new files created
 
 Key files:
+
 - `apps/portal/src/components/render/*` - UI components
 - `services/bff-portal/src/routes/render.ts` - Backend API
 - `services/bff-portal/src/lib/assembly-to-dsl.ts` - Schema conversion
@@ -200,6 +215,7 @@ Key files:
 ### To Visualize Now:
 
 **Best Option**: Open the Portal UI and click around!
+
 - URL: http://localhost:5173
 - Navigate through the assembly DRC flow
 - See the new "Generate Drawing" button
@@ -218,6 +234,7 @@ The backend is proven working through tests. The UI is fully implemented. You ca
 ✅ **Portal UI ready for visual inspection**
 
 **You CAN visualize the changes** by opening the Portal and seeing:
+
 - New "Generate Drawing" button
 - Template selection dialog
 - Preview components (UI skeleton)

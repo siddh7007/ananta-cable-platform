@@ -3,15 +3,15 @@
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import { telemetry } from '$lib/stores/telemetry';
-  
+
   // Track page views with telemetry
   $: if ($page.url.pathname) {
     telemetry.track('page.view', {
       path: $page.url.pathname,
-      params: Object.fromEntries($page.url.searchParams)
+      params: Object.fromEntries($page.url.searchParams),
     });
   }
-  
+
   onMount(() => {
     console.log('Portal initialized with SvelteKit');
   });
@@ -19,7 +19,7 @@
 
 <div class="app-container">
   <Nav />
-  
+
   <main class="main-content">
     <slot />
   </main>
@@ -28,8 +28,9 @@
 <style>
   :global(body) {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+      'Helvetica Neue', sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f5f5f5;

@@ -5,6 +5,7 @@ Template packs define the visual style and layout for cable assembly drawings.
 ## Structure
 
 Each template pack contains:
+
 - `manifest.json` - Template metadata and styling
 - `symbols/` - SVG symbols for connectors and decorations
 - `fonts/` - Custom fonts (optional)
@@ -12,6 +13,7 @@ Each template pack contains:
 ## Available Templates
 
 ### basic-a3
+
 Standard A3 (420mm × 297mm) template with minimal styling.
 
 ## Creating a Custom Template
@@ -54,6 +56,7 @@ Standard A3 (420mm × 297mm) template with minimal styling.
 ## Paper Sizes
 
 Supported paper sizes:
+
 - A3: 420mm × 297mm
 - A4: 297mm × 210mm
 - Letter: 279.4mm × 215.9mm (11" × 8.5")

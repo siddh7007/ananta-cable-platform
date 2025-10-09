@@ -18,26 +18,31 @@ FastAPI service implementing comprehensive Design Rule Checks (DRC) for cable as
 ## DRC Rule Categories
 
 ### Mechanical
+
 - Connector positions/ways matching conductor count
 - Bend radius verification for long cables
 - Accessory clamp range validation
 
 ### Electrical
+
 - AWG ampacity vs current requirements (with derating)
 - Voltage/temperature rating compliance
 - Shield termination policy consistency
 
 ### Standards
+
 - IPC/WHMA class specification
 - RoHS/REACH compliance
 - UL94 labeling requirements
 
 ### Labeling
+
 - Title block completeness
 - Label text content validation
 - Label offset positioning
 
 ### Consistency
+
 - Ribbon cable red-stripe positioning
 - Pin-1 triangle markings
 - Locale-specific color semantics

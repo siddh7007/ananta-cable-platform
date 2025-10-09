@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   // Reactive current path
   $: currentPath = $page.url.pathname;
-  
+
   // Helper to check if current route matches
   function isActive(path: string): boolean {
     if (path === '/') {
@@ -18,29 +18,16 @@
     <div class="nav-brand">
       <a href="/">Cable Platform</a>
     </div>
-    
+
     <ul class="nav-links">
       <li class:active={isActive('/')}>
-        <a 
-          href="/" 
-          aria-current={isActive('/') ? 'page' : undefined}
-        >
-          Home
-        </a>
+        <a href="/" aria-current={isActive('/') ? 'page' : undefined}> Home </a>
       </li>
       <li class:active={isActive('/drc')}>
-        <a 
-          href="/drc" 
-          aria-current={isActive('/drc') ? 'page' : undefined}
-        >
-          DRC
-        </a>
+        <a href="/drc" aria-current={isActive('/drc') ? 'page' : undefined}> DRC </a>
       </li>
       <li class:active={isActive('/synthesis')}>
-        <a 
-          href="/synthesis" 
-          aria-current={isActive('/synthesis') ? 'page' : undefined}
-        >
+        <a href="/synthesis" aria-current={isActive('/synthesis') ? 'page' : undefined}>
           Synthesis
         </a>
       </li>
@@ -52,7 +39,7 @@
   .main-nav {
     background-color: #2c3e50;
     color: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .nav-container {

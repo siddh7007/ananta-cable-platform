@@ -7,20 +7,16 @@
 </svelte:head>
 
 <main class="home-page">
-  <h1 bind:this={mainHeading} tabindex="-1">
-    Welcome to Cable Platform
-  </h1>
-  
-  <p class="lead">
-    Design, synthesize, and verify cable assemblies with confidence.
-  </p>
-  
+  <h1 bind:this={mainHeading} tabindex="-1">Welcome to Cable Platform</h1>
+
+  <p class="lead">Design, synthesize, and verify cable assemblies with confidence.</p>
+
   <div class="quick-links">
     <a href="/drc" class="card">
       <h2>Design Rule Check</h2>
       <p>Verify your cable designs against industry standards</p>
     </a>
-    
+
     <a href="/synthesis" class="card">
       <h2>Synthesis</h2>
       <p>Generate optimized cable assemblies</p>
@@ -74,15 +70,17 @@
     background: white;
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
     text-decoration: none;
     color: inherit;
   }
 
   .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     text-decoration: none;
   }
 
@@ -102,7 +100,8 @@
     color: white;
   }
 
-  .demo-card h2, .demo-card p {
+  .demo-card h2,
+  .demo-card p {
     color: white;
   }
 

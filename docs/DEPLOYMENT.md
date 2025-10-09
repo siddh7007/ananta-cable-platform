@@ -106,7 +106,7 @@ services:
       context: .
       dockerfile: Dockerfile.portal
     ports:
-      - "5173:3000"  # Host:Container
+      - '5173:3000' # Host:Container
     environment:
       - NODE_ENV=production
       - BFF_PORTAL_URL=http://bff-portal:4001
@@ -114,7 +114,13 @@ services:
     depends_on:
       - bff-portal
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))",
+        ]
       interval: 30s
       timeout: 3s
       start_period: 5s
@@ -205,11 +211,13 @@ docker build -f Dockerfile.portal -t portal:v0.2.0 .
 ### Build Optimization
 
 **Current Metrics:**
+
 - Build time: ~30 seconds
 - Image size: ~150MB
 - Layers: 12
 
 **Optimization Tips:**
+
 - Use `.dockerignore` to exclude unnecessary files
 - Multi-stage builds reduce final image size
 - Alpine base image (smaller than Debian)
@@ -402,41 +410,41 @@ spec:
         version: v0.2.0
     spec:
       containers:
-      - name: portal
-        image: registry.example.com/portal:v0.2.0
-        ports:
-        - containerPort: 3000
-          name: http
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: BFF_PORTAL_URL
-          value: "http://bff-portal.cable-platform.svc.cluster.local:4001"
-        - name: PORT
-          value: "3000"
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          timeoutSeconds: 3
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          timeoutSeconds: 3
-          failureThreshold: 2
+        - name: portal
+          image: registry.example.com/portal:v0.2.0
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: NODE_ENV
+              value: 'production'
+            - name: BFF_PORTAL_URL
+              value: 'http://bff-portal.cable-platform.svc.cluster.local:4001'
+            - name: PORT
+              value: '3000'
+          resources:
+            requests:
+              memory: '64Mi'
+              cpu: '100m'
+            limits:
+              memory: '256Mi'
+              cpu: '500m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 2
 ---
 apiVersion: v1
 kind: Service
@@ -446,10 +454,10 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 80
-    targetPort: 3000
-    protocol: TCP
-    name: http
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
   selector:
     app: portal
 ---
@@ -463,20 +471,20 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
-  - hosts:
-    - portal.example.com
-    secretName: portal-tls
+    - hosts:
+        - portal.example.com
+      secretName: portal-tls
   rules:
-  - host: portal.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: portal
-            port:
-              number: 80
+    - host: portal.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portal
+                port:
+                  number: 80
 ```
 
 ### Deploy to Kubernetes
@@ -524,11 +532,11 @@ kubectl rollout undo deployment/portal -n cable-platform
 ```yaml
 resources:
   requests:
-    memory: "32Mi"
-    cpu: "50m"
+    memory: '32Mi'
+    cpu: '50m'
   limits:
-    memory: "128Mi"
-    cpu: "200m"
+    memory: '128Mi'
+    cpu: '200m'
 ```
 
 #### Production (per replica)
@@ -536,11 +544,11 @@ resources:
 ```yaml
 resources:
   requests:
-    memory: "64Mi"
-    cpu: "100m"
+    memory: '64Mi'
+    cpu: '100m'
   limits:
-    memory: "256Mi"
-    cpu: "500m"
+    memory: '256Mi'
+    cpu: '500m'
 ```
 
 ### Observed Usage
@@ -553,12 +561,12 @@ From testing (Phase 6):
 
 ### Scaling Guidelines
 
-| Users | Replicas | Memory/Replica | CPU/Replica |
-|-------|----------|----------------|-------------|
-| < 100 | 2 | 64Mi | 100m |
-| 100-500 | 3 | 128Mi | 200m |
-| 500-1000 | 5 | 128Mi | 200m |
-| 1000+ | 10+ | 256Mi | 500m |
+| Users    | Replicas | Memory/Replica | CPU/Replica |
+| -------- | -------- | -------------- | ----------- |
+| < 100    | 2        | 64Mi           | 100m        |
+| 100-500  | 3        | 128Mi          | 200m        |
+| 500-1000 | 5        | 128Mi          | 200m        |
+| 1000+    | 10+      | 256Mi          | 500m        |
 
 ---
 
@@ -579,6 +587,7 @@ From testing (Phase 6):
 ```
 
 **Status Codes:**
+
 - `200 OK` - Service healthy
 - `500 Internal Server Error` - Service unhealthy
 
@@ -586,7 +595,13 @@ From testing (Phase 6):
 
 ```yaml
 healthcheck:
-  test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+  test:
+    [
+      'CMD',
+      'node',
+      '-e',
+      "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))",
+    ]
   interval: 30s
   timeout: 3s
   start_period: 5s
@@ -602,7 +617,7 @@ livenessProbe:
     port: 3000
   initialDelaySeconds: 10
   periodSeconds: 30
-  
+
 readinessProbe:
   httpGet:
     path: /health
@@ -902,13 +917,15 @@ NODE_OPTIONS="--max-old-space-size=256 --optimize-for-size"
 
 ```json
 {
-  "apps": [{
-    "name": "portal",
-    "script": "build/index.js",
-    "instances": "max",
-    "exec_mode": "cluster",
-    "max_memory_restart": "256M"
-  }]
+  "apps": [
+    {
+      "name": "portal",
+      "script": "build/index.js",
+      "instances": "max",
+      "exec_mode": "cluster",
+      "max_memory_restart": "256M"
+    }
+  ]
 }
 ```
 

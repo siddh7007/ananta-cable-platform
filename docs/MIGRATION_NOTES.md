@@ -85,18 +85,21 @@ Successfully migrated the Cable Platform Portal from a custom Vite + hash-based 
 ### URL Format
 
 **Before:**
+
 ```
 http://localhost:5173/#/drc
 http://localhost:5173/#/assemblies/drc?assembly_id=123
 ```
 
 **After:**
+
 ```
 http://localhost:5173/drc
 http://localhost:5173/assemblies/drc?assembly_id=123
 ```
 
 **Impact:**
+
 - ✅ Cleaner URLs
 - ✅ Better SEO
 - ❌ Old bookmarks broken (need redirect)
@@ -105,6 +108,7 @@ http://localhost:5173/assemblies/drc?assembly_id=123
 ### File Structure
 
 **Before:**
+
 ```
 src/
 ├── App.svelte              # Root component with router
@@ -118,6 +122,7 @@ src/
 ```
 
 **After:**
+
 ```
 src/
 ├── app.html               # HTML template
@@ -136,6 +141,7 @@ src/
 ```
 
 **Impact:**
+
 - ✅ Standard convention (easier to understand)
 - ✅ Clear separation of concerns
 - ✅ Auto-routing based on file structure
@@ -144,6 +150,7 @@ src/
 ### Navigation API
 
 **Before:**
+
 ```typescript
 import { navigate } from '$lib/router';
 
@@ -157,6 +164,7 @@ $: params = $route.params;
 ```
 
 **After:**
+
 ```typescript
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
@@ -170,6 +178,7 @@ $: assemblyId = $page.url.searchParams.get('assembly_id');
 ```
 
 **Impact:**
+
 - ✅ Standard SvelteKit API
 - ✅ Better type safety
 - ❌ Required find/replace across codebase
@@ -178,14 +187,15 @@ $: assemblyId = $page.url.searchParams.get('assembly_id');
 ### Data Loading
 
 **Before:**
+
 ```svelte
 <script lang="ts">
   import { onMount } from 'svelte';
   import { api } from '$lib/api/client';
-  
+
   let loading = true;
   let data = null;
-  
+
   onMount(async () => {
     data = await api.fetchData();
     loading = false;
@@ -200,6 +210,7 @@ $: assemblyId = $page.url.searchParams.get('assembly_id');
 ```
 
 **After:**
+
 ```svelte
 <!-- +page.server.ts -->
 <script lang="ts">
@@ -210,6 +221,7 @@ $: assemblyId = $page.url.searchParams.get('assembly_id');
 ```
 
 **Impact:**
+
 - ✅ Faster initial render (data in HTML)
 - ✅ No loading spinner on initial load
 - ✅ Better SEO (content in HTML)
@@ -218,6 +230,7 @@ $: assemblyId = $page.url.searchParams.get('assembly_id');
 ### Build Output
 
 **Before:**
+
 ```
 dist/
 ├── index.html
@@ -229,6 +242,7 @@ dist/
 Static files, serve with any web server.
 
 **After:**
+
 ```
 build/
 ├── index.js              # Node.js server
@@ -239,6 +253,7 @@ build/
 Node.js server with SSR.
 
 **Impact:**
+
 - ✅ Server-side rendering
 - ✅ Dynamic capabilities
 - ❌ Requires Node.js runtime
@@ -247,12 +262,14 @@ Node.js server with SSR.
 ### Environment Variables
 
 **Before:**
+
 ```typescript
 // All variables accessible
 const API_URL = import.meta.env.VITE_API_URL;
 ```
 
 **After:**
+
 ```typescript
 // Client-side (must prefix with PUBLIC_)
 const API_URL = import.meta.env.PUBLIC_API_URL;
@@ -262,9 +279,10 @@ const API_URL = process.env.API_URL;
 ```
 
 **Impact:**
+
 - ✅ Better security (server vars not exposed)
 - ❌ Need to rename variables
-- ❌ More verbose (PUBLIC_ prefix)
+- ❌ More verbose (PUBLIC\_ prefix)
 
 ---
 
@@ -276,6 +294,7 @@ const API_URL = process.env.API_URL;
 **Commits:** b95b90d, 90b9b3e
 
 **Actions:**
+
 1. Installed SvelteKit and adapter-node
 2. Created svelte.config.js
 3. Created app.html template
@@ -283,9 +302,11 @@ const API_URL = process.env.API_URL;
 5. Configured TypeScript
 
 **Challenges:**
+
 - None (straightforward setup)
 
 **Lessons Learned:**
+
 - Start with minimal config, expand as needed
 - Test basic setup before proceeding
 
@@ -295,6 +316,7 @@ const API_URL = process.env.API_URL;
 **Commits:** 0b7c28d, fe3332a
 
 **Actions:**
+
 1. Created +layout.svelte (root layout)
 2. Created +page.svelte (home page)
 3. Created +error.svelte (error boundary)
@@ -302,9 +324,11 @@ const API_URL = process.env.API_URL;
 5. Applied global styles
 
 **Challenges:**
+
 - None (followed SvelteKit conventions)
 
 **Lessons Learned:**
+
 - Layout wraps all pages (good for global nav)
 - Error boundaries catch all route errors
 - Styles can be global or scoped
@@ -315,6 +339,7 @@ const API_URL = process.env.API_URL;
 **Commits:** 045ba14, cd31e94, bf80de5
 
 **Actions:**
+
 1. Created routes/drc/+page.svelte
 2. Created routes/synthesis/+page.svelte
 3. Updated routes/assemblies/drc/+page.svelte
@@ -325,11 +350,13 @@ const API_URL = process.env.API_URL;
 8. Updated route data access
 
 **Challenges:**
+
 - Type naming inconsistencies
 - Need to update all `navigate()` calls
 - Query params accessed differently
 
 **Lessons Learned:**
+
 - Do a comprehensive search for old API usage
 - Fix type issues as you go
 - Test each route after migration
@@ -340,6 +367,7 @@ const API_URL = process.env.API_URL;
 **Commits:** 71d9e33, 4812525
 
 **Actions:**
+
 1. Updated Dockerfile with multi-stage build
 2. Changed from Vite dev server to Node.js server
 3. Added health check endpoint
@@ -347,10 +375,12 @@ const API_URL = process.env.API_URL;
 5. Configured port mappings (3000 container, 5173 host)
 
 **Challenges:**
+
 - Port conflicts (5173 already in use)
 - Need to understand adapter-node output
 
 **Lessons Learned:**
+
 - Multi-stage builds keep images small
 - Health checks are essential for production
 - Container port ≠ host port
@@ -361,16 +391,19 @@ const API_URL = process.env.API_URL;
 **Commits:** cbbce80, 8e6bd50
 
 **Actions:**
+
 1. Created server-side API routes in routes/api/
 2. Created +page.server.ts data loaders
 3. Configured BFF_PORTAL_URL environment variable
 4. Updated docker-compose.yml with env vars
 
 **Challenges:**
+
 - BFF connection errors (wrong URL)
 - Understanding server vs client context
 
 **Lessons Learned:**
+
 - Server routes hide backend URLs from client
 - Data loaders enable SSR
 - Use internal Docker service names for URLs
@@ -381,6 +414,7 @@ const API_URL = process.env.API_URL;
 **Commit:** 1e912f4
 
 **Actions:**
+
 1. Ran 14 automated tests
 2. Validated production build
 3. Tested Docker container
@@ -390,6 +424,7 @@ const API_URL = process.env.API_URL;
 7. Measured performance
 
 **Results:**
+
 - ✅ 14/14 tests passed
 - ✅ Build time: 5.77s
 - ✅ Bundle: 13KB gzipped
@@ -397,6 +432,7 @@ const API_URL = process.env.API_URL;
 - ✅ CPU: 0.03%
 
 **Lessons Learned:**
+
 - Test everything before calling it done
 - Document test results
 - Performance metrics are valuable
@@ -407,6 +443,7 @@ const API_URL = process.env.API_URL;
 **Commit:** 34adea6
 
 **Actions:**
+
 1. Deleted src/lib/router.ts (375 lines)
 2. Deleted src/main.ts (18 lines)
 3. Deleted src/App.svelte (68 lines)
@@ -418,11 +455,13 @@ const API_URL = process.env.API_URL;
 9. Verified no dependencies on legacy files
 
 **Results:**
+
 - Removed 1,237 lines of legacy code
 - Type errors reduced from 97 to 70
 - Linting clean (0 errors)
 
 **Lessons Learned:**
+
 - Verify no dependencies before deleting
 - Clean up incrementally
 - Document what was removed and why
@@ -477,6 +516,7 @@ const API_URL = process.env.API_URL;
 **Problem:** 97 type warnings in existing code
 
 **Solution:**
+
 - Fixed naming inconsistencies (DRCResult → DrcResult)
 - Updated imports to use correct types
 - Accepted remaining 70 warnings (in active code, non-blocking)
@@ -488,6 +528,7 @@ const API_URL = process.env.API_URL;
 **Problem:** Port 5173 already in use
 
 **Solution:**
+
 - Dev server auto-switched to 5174
 - Container uses port 3000, mapped to 5173 on host
 - Documented port usage
@@ -499,6 +540,7 @@ const API_URL = process.env.API_URL;
 **Problem:** API calls failing with ECONNREFUSED
 
 **Solution:**
+
 - Used Docker service name: `http://bff-portal:4001`
 - Configured BFF_PORTAL_URL environment variable
 - Tested Docker network connectivity
@@ -510,6 +552,7 @@ const API_URL = process.env.API_URL;
 **Problem:** Need to ensure legacy files can be safely deleted
 
 **Solution:**
+
 - Ran grep searches to find all imports
 - Verified only legacy files import other legacy files
 - Confirmed all functionality reimplemented
@@ -522,20 +565,20 @@ const API_URL = process.env.API_URL;
 
 ### Build Performance
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Build Time | ~5s | ~6s | +1s |
-| Output Size | N/A | 180KB | N/A |
-| Bundle (gzip) | N/A | 13KB | N/A |
+| Metric        | Before | After | Change |
+| ------------- | ------ | ----- | ------ |
+| Build Time    | ~5s    | ~6s   | +1s    |
+| Output Size   | N/A    | 180KB | N/A    |
+| Bundle (gzip) | N/A    | 13KB  | N/A    |
 
 ### Runtime Performance
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Initial Load | ~3s | ~2s | -1s ✅ |
-| Navigation | ~500ms | ~300ms | -200ms ✅ |
-| Memory | N/A | 18MB | N/A |
-| CPU (idle) | N/A | 0.03% | N/A |
+| Metric       | Before | After  | Change    |
+| ------------ | ------ | ------ | --------- |
+| Initial Load | ~3s    | ~2s    | -1s ✅    |
+| Navigation   | ~500ms | ~300ms | -200ms ✅ |
+| Memory       | N/A    | 18MB   | N/A       |
+| CPU (idle)   | N/A    | 0.03%  | N/A       |
 
 ### User Experience
 
@@ -629,12 +672,14 @@ const API_URL = process.env.API_URL;
 ### Developer Experience
 
 **Positive:**
+
 - File-based routing is intuitive
 - Auto-generated types are helpful
 - Less boilerplate code
 - Hot reload is faster
 
 **Challenges:**
+
 - Learning curve for SvelteKit concepts
 - Understanding server vs client context
 - Debugging SSR can be tricky

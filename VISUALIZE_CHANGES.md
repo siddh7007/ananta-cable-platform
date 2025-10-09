@@ -16,6 +16,7 @@
 ### Option 2: Direct Navigation
 
 Navigate directly to this URL in your browser:
+
 ```
 http://localhost:5173/assemblies/drc?assembly_id=asm-test-ribbon-001
 ```
@@ -23,6 +24,7 @@ http://localhost:5173/assemblies/drc?assembly_id=asm-test-ribbon-001
 ## What You Should See
 
 ### 1. Home Page (http://localhost:5173)
+
 - ✅ **NEW**: Purple gradient card with "📐 Test Drawing Generation"
 - ✅ **NEW**: "NEW" badge on the card
 - Existing: "Design Rule Check" card
@@ -31,6 +33,7 @@ http://localhost:5173/assemblies/drc?assembly_id=asm-test-ribbon-001
 ### 2. DRC Assembly Page (When You Click the Card)
 
 The page will try to load assembly data. Since we're in development mode without real assembly data, you might see:
+
 - Loading state
 - Empty state ("No DRC report found")
 
@@ -50,23 +53,23 @@ Let me create a demo mode for you. The easiest way to visualize is:
 ```javascript
 // Mock a successful DRC report
 const mockReport = {
-  assembly_id: "asm-test-ribbon-001",
-  ruleset_id: "standard-v1",
+  assembly_id: 'asm-test-ribbon-001',
+  ruleset_id: 'standard-v1',
   passed: true,
   errors: 0,
   warnings: 2,
   findings: [
     {
-      id: "w-001",
-      severity: "warning",
-      domain: "electrical",
-      rule_id: "wire-gauge",
-      message: "Wire gauge might be undersized for current load",
-      location: { conductor: 1 }
-    }
+      id: 'w-001',
+      severity: 'warning',
+      domain: 'electrical',
+      rule_id: 'wire-gauge',
+      message: 'Wire gauge might be undersized for current load',
+      location: { conductor: 1 },
+    },
   ],
   fixes: [],
-  timestamp: new Date().toISOString()
+  timestamp: new Date().toISOString(),
 };
 
 // Inject into page state (this is a hack for demo purposes)
@@ -77,6 +80,7 @@ location.reload();
 ## 📊 What the UI Components Look Like
 
 ### Generate Drawing Button
+
 ```
 ┌─────────────────────────────────────────┐
 │                                         │
@@ -86,6 +90,7 @@ location.reload();
 ```
 
 ### When You Click "Generate Drawing"
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Generate Drawing                          [×]  │
@@ -106,6 +111,7 @@ location.reload();
 ```
 
 ### After Generating (Preview Screen)
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Drawing Preview                           [×]  │
@@ -160,30 +166,34 @@ pnpm --filter apps/portal storybook
 
 ## ✅ Verification Checklist
 
-- [  ] Can see new purple card on home page
-- [  ] Card has "📐 Test Drawing Generation" text
-- [  ] Card has "NEW" badge in top-right
-- [  ] Clicking card navigates to `/assemblies/drc?assembly_id=...`
-- [  ] Page loads (even if no data shown)
+- [ ] Can see new purple card on home page
+- [ ] Card has "📐 Test Drawing Generation" text
+- [ ] Card has "NEW" badge in top-right
+- [ ] Clicking card navigates to `/assemblies/drc?assembly_id=...`
+- [ ] Page loads (even if no data shown)
 
 ## 🔧 Still Can't See It?
 
 ### Check 1: Portal Is Running
+
 ```bash
 curl http://localhost:5173
 # Should return HTML with "Cable Platform"
 ```
 
 ### Check 2: Clear Browser Cache
+
 - Press `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
 - Or open incognito/private window
 
 ### Check 3: Check Browser Console
+
 - Press F12
 - Look for any JavaScript errors
 - Check Network tab for failed requests
 
 ### Check 4: Verify Portal Dev Server
+
 ```bash
 # In terminal, you should see:
 VITE v... ready in ...ms
@@ -193,6 +203,7 @@ VITE v... ready in ...ms
 ## 📝 Summary
 
 **What Changed:**
+
 1. ✅ Added purple "Test Drawing Generation" card to home page
 2. ✅ "Generate Drawing" button on DRC pages (when DRC passes)
 3. ✅ RenderDialog modal component
@@ -202,6 +213,7 @@ VITE v... ready in ...ms
 7. ✅ Backend `/v1/render` endpoint (WORKING!)
 
 **To See It:**
+
 - Go to http://localhost:5173
 - Look for the new purple card (it's BIG and hard to miss!)
 - Click it

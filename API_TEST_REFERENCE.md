@@ -5,6 +5,7 @@ Based on test suite verification (55/60 passing assertions)
 ## Working Endpoints
 
 ### 1. List Template Packs
+
 ```bash
 GET http://localhost:4001/v1/template-packs
 
@@ -12,6 +13,7 @@ GET http://localhost:4001/v1/template-packs
 ```
 
 **Expected Response:**
+
 ```json
 {
   "templatePacks": [
@@ -29,6 +31,7 @@ GET http://localhost:4001/v1/template-packs
 ```
 
 ### 2. Render Drawing
+
 ```bash
 POST http://localhost:4001/v1/render
 Content-Type: application/json
@@ -43,6 +46,7 @@ Content-Type: application/json
 ```
 
 **Expected Response:**
+
 ```json
 {
   "render_manifest": {
@@ -57,6 +61,7 @@ Content-Type: application/json
 ```
 
 ### 3. Render Drawing (URL Format)
+
 ```bash
 POST http://localhost:4001/v1/render
 Content-Type: application/json
@@ -71,6 +76,7 @@ Content-Type: application/json
 ```
 
 **Expected Response:**
+
 ```json
 {
   "render_manifest": {
@@ -86,13 +92,13 @@ Content-Type: application/json
 
 ## Test Evidence - Verified Assembly Types
 
-| Assembly ID | Type | Cache | Response Time | Status |
-|-------------|------|-------|---------------|---------|
-| asm-test-ribbon-001 | 12-conductor ribbon | ✅ | 2.7ms | ✅ 200 |
-| asm-test-inline-001 | Inline format test | ✅ | 1.8ms | ✅ 200 |
-| asm-test-cache-001 | Cache verification | ✅ (2x) | 1.5ms | ✅ 200 |
-| asm-test-power-na-001 | Power cable | ✅ | 2.3ms | ✅ 200 |
-| asm-test-long-cable-001 | Long distance cable | ✅ | 2.3ms | ✅ 200 |
+| Assembly ID             | Type                | Cache   | Response Time | Status |
+| ----------------------- | ------------------- | ------- | ------------- | ------ |
+| asm-test-ribbon-001     | 12-conductor ribbon | ✅      | 2.7ms         | ✅ 200 |
+| asm-test-inline-001     | Inline format test  | ✅      | 1.8ms         | ✅ 200 |
+| asm-test-cache-001      | Cache verification  | ✅ (2x) | 1.5ms         | ✅ 200 |
+| asm-test-power-na-001   | Power cable         | ✅      | 2.3ms         | ✅ 200 |
+| asm-test-long-cable-001 | Long distance cable | ✅      | 2.3ms         | ✅ 200 |
 
 ## Sample Request Body (12-Conductor Ribbon)
 
@@ -149,11 +155,12 @@ The caching system is working correctly:
 
 1. **Cache Key:** `{schema_hash}-{template_pack_id}-{renderer_kind}.svg`
 2. **Cache Hit Rate:** 100% in tests (all requests hit cache)
-3. **Cache Performance:** 
+3. **Cache Performance:**
    - First render with cache: 2.7ms
    - Subsequent render (same assembly): 1.3ms
 
 **Example from test output:**
+
 ```
 asm-test-cache-001 rendered twice:
 - Request 1: cacheHit: true, responseTime: 1.5ms
@@ -170,6 +177,7 @@ asm-test-cache-001 rendered twice:
 ## Environment Variables
 
 Required for testing:
+
 ```bash
 DEV_AUTH_BYPASS=true        # Bypass authentication
 RENDERER_SERVICE_URL=http://localhost:5002
@@ -208,6 +216,7 @@ pnpm dev
 ```
 
 Then in another terminal:
+
 ```powershell
 # Test template packs
 Invoke-RestMethod -Uri "http://localhost:8081/v1/template-packs"

@@ -39,9 +39,9 @@
       }
     } catch (err) {
       loadError = err instanceof Error ? err.message : 'Failed to load template packs';
-      telemetry.track('render.loadTemplatesError', { 
-        assembly_id: assemblyId, 
-        error: loadError 
+      telemetry.track('render.loadTemplatesError', {
+        assembly_id: assemblyId,
+        error: loadError,
       });
     } finally {
       loading = false;
@@ -61,13 +61,13 @@
       assembly_id: assemblyId,
       template_pack_id: selectedTemplateId,
       format,
-      inline
+      inline,
     });
 
     dispatch('submit', {
       templatePackId: selectedTemplateId,
       format,
-      inline
+      inline,
     });
   }
 
@@ -84,16 +84,16 @@
 </script>
 
 {#if open}
-  <div 
-    class="dialog-overlay" 
+  <div
+    class="dialog-overlay"
     on:click={handleClose}
     on:keydown={handleKeydown}
     role="presentation"
     tabindex="-1"
   >
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-    <div 
-      class="dialog" 
+    <div
+      class="dialog"
       on:click|stopPropagation
       on:keydown={(e) => e.key === 'Escape' && handleClose()}
       role="dialog"
@@ -102,12 +102,7 @@
     >
       <header class="dialog-header">
         <h2 id="dialog-title">Generate Drawing</h2>
-        <button
-          type="button"
-          class="close-btn"
-          on:click={handleClose}
-          aria-label="Close dialog"
-        >
+        <button type="button" class="close-btn" on:click={handleClose} aria-label="Close dialog">
           ×
         </button>
       </header>
@@ -153,23 +148,11 @@
               </legend>
               <div class="radio-group">
                 <label class="radio-label">
-                  <input
-                    type="radio"
-                    name="format"
-                    value="svg"
-                    bind:group={format}
-                    required
-                  />
+                  <input type="radio" name="format" value="svg" bind:group={format} required />
                   <span>SVG (Scalable Vector Graphics)</span>
                 </label>
                 <label class="radio-label">
-                  <input
-                    type="radio"
-                    name="format"
-                    value="pdf"
-                    bind:group={format}
-                    required
-                  />
+                  <input type="radio" name="format" value="pdf" bind:group={format} required />
                   <span>PDF (Portable Document Format)</span>
                 </label>
               </div>
@@ -196,18 +179,8 @@
           </div>
 
           <div class="dialog-actions">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              on:click={handleClose}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              disabled={!selectedTemplateId}
-            >
+            <button type="button" class="btn btn-secondary" on:click={handleClose}> Cancel </button>
+            <button type="submit" class="btn btn-primary" disabled={!selectedTemplateId}>
               Generate Drawing
             </button>
           </div>
@@ -401,7 +374,7 @@
     background: #f7fafc;
   }
 
-  .radio-label input[type="radio"] {
+  .radio-label input[type='radio'] {
     cursor: pointer;
   }
 
@@ -412,7 +385,7 @@
     cursor: pointer;
   }
 
-  .checkbox-label input[type="checkbox"]:disabled {
+  .checkbox-label input[type='checkbox']:disabled {
     cursor: not-allowed;
     opacity: 0.5;
   }

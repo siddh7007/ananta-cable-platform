@@ -28,6 +28,7 @@ The drawing generation feature follows this workflow:
 The home page has been updated to show **instructions** instead of a broken link:
 
 ### Purple Card Content:
+
 - **Title**: 📐 Drawing Generation
 - **Description**: Generate technical drawings from DRC-validated assemblies
 - **Badge**: NEW
@@ -67,37 +68,37 @@ For testing the UI without backend data, you can inject mock data in browser con
 // Open browser console (F12) on the DRC page
 // Paste this to simulate a passing DRC report
 window.mockDrcReport = {
-  assembly_id: "asm-test-001",
-  ruleset_id: "ruleset-default-v1",
+  assembly_id: 'asm-test-001',
+  ruleset_id: 'ruleset-default-v1',
   passed: true,
   errors: 0,
   warnings: 2,
   findings: [
     {
-      id: "warn-001",
-      severity: "warning",
-      domain: "labeling",
-      rule_id: "label-font-size",
-      message: "Label font size below recommended minimum",
-      location: { component: "connector-1", position: "left" },
-      recommendation: "Increase label font size to 10pt or larger"
+      id: 'warn-001',
+      severity: 'warning',
+      domain: 'labeling',
+      rule_id: 'label-font-size',
+      message: 'Label font size below recommended minimum',
+      location: { component: 'connector-1', position: 'left' },
+      recommendation: 'Increase label font size to 10pt or larger',
     },
     {
-      id: "warn-002", 
-      severity: "warning",
-      domain: "mechanical",
-      rule_id: "bend-radius",
-      message: "Bend radius near minimum threshold",
-      location: { component: "cable-segment-3", position: "junction-2" },
-      recommendation: "Consider increasing bend radius for better reliability"
-    }
+      id: 'warn-002',
+      severity: 'warning',
+      domain: 'mechanical',
+      rule_id: 'bend-radius',
+      message: 'Bend radius near minimum threshold',
+      location: { component: 'cable-segment-3', position: 'junction-2' },
+      recommendation: 'Consider increasing bend radius for better reliability',
+    },
   ],
   fixes: [],
   metadata: {
     checked_at: new Date().toISOString(),
     duration_ms: 150,
-    rule_count: 24
-  }
+    rule_count: 24,
+  },
 };
 
 // Then manually trigger the "Generate Drawing" button to appear
@@ -113,11 +114,12 @@ window.mockDrcReport = {
 
 ## Next Steps to Use the Feature
 
-1. **Get a Real Assembly ID**: 
+1. **Get a Real Assembly ID**:
    - Check your database for existing assemblies
    - Or create a new assembly through the API
 
 2. **Navigate to DRC Page**:
+
    ```
    http://localhost:5173/assemblies/drc?assembly_id={your-assembly-id}
    ```
@@ -153,14 +155,17 @@ window.mockDrcReport = {
 ## Troubleshooting
 
 ### Error: "HTTP 404" when loading DRC page
+
 - **Cause**: Assembly ID doesn't exist in the backend
 - **Solution**: Use a valid assembly ID from your database
 
 ### Error: "Generate Drawing" button doesn't appear
+
 - **Cause**: DRC report has errors or didn't pass
 - **Solution**: Fix DRC errors first, or use an assembly with a passing report
 
 ### Error: "Failed to render" when clicking Render button
+
 - **Cause**: Backend renderer service may not be running or assembly data is incomplete
 - **Solution**: Check that the renderer service is running and assembly has required data
 

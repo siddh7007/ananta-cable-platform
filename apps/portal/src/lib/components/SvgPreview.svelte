@@ -41,7 +41,7 @@
 
     const scaleX = containerRect.width / svgRect.width;
     const scaleY = containerRect.height / svgRect.height;
-    
+
     scale = Math.min(scaleX, scaleY, 1) * 0.9; // 90% of available space
     translateX = 0;
     translateY = 0;
@@ -105,7 +105,8 @@
         class="control-btn"
         on:click={zoomOut}
         aria-label="Zoom out"
-        title="Zoom out (-)">
+        title="Zoom out (-)"
+      >
         <span aria-hidden="true">−</span>
       </button>
       <span class="zoom-level" role="status" aria-live="polite">
@@ -116,7 +117,8 @@
         class="control-btn"
         on:click={zoomIn}
         aria-label="Zoom in"
-        title="Zoom in (+)">
+        title="Zoom in (+)"
+      >
         <span aria-hidden="true">+</span>
       </button>
       <button
@@ -124,7 +126,8 @@
         class="control-btn"
         on:click={resetZoom}
         aria-label="Reset zoom"
-        title="Reset zoom (0)">
+        title="Reset zoom (0)"
+      >
         <span aria-hidden="true">↺</span>
       </button>
       <button
@@ -132,28 +135,31 @@
         class="control-btn"
         on:click={fitToScreen}
         aria-label="Fit to screen"
-        title="Fit to screen">
+        title="Fit to screen"
+      >
         <span aria-hidden="true">⛶</span>
       </button>
       <button
         type="button"
         class="control-btn download-btn"
         on:click={onDownload}
-        aria-label="Download drawing">
+        aria-label="Download drawing"
+      >
         ↓ Download
       </button>
       <button
         type="button"
         class="control-btn close-btn"
         on:click={onClose}
-        aria-label="Close preview">
+        aria-label="Close preview"
+      >
         ×
       </button>
     </div>
   </div>
 
   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-  <div 
+  <div
     class="preview-container"
     bind:this={containerRef}
     on:mousedown={handleMouseDown}
@@ -173,7 +179,7 @@
 
   <div class="preview-footer">
     <p class="hint-text">
-      <kbd>Mouse wheel</kbd> to zoom • <kbd>Click & drag</kbd> to pan • 
+      <kbd>Mouse wheel</kbd> to zoom • <kbd>Click & drag</kbd> to pan •
       <kbd>+/-</kbd> to zoom • <kbd>0</kbd> to reset • <kbd>Esc</kbd> to close
     </p>
   </div>
@@ -276,13 +282,17 @@
   .preview-container {
     flex: 1;
     overflow: hidden;
-    background: 
+    background:
       linear-gradient(45deg, #2d3748 25%, transparent 25%),
       linear-gradient(-45deg, #2d3748 25%, transparent 25%),
       linear-gradient(45deg, transparent 75%, #2d3748 75%),
       linear-gradient(-45deg, transparent 75%, #2d3748 75%);
     background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-position:
+      0 0,
+      0 10px,
+      10px -10px,
+      -10px 0px;
     display: flex;
     align-items: center;
     justify-content: center;

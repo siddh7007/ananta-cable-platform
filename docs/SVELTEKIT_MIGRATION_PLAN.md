@@ -10,6 +10,7 @@
 ## 📊 Current State Analysis
 
 ### Current Setup
+
 - ✅ Plain Svelte 4 + Vite
 - ✅ Custom hash-based router (`lib/router.ts`)
 - ✅ Manual route handling in `App.svelte`
@@ -22,6 +23,7 @@
 - ❌ No built-in data loading
 
 ### Current File Structure
+
 ```
 apps/portal/
 ├── src/
@@ -64,6 +66,7 @@ We recommend a **phased migration** rather than a big-bang rewrite to minimize r
 ## Phase 1: Parallel SvelteKit Setup (Week 1)
 
 ### Goals
+
 - Set up SvelteKit alongside existing Vite app
 - Zero disruption to current functionality
 - Test SvelteKit configuration
@@ -77,6 +80,7 @@ pnpm add -D @sveltejs/adapter-static  # Optional: for static export
 ```
 
 **Dependencies to add:**
+
 - `@sveltejs/kit`: Core SvelteKit framework
 - `@sveltejs/adapter-node`: Node.js adapter for SSR
 - `@sveltejs/adapter-static`: Static site adapter (optional)
@@ -92,31 +96,31 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   preprocess: vitePreprocess(),
-  
+
   kit: {
     adapter: adapter({
       out: 'build',
       precompress: false,
-      envPrefix: ''
+      envPrefix: '',
     }),
-    
+
     // Path aliases (matching current setup)
     alias: {
-      '$lib': './src/lib',
-      '$lib/*': './src/lib/*'
+      $lib: './src/lib',
+      '$lib/*': './src/lib/*',
     },
-    
+
     // Match your current routing structure
     files: {
       routes: 'src/routes',
-      lib: 'src/lib'
+      lib: 'src/lib',
     },
-    
+
     // Environment variables
     env: {
-      publicPrefix: 'PUBLIC_'
-    }
-  }
+      publicPrefix: 'PUBLIC_',
+    },
+  },
 };
 
 export default config;
@@ -132,20 +136,20 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [sveltekit()],
-  
-  server: { 
-    host: true, 
-    port: 5173 
+
+  server: {
+    host: true,
+    port: 5173,
   },
-  
+
   // Keep your workspace dependencies optimized
   optimizeDeps: {
     include: [
       '@cable-platform/client-sdk',
       '@cable-platform/contracts',
-      '@cable-platform/validation'
-    ]
-  }
+      '@cable-platform/validation',
+    ],
+  },
 });
 ```
 
@@ -198,6 +202,7 @@ apps/portal/src/
 ```
 
 **Notes:**
+
 - `%sveltekit.head%`: Replaced with page-specific head content
 - `%sveltekit.body%`: Replaced with page content
 - `data-sveltekit-preload-data="hover"`: Enables link preloading on hover
@@ -215,6 +220,7 @@ build/
 ## Phase 2: Migrate Router & Layout (Week 1-2)
 
 ### Goals
+
 - Replace custom router with SvelteKit routing
 - Create root layout with Nav component
 - Remove dependency on `lib/router.ts`
@@ -229,7 +235,7 @@ build/
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import { telemetry } from '$lib/stores/telemetry';
-  
+
   // Track page views with telemetry
   $: if ($page.url.pathname) {
     telemetry.track('page.view', {
@@ -237,7 +243,7 @@ build/
       params: Object.fromEntries($page.url.searchParams)
     });
   }
-  
+
   onMount(() => {
     console.log('Portal initialized');
   });
@@ -245,7 +251,7 @@ build/
 
 <div class="app-container">
   <Nav />
-  
+
   <main class="main-content">
     <slot />
   </main>
@@ -301,10 +307,10 @@ build/
 ```svelte
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   // Reactive current path
   $: currentPath = $page.url.pathname;
-  
+
   // Helper to check if current route matches
   function isActive(path: string): boolean {
     if (path === '/') {
@@ -319,7 +325,7 @@ build/
     <div class="nav-brand">
       <a href="/">Cable Platform</a>
     </div>
-    
+
     <ul class="nav-links">
       <li class:active={isActive('/')}>
         <a href="/">Home</a>
@@ -402,6 +408,7 @@ apps/portal/index.html
 ## Phase 3: Migrate Routes (Week 2)
 
 ### Goals
+
 - Convert all routes to SvelteKit format
 - Implement data loading where beneficial
 - Maintain existing functionality
@@ -423,17 +430,17 @@ apps/portal/index.html
   <h1 bind:this={mainHeading} tabindex="-1">
     Welcome to Cable Platform
   </h1>
-  
+
   <p class="lead">
     Design, synthesize, and verify cable assemblies with confidence.
   </p>
-  
+
   <div class="quick-links">
     <a href="/drc" class="card">
       <h2>Design Rule Check</h2>
       <p>Verify your cable designs against industry standards</p>
     </a>
-    
+
     <a href="/synthesis" class="card">
       <h2>Synthesis</h2>
       <p>Generate optimized cable assemblies</p>
@@ -495,6 +502,7 @@ apps/portal/index.html
 **File: `apps/portal/src/routes/assemblies/drc/+page.svelte`**
 
 **Current issues to fix:**
+
 - Currently uses custom `route` store → Change to `$page` from `$app/stores`
 - Currently uses custom `navigate()` → Change to `goto()` from `$app/navigation`
 
@@ -550,32 +558,32 @@ import { error } from '@sveltejs/kit';
 
 export const load: PageLoad = async ({ url, fetch }) => {
   const assemblyId = url.searchParams.get('assembly_id');
-  
+
   if (!assemblyId) {
     throw error(400, {
       message: 'Assembly ID is required',
-      details: 'Please provide an assembly_id query parameter'
+      details: 'Please provide an assembly_id query parameter',
     });
   }
-  
+
   try {
     // Load DRC report
     const report = await api.getDrcReport(assemblyId);
-    
-    return { 
-      report, 
+
+    return {
+      report,
       assemblyId,
-      error: null
+      error: null,
     };
   } catch (err) {
     console.error('Failed to load DRC report:', err);
-    
+
     // Return error state instead of throwing
     // This allows the page to handle the error gracefully
-    return { 
-      report: null, 
+    return {
+      report: null,
       assemblyId,
-      error: err instanceof Error ? err.message : 'Failed to load DRC report'
+      error: err instanceof Error ? err.message : 'Failed to load DRC report',
     };
   }
 };
@@ -592,18 +600,18 @@ export const ssr = true;
 ```svelte
 <script lang="ts">
   import type { PageData } from './$types';
-  
+
   export let data: PageData;
-  
+
   // Data is already loaded from +page.ts!
   $: report = data.report;
   $: assemblyId = data.assemblyId;
   $: initialError = data.error;
-  
+
   // State for runtime errors
   let error: string | null = initialError;
   let loading = false; // Already loaded on mount
-  
+
   // ... rest of component ...
 </script>
 ```
@@ -615,7 +623,7 @@ export const ssr = true;
 ```svelte
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   $: status = $page.status;
   $: message = $page.error?.message || 'An error occurred';
 </script>
@@ -628,7 +636,7 @@ export const ssr = true;
   <div class="error-container">
     <h1>{status}</h1>
     <h2>{message}</h2>
-    
+
     {#if status === 404}
       <p>The page you're looking for doesn't exist.</p>
     {:else if status === 400}
@@ -636,7 +644,7 @@ export const ssr = true;
     {:else if status >= 500}
       <p>Something went wrong on our end. Please try again later.</p>
     {/if}
-    
+
     <a href="/" class="btn-home">Go back to Home</a>
   </div>
 </main>
@@ -690,19 +698,20 @@ export const ssr = true;
 
 ### 3.5 Migration Summary for Routes
 
-| Current Route | Status | Action Required |
-|---------------|--------|-----------------|
-| `/` (Home) | ❌ Not migrated | Move `routes/Home.svelte` → `routes/+page.svelte` |
-| `/drc` (Legacy DRC) | ❌ Not migrated | Move `routes/DRC.svelte` → `routes/drc/+page.svelte` |
-| `/synthesis` | ❌ Not migrated | Move `routes/Synthesis.svelte` → `routes/synthesis/+page.svelte` |
-| `/assemblies/drc` | ⚠️ Partially ready | Update imports to use `$app/stores` and `$app/navigation` |
-| `/assemblies/synthesis` | ⚠️ Partially ready | Update imports to use `$app/stores` and `$app/navigation` |
+| Current Route           | Status             | Action Required                                                  |
+| ----------------------- | ------------------ | ---------------------------------------------------------------- |
+| `/` (Home)              | ❌ Not migrated    | Move `routes/Home.svelte` → `routes/+page.svelte`                |
+| `/drc` (Legacy DRC)     | ❌ Not migrated    | Move `routes/DRC.svelte` → `routes/drc/+page.svelte`             |
+| `/synthesis`            | ❌ Not migrated    | Move `routes/Synthesis.svelte` → `routes/synthesis/+page.svelte` |
+| `/assemblies/drc`       | ⚠️ Partially ready | Update imports to use `$app/stores` and `$app/navigation`        |
+| `/assemblies/synthesis` | ⚠️ Partially ready | Update imports to use `$app/stores` and `$app/navigation`        |
 
 ---
 
 ## Phase 4: Update Dockerfile (Week 2)
 
 ### Goals
+
 - Build SvelteKit app instead of Vite static site
 - Create production-ready Node.js image
 - Optimize for size and performance
@@ -764,7 +773,7 @@ services:
       context: .
       dockerfile: Dockerfile.portal
     ports:
-      - "5173:5173"
+      - '5173:5173'
     environment:
       - NODE_ENV=production
       - PUBLIC_BFF_URL=http://localhost:3000
@@ -786,7 +795,7 @@ export const GET: RequestHandler = async () => {
   return json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'portal'
+    service: 'portal',
   });
 };
 ```
@@ -796,6 +805,7 @@ export const GET: RequestHandler = async () => {
 ## Phase 5: API Integration Enhancement (Week 3)
 
 ### Goals
+
 - Create server-side API routes (optional)
 - Improve security by hiding backend URLs
 - Enable SSR for better performance
@@ -813,34 +823,34 @@ const BFF_URL = process.env.BFF_INTERNAL_URL || 'http://bff-portal:3000';
 
 export const GET: RequestHandler = async ({ params, fetch }) => {
   const { assembly_id } = params;
-  
+
   try {
     const response = await fetch(`${BFF_URL}/api/drc/${assembly_id}`, {
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw error(response.status, {
         message: errorData.message || 'Failed to fetch DRC report',
-        details: errorData
+        details: errorData,
       });
     }
-    
+
     const data = await response.json();
     return json(data);
   } catch (err) {
     console.error('DRC API error:', err);
-    
+
     if (err instanceof Error && 'status' in err) {
       throw err; // Re-throw SvelteKit errors
     }
-    
+
     throw error(500, {
       message: 'Internal server error',
-      details: err instanceof Error ? err.message : 'Unknown error'
+      details: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 };
@@ -856,41 +866,38 @@ const BFF_URL = process.env.BFF_INTERNAL_URL || 'http://bff-portal:3000';
 
 export const POST: RequestHandler = async ({ params, request, fetch }) => {
   const { assembly_id } = params;
-  
+
   try {
     const body = await request.json();
-    
-    const response = await fetch(
-      `${BFF_URL}/api/drc/${assembly_id}/apply-fixes`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      }
-    );
-    
+
+    const response = await fetch(`${BFF_URL}/api/drc/${assembly_id}/apply-fixes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw error(response.status, {
         message: errorData.message || 'Failed to apply DRC fixes',
-        details: errorData
+        details: errorData,
       });
     }
-    
+
     const data = await response.json();
     return json(data);
   } catch (err) {
     console.error('Apply fixes API error:', err);
-    
+
     if (err instanceof Error && 'status' in err) {
       throw err;
     }
-    
+
     throw error(500, {
       message: 'Internal server error',
-      details: err instanceof Error ? err.message : 'Unknown error'
+      details: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 };
@@ -903,8 +910,8 @@ export const POST: RequestHandler = async ({ params, request, fetch }) => {
 ```typescript
 import { browser } from '$app/environment';
 
-const API_BASE_URL = browser 
-  ? '/api'  // Use server-side API routes in browser
+const API_BASE_URL = browser
+  ? '/api' // Use server-side API routes in browser
   : process.env.BFF_INTERNAL_URL || 'http://bff-portal:3000/api';
 
 class ApiClient {
@@ -916,30 +923,27 @@ class ApiClient {
 
   async getDrcReport(assemblyId: string): Promise<DrcReport> {
     const response = await fetch(`${this.baseUrl}/drc/${assemblyId}`);
-    
+
     if (!response.ok) {
       throw new Error(`Failed to get DRC report: ${response.statusText}`);
     }
-    
+
     return response.json();
   }
 
   async applyDrcFixes(assemblyId: string, fixIds: string[]): Promise<DrcReport> {
-    const response = await fetch(
-      `${this.baseUrl}/drc/${assemblyId}/apply-fixes`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ fix_ids: fixIds })
-      }
-    );
-    
+    const response = await fetch(`${this.baseUrl}/drc/${assemblyId}/apply-fixes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fix_ids: fixIds }),
+    });
+
     if (!response.ok) {
       throw new Error(`Failed to apply DRC fixes: ${response.statusText}`);
     }
-    
+
     return response.json();
   }
 
@@ -951,20 +955,21 @@ export const api = new ApiClient(API_BASE_URL);
 
 ### 5.3 Benefits of Server-Side API Routes
 
-| Benefit | Description |
-|---------|-------------|
-| 🔒 **Security** | Hide internal service URLs from client |
-| 🚀 **Performance** | Server-side fetching is faster (no CORS) |
-| 🔐 **Authentication** | Add auth middleware in one place |
-| 📊 **Analytics** | Track API usage server-side |
-| 🛡️ **Rate Limiting** | Implement rate limits per user |
-| 🔄 **Request Transform** | Modify requests/responses as needed |
+| Benefit                  | Description                              |
+| ------------------------ | ---------------------------------------- |
+| 🔒 **Security**          | Hide internal service URLs from client   |
+| 🚀 **Performance**       | Server-side fetching is faster (no CORS) |
+| 🔐 **Authentication**    | Add auth middleware in one place         |
+| 📊 **Analytics**         | Track API usage server-side              |
+| 🛡️ **Rate Limiting**     | Implement rate limits per user           |
+| 🔄 **Request Transform** | Modify requests/responses as needed      |
 
 ---
 
 ## Phase 6: Testing & Validation (Week 3-4)
 
 ### Goals
+
 - Ensure all functionality works in SvelteKit
 - Test build and deployment process
 - Validate performance improvements
@@ -1044,12 +1049,14 @@ export const api = new ApiClient(API_BASE_URL);
 #### Build & Deployment Testing
 
 - [ ] **Development**
+
   ```bash
   pnpm --filter portal dev
   # Check: http://localhost:5173 loads
   ```
 
 - [ ] **Production Build**
+
   ```bash
   pnpm --filter portal build
   # Check: No TypeScript errors
@@ -1057,12 +1064,14 @@ export const api = new ApiClient(API_BASE_URL);
   ```
 
 - [ ] **Production Preview**
+
   ```bash
   pnpm --filter portal preview
   # Check: Built app runs correctly
   ```
 
 - [ ] **Docker Build**
+
   ```bash
   docker-compose build portal
   # Check: Build completes successfully
@@ -1123,6 +1132,7 @@ pnpm --filter portal preview
 ## Phase 7: Cleanup (Week 4)
 
 ### Goals
+
 - Remove legacy code
 - Clean up old configurations
 - Update documentation
@@ -1151,6 +1161,7 @@ rm apps/portal/src/routes/Synthesis.svelte
 ### 7.2 Update Documentation
 
 **Files to update:**
+
 - [ ] `README.md` - Update setup instructions
 - [ ] `docs/PORTAL_SETUP.md` - Document SvelteKit architecture
 - [ ] `docs/DEPLOYMENT.md` - Update deployment process
@@ -1175,6 +1186,7 @@ git commit -m "chore(portal): Complete SvelteKit migration and remove legacy cod
 ## Phase 8: Update Documentation (Week 4)
 
 ### Goals
+
 - Document new architecture
 - Update setup guides
 - Create migration notes for future reference
@@ -1187,6 +1199,7 @@ git commit -m "chore(portal): Complete SvelteKit migration and remove legacy cod
 # Portal Architecture
 
 ## Tech Stack
+
 - **Framework**: SvelteKit 2.0
 - **UI Library**: Svelte 4
 - **Build Tool**: Vite 5
@@ -1194,15 +1207,19 @@ git commit -m "chore(portal): Complete SvelteKit migration and remove legacy cod
 - **Adapter**: Node.js (adapter-node)
 
 ## Directory Structure
+
 [Document new structure]
 
 ## Routing
+
 [Document SvelteKit routing patterns]
 
 ## Data Loading
+
 [Document +page.ts load functions]
 
 ## API Integration
+
 [Document server-side API routes]
 ```
 
@@ -1214,16 +1231,19 @@ git commit -m "chore(portal): Complete SvelteKit migration and remove legacy cod
 ## SvelteKit Portal
 
 ### Development
+
 \`\`\`bash
 pnpm --filter portal dev
 \`\`\`
 
 ### Build
+
 \`\`\`bash
 pnpm --filter portal build
 \`\`\`
 
 ### Routes
+
 - `/` - Home page
 - `/drc` - Design Rule Check (legacy form)
 - `/synthesis` - Synthesis (legacy)
@@ -1231,6 +1251,7 @@ pnpm --filter portal build
 - `/assemblies/synthesis?draft_id=X` - Synthesis Review (Step 2)
 
 ### Environment Variables
+
 - `PUBLIC_BFF_URL` - Public BFF URL (client-side)
 - `BFF_INTERNAL_URL` - Internal BFF URL (server-side)
 ```
@@ -1240,6 +1261,7 @@ pnpm --filter portal build
 ## Phase 9: Deploy to Staging (Week 4)
 
 ### Goals
+
 - Deploy to staging environment
 - Perform end-to-end testing
 - Gather feedback
@@ -1285,6 +1307,7 @@ kubectl rollout status deployment/portal -n staging
 ## Phase 10: Production Deployment (Week 5)
 
 ### Goals
+
 - Deploy to production
 - Monitor performance
 - Ensure zero downtime
@@ -1326,6 +1349,7 @@ kubectl delete deployment portal-v1 -n prod
 ### 10.3 Post-Deployment Monitoring
 
 **Monitor for 24 hours:**
+
 - [ ] Error rates < 1%
 - [ ] Response times < 500ms (p95)
 - [ ] No memory leaks
@@ -1407,16 +1431,19 @@ kubectl delete deployment portal-v1 -n prod
 ### 1. URL Format Change
 
 **Before:**
+
 ```
 http://localhost:5173/#/assemblies/drc?assembly_id=123
 ```
 
 **After:**
+
 ```
 http://localhost:5173/assemblies/drc?assembly_id=123
 ```
 
 **Impact:**
+
 - Bookmarks will break (need redirect)
 - External links need updating
 - Analytics URLs change
@@ -1437,65 +1464,77 @@ export const load: LayoutServerLoad = async ({ url }) => {
 ### 2. Navigation API Change
 
 **Before:**
+
 ```typescript
 import { navigate } from '$lib/router';
 navigate('/path');
 ```
 
 **After:**
+
 ```typescript
 import { goto } from '$app/navigation';
 goto('/path');
 ```
 
 **Impact:**
+
 - All `navigate()` calls need updating
 - Import statements need changing
 
 **Mitigation:**
+
 - Find and replace across codebase
 - Update linting rules to catch old imports
 
 ### 3. Route Data Access Change
 
 **Before:**
+
 ```typescript
 import { route } from '$lib/router';
 $: assemblyId = $route.params.assembly_id;
 ```
 
 **After:**
+
 ```typescript
 import { page } from '$app/stores';
 $: assemblyId = $page.url.searchParams.get('assembly_id');
 ```
 
 **Impact:**
+
 - All route data access needs updating
 - Different API for params vs search params
 
 **Mitigation:**
+
 - Comprehensive search and replace
 - Test all query parameter usage
 
 ### 4. Build Output Change
 
 **Before:**
+
 - Static files in `dist/`
 - Served by any static file server
 - No server required
 
 **After:**
+
 - Node.js server in `build/`
 - Requires Node.js runtime
 - More complex deployment
 
 **Impact:**
+
 - Deployment process changes
 - Hosting requirements change
 - Infrastructure costs may increase
 
 **Mitigation:**
+
 - Update CI/CD pipelines
 - Update infrastructure as code
 - Document new deployment process
@@ -1503,17 +1542,21 @@ $: assemblyId = $page.url.searchParams.get('assembly_id');
 ### 5. Environment Variables
 
 **Before:**
+
 - All env vars available via `import.meta.env`
 
 **After:**
+
 - Client vars must be prefixed with `PUBLIC_`
 - Server vars not exposed to client
 
 **Impact:**
+
 - Some env vars may need renaming
 - Better security (but more verbose)
 
 **Mitigation:**
+
 ```typescript
 // Before
 const API_URL = import.meta.env.VITE_API_URL;
@@ -1530,9 +1573,11 @@ const API_URL = process.env.API_URL;
 ## 📊 Estimated Timeline
 
 ### Quick Migration (Minimal Changes)
+
 **Duration:** 1-2 weeks
 
 **Scope:**
+
 - Basic SvelteKit setup
 - Route conversion
 - No server-side features
@@ -1541,9 +1586,11 @@ const API_URL = process.env.API_URL;
 **Risk:** Medium
 
 ### Standard Migration (Recommended)
+
 **Duration:** 3-4 weeks
 
 **Scope:**
+
 - Complete SvelteKit setup
 - All routes migrated
 - Server-side API routes
@@ -1554,9 +1601,11 @@ const API_URL = process.env.API_URL;
 **Risk:** Low
 
 ### Full Migration (with Optimizations)
+
 **Duration:** 5-6 weeks
 
 **Scope:**
+
 - Everything in standard
 - SSR optimization
 - Performance tuning
@@ -1624,6 +1673,7 @@ const API_URL = process.env.API_URL;
 ## 📝 Migration Checklist Summary
 
 ### Planning Phase
+
 - [ ] Read migration plan
 - [ ] Assess current state
 - [ ] Identify breaking changes
@@ -1631,6 +1681,7 @@ const API_URL = process.env.API_URL;
 - [ ] Get team buy-in
 
 ### Phase 1: Setup
+
 - [ ] Install SvelteKit dependencies
 - [ ] Create svelte.config.js
 - [ ] Update vite.config.ts
@@ -1638,12 +1689,14 @@ const API_URL = process.env.API_URL;
 - [ ] Test basic setup
 
 ### Phase 2: Layout
+
 - [ ] Create +layout.svelte
 - [ ] Update Nav component
 - [ ] Test layout rendering
 - [ ] Remove old App.svelte (later)
 
 ### Phase 3: Routes
+
 - [ ] Migrate home page
 - [ ] Migrate DRC pages
 - [ ] Migrate synthesis pages
@@ -1652,6 +1705,7 @@ const API_URL = process.env.API_URL;
 - [ ] Test all routes
 
 ### Phase 4: Docker
+
 - [ ] Update Dockerfile
 - [ ] Update docker-compose.yml
 - [ ] Add health check endpoint
@@ -1659,12 +1713,14 @@ const API_URL = process.env.API_URL;
 - [ ] Test Docker run
 
 ### Phase 5: API (Optional)
+
 - [ ] Create server API routes
 - [ ] Update API client
 - [ ] Test server routes
 - [ ] Update environment variables
 
 ### Phase 6: Testing
+
 - [ ] Run type checking
 - [ ] Run linting
 - [ ] Manual testing
@@ -1672,24 +1728,28 @@ const API_URL = process.env.API_URL;
 - [ ] Accessibility testing
 
 ### Phase 7: Cleanup
+
 - [ ] Remove old files
 - [ ] Update .gitignore
 - [ ] Clean up dependencies
 - [ ] Run final tests
 
 ### Phase 8: Documentation
+
 - [ ] Update README
 - [ ] Create architecture doc
 - [ ] Update deployment docs
 - [ ] Create runbooks
 
 ### Phase 9: Staging
+
 - [ ] Deploy to staging
 - [ ] Run smoke tests
 - [ ] Monitor performance
 - [ ] Gather feedback
 
 ### Phase 10: Production
+
 - [ ] Deploy to production
 - [ ] Monitor closely
 - [ ] Gather metrics
@@ -1700,17 +1760,20 @@ const API_URL = process.env.API_URL;
 ## 🔗 Resources
 
 ### Official Documentation
+
 - [SvelteKit Docs](https://kit.svelte.dev/docs)
 - [Svelte Tutorial](https://svelte.dev/tutorial)
 - [Vite Guide](https://vitejs.dev/guide/)
 
 ### Migration Guides
+
 - [From Vite to SvelteKit](https://kit.svelte.dev/docs/migrating)
 - [Routing](https://kit.svelte.dev/docs/routing)
 - [Load Functions](https://kit.svelte.dev/docs/load)
 - [Form Actions](https://kit.svelte.dev/docs/form-actions)
 
 ### Community
+
 - [SvelteKit Discord](https://discord.gg/svelte)
 - [Svelte Summit](https://www.sveltesummit.com/)
 - [Svelte Society](https://sveltesociety.dev/)
@@ -1720,6 +1783,7 @@ const API_URL = process.env.API_URL;
 ## 📞 Support & Questions
 
 For questions about this migration:
+
 1. Review this document
 2. Check SvelteKit docs
 3. Search GitHub issues

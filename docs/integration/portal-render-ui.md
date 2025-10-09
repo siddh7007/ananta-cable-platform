@@ -7,7 +7,9 @@ Successfully integrated Step 11 (Drawing Generation) into the Portal (SvelteKit)
 ## Files Created
 
 ### 1. Type Definitions (`apps/portal/src/lib/types/api.ts`)
+
 Added rendering-related types:
+
 - `RenderFormat`: 'svg' | 'pdf'
 - `TemplatePack`: Template pack metadata with id, version, name, paper size
 - `RenderRequest`: Request payload for rendering
@@ -15,12 +17,16 @@ Added rendering-related types:
 - `RenderResponse`: Response with URL or inline SVG content
 
 ### 2. API Client Methods (`apps/portal/src/lib/api/client.ts`)
+
 Added two new methods:
+
 - `listTemplatePacks()`: GET /v1/template-packs - Fetch available template packs
 - `renderAssembly(request)`: POST /v1/render - Generate drawing from assembly
 
 ### 3. RenderDialog Component (`apps/portal/src/lib/components/RenderDialog.svelte`)
+
 Modal dialog for template pack selection:
+
 - **Features**:
   - Loads available template packs from BFF
   - Dropdown to select template pack (shows id, version, paper size)
@@ -38,7 +44,9 @@ Modal dialog for template pack selection:
   - `render.submit` on form submission
 
 ### 4. SvgPreview Component (`apps/portal/src/lib/components/SvgPreview.svelte`)
+
 Full-screen SVG preview with zoom and pan:
+
 - **Features**:
   - Zoom controls (+, -, reset, fit to screen)
   - Pan with mouse drag
@@ -57,7 +65,9 @@ Full-screen SVG preview with zoom and pan:
   - Cursor changes (grab/grabbing)
 
 ### 5. ManifestPanel Component (`apps/portal/src/lib/components/ManifestPanel.svelte`)
+
 Collapsible panel displaying render metadata:
+
 - **Fields Displayed**:
   - Assembly ID
   - Revision
@@ -78,6 +88,7 @@ Collapsible panel displaying render metadata:
 ### 6. DRC Page Updates (`apps/portal/src/routes/assemblies/drc/+page.svelte`)
 
 #### New State Variables
+
 ```typescript
 let showRenderDialog = false;
 let rendering = false;
@@ -87,6 +98,7 @@ let showPreview = false;
 ```
 
 #### New Functions
+
 - `openRenderDialog()`: Opens dialog, tracks telemetry
 - `closeRenderDialog()`: Closes dialog
 - `handleRenderSubmit()`: Handles form submission, calls render API
@@ -95,6 +107,7 @@ let showPreview = false;
 - `dismissRenderResult()`: Dismisses success/error messages
 
 #### UI Changes
+
 - Added "Generate Drawing" button next to "Continue to Layout"
   - Only visible when `canContinue === true` (DRC passed with 0 errors)
   - Disabled during rendering
@@ -109,6 +122,7 @@ let showPreview = false;
   - SvgPreview (when `showPreview === true` and SVG content available)
 
 #### Telemetry Events
+
 - `render.openDialog`: User clicks "Generate Drawing"
 - `render.submit`: User submits template selection form
 - `render.done`: Render completes successfully
@@ -139,6 +153,7 @@ let showPreview = false;
 ## Accessibility Features
 
 ### Keyboard Navigation
+
 - Tab through all interactive elements
 - Escape to close dialog/preview
 - +/- to zoom in/out
@@ -146,12 +161,14 @@ let showPreview = false;
 - Space/Enter to toggle checkboxes
 
 ### Screen Readers
+
 - ARIA labels on all controls
 - ARIA live regions for status updates
 - Role attributes (dialog, alert, status)
 - Required field indicators
 
 ### Visual
+
 - High contrast colors
 - Focus indicators on all interactive elements
 - Clear button states (hover, disabled)
@@ -160,11 +177,13 @@ let showPreview = false;
 ## Responsive Design
 
 ### Desktop (> 768px)
+
 - Side-by-side action buttons
 - Full dialog width (max 500px)
 - Full-screen preview
 
 ### Mobile (≤ 768px)
+
 - Stacked action buttons (full width)
 - Dialog adapts to screen width
 - Touch-friendly controls
@@ -172,33 +191,39 @@ let showPreview = false;
 ## Error Handling
 
 ### Template Loading
+
 - Retry button on failure
 - Error message display
 - Telemetry tracking
 
 ### Rendering
+
 - User-friendly error messages
 - Red alert banner
 - Dismiss button
 - Telemetry tracking
 
 ### Network Failures
+
 - Caught and displayed
 - Tracked in telemetry
 
 ## Performance Considerations
 
 ### Template Pack Loading
+
 - Loaded once on dialog mount
 - Cached in component state
 - Default selection (first pack)
 
 ### SVG Preview
+
 - Inline content (no additional request)
 - Efficient transform for zoom/pan
 - Transition throttling
 
 ### Caching
+
 - BFF caches renders
 - "Cached" badge shown
 - No redundant renders
@@ -206,6 +231,7 @@ let showPreview = false;
 ## Integration Points
 
 ### BFF Portal Service
+
 - **GET /v1/template-packs**: Lists available template packs
 - **POST /v1/render**: Generates drawing from assembly
   - Returns inline SVG or URL
@@ -213,6 +239,7 @@ let showPreview = false;
   - Caches results
 
 ### Renderer Service
+
 - Template pack system (STD-A3-IPC620@1.1.0, STD-Letter-IPC620@1.0.0)
 - Symbol embedding (titleblock, notes table)
 - SVG/PDF generation
@@ -220,6 +247,7 @@ let showPreview = false;
 ## Testing Recommendations
 
 ### Unit Tests (Vitest + Testing Library)
+
 1. RenderDialog:
    - Template pack loading
    - Form validation
@@ -238,6 +266,7 @@ let showPreview = false;
    - Cached badge
 
 ### Integration Tests
+
 1. Full user flow:
    - DRC pass → Generate button appears
    - Open dialog → Select template → Submit
@@ -250,6 +279,7 @@ let showPreview = false;
    - Network timeout
 
 ### E2E Tests (Playwright)
+
 1. Complete workflow from DRC to drawing
 2. Keyboard navigation
 3. Screen reader compatibility
@@ -258,34 +288,40 @@ let showPreview = false;
 ## Acceptance Criteria
 
 ✅ **After DRC passes** (0 errors):
-  - "Generate Drawing" button visible
-  - Button disabled during render
+
+- "Generate Drawing" button visible
+- Button disabled during render
 
 ✅ **Dialog with template selection**:
-  - Dropdown of template packs
-  - Format radio buttons (SVG/PDF)
-  - "Preview inline" checkbox (disabled for PDF)
+
+- Dropdown of template packs
+- Format radio buttons (SVG/PDF)
+- "Preview inline" checkbox (disabled for PDF)
 
 ✅ **Call renderAssembly()**:
-  - Inline SVG: Display in preview with zoom/pan
-  - URL: Show download link
-  - Manifest details panel visible
+
+- Inline SVG: Display in preview with zoom/pan
+- URL: Show download link
+- Manifest details panel visible
 
 ✅ **Accessibility**:
-  - All controls labeled
-  - Keyboard navigation works
-  - ARIA roles and labels
+
+- All controls labeled
+- Keyboard navigation works
+- ARIA roles and labels
 
 ✅ **Telemetry**:
-  - render.openDialog
-  - render.submit
-  - render.done
-  - render.error
+
+- render.openDialog
+- render.submit
+- render.done
+- render.error
 
 ✅ **Strict TypeScript**:
-  - No `any` types
-  - Proper type imports
-  - Type-safe API calls
+
+- No `any` types
+- Proper type imports
+- Type-safe API calls
 
 ## Next Steps (Future Enhancements)
 
@@ -344,6 +380,7 @@ let showPreview = false;
 ## Dependencies
 
 No new dependencies added. Uses existing:
+
 - SvelteKit
 - Existing API client
 - Existing telemetry store

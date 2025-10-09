@@ -1,7 +1,3 @@
-<svelte:head>
-  <title>Synthesis - Ananta Cable Platform</title>
-</svelte:head>
-
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
@@ -126,6 +122,10 @@
     return options;
   }
 </script>
+
+<svelte:head>
+  <title>Synthesis - Ananta Cable Platform</title>
+</svelte:head>
 
 <main bind:this={mainHeading} tabindex="-1">
   <h1>Synthesis Review</h1>

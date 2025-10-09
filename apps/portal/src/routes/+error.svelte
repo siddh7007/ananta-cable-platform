@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  
+
   $: status = $page.status;
   $: message = $page.error?.message || 'An error occurred';
 </script>
@@ -13,7 +13,7 @@
   <div class="error-container">
     <h1>{status}</h1>
     <h2>{message}</h2>
-    
+
     {#if status === 404}
       <p>The page you're looking for doesn't exist.</p>
     {:else if status === 400}
@@ -21,7 +21,7 @@
     {:else if status >= 500}
       <p>Something went wrong on our end. Please try again later.</p>
     {/if}
-    
+
     <a href="/" class="btn-home">Go back to Home</a>
   </div>
 </main>

@@ -25,7 +25,8 @@
 
   onMount(async () => {
     if (!draftId) {
-      error = 'No draft_id provided in URL. Please navigate to this page with a valid draft_id parameter (e.g., /assemblies/synthesis?draft_id=your-draft-id)';
+      error =
+        'No draft_id provided in URL. Please navigate to this page with a valid draft_id parameter (e.g., /assemblies/synthesis?draft_id=your-draft-id)';
       loading = false;
       return;
     }
