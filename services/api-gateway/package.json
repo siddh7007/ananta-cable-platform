@@ -28,6 +28,7 @@
     "pg": "^8.11.0"
   },
   "devDependencies": {
+    "@cable-platform/contracts": "workspace:*",
     "@types/oracledb": "^6.9.1",
     "@types/pg": "^8.15.5",
     "@types/supertest": "^6.0.3",
