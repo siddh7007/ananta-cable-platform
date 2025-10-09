@@ -3,6 +3,7 @@
   import type { DrcResult } from '$lib/types/api';
   import DRCResults from '$lib/components/DRCResults.svelte';
   import ErrorCard from '$lib/components/ErrorCard.svelte';
+  import { addApiErrorToast } from '$lib/stores/toasts';
 
   // Form data type
   type FormData = {
@@ -149,11 +150,13 @@
           resultsHeading.focus();
         }
       } else {
-        submitError = mapErrorToMessage(
+        const errorMessage = mapErrorToMessage(
           response.error || 'unknown_error',
           response.status,
           response.details,
         );
+        addApiErrorToast(errorMessage);
+        submitError = errorMessage; // Keep for backward compatibility with existing UI
         // Focus error banner
         if (errorBanner) {
           errorBanner.focus();

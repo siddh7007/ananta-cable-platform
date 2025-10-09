@@ -1,6 +1,7 @@
 <script lang="ts">
   import '$lib/styles/base.css';
   import Nav from '$lib/components/Nav.svelte';
+  import Toaster from '$lib/components/Toaster.svelte';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import { telemetry } from '$lib/stores/telemetry';
@@ -26,6 +27,8 @@
   <main id="main" class="main-content">
     <slot />
   </main>
+
+  <Toaster />
 </div>
 
 <style>
