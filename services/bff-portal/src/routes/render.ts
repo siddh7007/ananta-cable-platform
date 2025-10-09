@@ -5,6 +5,7 @@ import { createHash } from 'crypto';
 import { mkdir, writeFile, readFile, access } from 'fs/promises';
 import { join } from 'path';
 import type { AssemblySchema } from '@cable-platform/contracts/types/api';
+import { ErrorCode } from '../../../../shared/libs/error-codes.js';
 
 interface AuthenticatedRequest extends FastifyRequest {
   user?: { sub: string };
@@ -78,7 +79,7 @@ async function requireAuth(request: AuthenticatedRequest, reply: FastifyReply) {
   const devBypass = isDevAuthBypass();
 
   if (!devBypass && !request.user?.sub) {
-    reply.code(401).send({ error: 'Unauthorized' });
+    reply.code(401).send({ error: ErrorCode.UNAUTHORIZED });
     return;
   }
 }

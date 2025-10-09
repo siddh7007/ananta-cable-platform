@@ -3,6 +3,7 @@ import { SynthesisDAO } from '../dao/synthesis.js';
 import { AssembliesDAO } from '../dao/assemblies.js';
 import { getAjv } from '@cable-platform/validation';
 import crypto from 'crypto';
+import { ErrorCode } from '../../../../shared/libs/error-codes.js';
 
 // Extend FastifyRequest to include user property
 interface AuthenticatedRequest extends FastifyRequest {
@@ -57,7 +58,7 @@ async function requireAuth(request: AuthenticatedRequest, reply: FastifyReply) {
   // For now, require Authorization header
   const authHeader = request.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return reply.status(401).send({ error: 'Unauthorized' });
+    return reply.status(401).send({ error: ErrorCode.UNAUTHORIZED });
   }
 
   // In production, verify JWT here

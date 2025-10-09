@@ -1,3 +1,5 @@
+import { ErrorCode } from '../../../shared/libs/error-codes.js';
+
 export class HttpError extends Error {
   status: number;
   code: string;
@@ -13,43 +15,43 @@ export class HttpError extends Error {
 
 export class BadRequest extends HttpError {
   constructor(msg = 'bad request', details?: unknown) {
-    super('bad_request', 400, msg, details);
+    super(ErrorCode.BAD_REQUEST, 400, msg, details);
   }
 }
 
 export class Unauthorized extends HttpError {
   constructor(msg = 'unauthorized') {
-    super('unauthorized', 401, msg);
+    super(ErrorCode.UNAUTHORIZED, 401, msg);
   }
 }
 
 export class Forbidden extends HttpError {
   constructor(msg = 'forbidden') {
-    super('forbidden', 403, msg);
+    super(ErrorCode.FORBIDDEN, 403, msg);
   }
 }
 
 export class NotFound extends HttpError {
   constructor(msg = 'not found') {
-    super('not_found', 404, msg);
+    super(ErrorCode.NOT_FOUND, 404, msg);
   }
 }
 
 export class Conflict extends HttpError {
   constructor(msg = 'conflict', details?: unknown) {
-    super('conflict', 409, msg, details);
+    super(ErrorCode.CONFLICT, 409, msg, details);
   }
 }
 
 export class RateLimited extends HttpError {
   constructor(retryMs?: number) {
-    super('rate_limited', 429, 'rate limited', retryMs ? { retry_after_ms: retryMs } : undefined);
+    super(ErrorCode.RATE_LIMITED, 429, 'rate limited', retryMs ? { retry_after_ms: retryMs } : undefined);
   }
 }
 
 export class UpstreamUnavailable extends HttpError {
   constructor(msg = 'upstream unavailable') {
-    super('upstream_unavailable', 502, msg);
+    super(ErrorCode.UPSTREAM_UNAVAILABLE, 502, msg);
   }
 }
 

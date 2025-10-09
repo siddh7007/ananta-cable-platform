@@ -8,9 +8,7 @@ import { assemblyRoutes } from "./routes/assemblies.js";
 import { presetsRoutes } from "./routes/presets.js";
 import { assistRoutes } from "./routes/assist.js";
 import { synthesisRoutes } from "./routes/synthesis.js";
-import { drcRoutes } from "./routes/drc.js";
-import { renderRoutes } from "./routes/render.js";
-import { vendorRoutes } from "./routes/vendor.js";
+import { ErrorCode } from '../../../shared/libs/error-codes.js';
 
 export async function build() {
   const server = Fastify({ logger: true });
@@ -66,7 +64,7 @@ export async function build() {
     const devBypass = (process.env.DEV_AUTH_BYPASS ?? "false") === "true";
 
     if (!devBypass) {
-      return reply.code(401).send({ error: "unauthorized" });
+      return reply.code(401).send({ error: ErrorCode.UNAUTHORIZED });
     }
 
     return {

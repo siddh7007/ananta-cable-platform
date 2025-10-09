@@ -8,6 +8,7 @@ import { getAjv } from "@cable-platform/validation";
 import { getLoggerConfig, attachRequestLogging } from "./logging.js";
 import { initOtelIfEnabled } from "./otel.js";
 import { toResponse, UpstreamUnavailable } from './errors.js';
+import { ErrorCode } from '../../../shared/libs/error-codes.js';
 import { enforceJsonContentNegotiation } from './content-negotiation.js';
 
 // Initialize OpenTelemetry if enabled (must be done before any other imports that might use tracing)
@@ -88,7 +89,7 @@ await server.register(rateLimit, {
   },
   errorResponseBuilder: (req: FastifyRequest, context: { ttl?: number }) => {
     return {
-      error: "rate_limited",
+      error: ErrorCode.RATE_LIMITED,
       message: "Rate limit exceeded",
       retry_after_ms: context.ttl || RATE_LIMIT_WINDOW_MS
     };
