@@ -9,7 +9,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/git:1": {}
   },
-  "postCreateCommand": "corepack enable && pnpm i",
+  "postCreateCommand": "corepack enable && pnpm i && pnpm -w build",
   "forwardPorts": [5173, 8080, 4001, 8000, 4317, 4318],
   "customizations": {
     "vscode": {
