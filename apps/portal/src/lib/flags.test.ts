@@ -33,8 +33,8 @@ describe('Feature Flags', () => {
   describe('isFlagOn', () => {
     it('returns false for invalid input', () => {
       expect(isFlagOn('')).toBe(false);
-      expect(isFlagOn(null as any)).toBe(false);
-      expect(isFlagOn(undefined as any)).toBe(false);
+      expect(isFlagOn(null as unknown as string)).toBe(false);
+      expect(isFlagOn(undefined as unknown as string)).toBe(false);
     });
 
     it('returns false when flag is not enabled', () => {
@@ -75,8 +75,8 @@ describe('Feature Flags', () => {
   describe('enableFlag', () => {
     it('does nothing for invalid input', () => {
       enableFlag('');
-      enableFlag(null as any);
-      enableFlag(undefined as any);
+      enableFlag(null as unknown as string);
+      enableFlag(undefined as unknown as string);
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
     });
 
@@ -108,8 +108,8 @@ describe('Feature Flags', () => {
   describe('disableFlag', () => {
     it('does nothing for invalid input', () => {
       disableFlag('');
-      disableFlag(null as any);
-      disableFlag(undefined as any);
+      disableFlag(null as unknown as string);
+      disableFlag(undefined as unknown as string);
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
       expect(localStorageMock.removeItem).not.toHaveBeenCalled();
     });

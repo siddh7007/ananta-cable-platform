@@ -23,10 +23,12 @@ COPY packages ./packages
 COPY shared ./shared
 COPY services/bff-portal ./services/bff-portal
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm --filter @cable-platform/types... build
 RUN pnpm --filter @cable-platform/validation... build
 RUN pnpm --filter @cable-platform/contracts... build
 RUN pnpm --filter bff-portal... build
 RUN pnpm deploy --filter bff-portal --prod /opt/app
+RUN mkdir -p /opt/app/dist/packages/contracts && cp packages/contracts/openapi.json /opt/app/dist/packages/contracts/openapi.json
 RUN rm -rf /opt/app/test /opt/app/.tap /opt/app/src /opt/app/test-e2e
 
 FROM node:${NODE_VERSION} AS runner
@@ -35,4 +37,4 @@ ENV PORT=4001
 WORKDIR /app
 COPY --from=builder /opt/app/ ./
 EXPOSE 4001
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/services/bff-portal/src/index.js"]

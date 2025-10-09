@@ -65,6 +65,7 @@ function buildForwardHeaders(req) {
 }
 async function parseJson(response) {
     try {
+        // Response body can only be read once
         const text = await response.text();
         if (!text) {
             return null;

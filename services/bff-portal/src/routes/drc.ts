@@ -4,7 +4,6 @@ import { AssembliesDAO } from '../dao/assemblies.js';
 import { getAjv } from '@cable-platform/validation';
 import { httpClient, HttpClient } from '../lib/http.js';
 import { createRequire } from 'module';
-import { ErrorCode } from '../../../../shared/libs/error-codes.js';
 
 const require = createRequire(import.meta.url);
 const openapiSpec = require('../../../../packages/contracts/openapi.json');
@@ -64,7 +63,7 @@ async function requireAuth(request: AuthenticatedRequest, reply: FastifyReply) {
 
   const authHeader = request.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return reply.status(401).send({ error: ErrorCode.UNAUTHORIZED });
+    return reply.status(401).send({ error: 'Unauthorized' });
   }
 
   // TODO: verify JWT with Auth0; for now accept authenticated header

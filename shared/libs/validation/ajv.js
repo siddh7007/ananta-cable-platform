@@ -1,9 +1,7 @@
-import { createRequire } from "module";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-const require = createRequire(import.meta.url);
-const cableDesignSchema = require("../../contracts/schemas/v1/cable-design.schema.json");
-const drcResultSchema = require("../../contracts/schemas/v1/drc-result.schema.json");
+import cableDesignSchema from "./schemas/v1/cable-design.schema.json" assert { type: "json" };
+import drcResultSchema from "./schemas/v1/drc-result.schema.json" assert { type: "json" };
 let _ajv = null;
 export function getAjv() {
     if (_ajv)

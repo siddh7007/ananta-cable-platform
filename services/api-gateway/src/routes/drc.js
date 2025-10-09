@@ -9,19 +9,29 @@ import { trace } from '@opentelemetry/api';
 import { BadRequest, UpstreamUnavailable, UpstreamInvalidPayload, UpstreamBadRequest, UnsupportedMediaType } from '../errors.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// Load schemas at runtime to avoid JSON import issues
-const cableDesignSchema = JSON.parse(readFileSync(join(__dirname, '../../../../shared/contracts/schemas/v1/cable-design.schema.json'), 'utf8'));
-const drcResultSchema = JSON.parse(readFileSync(join(__dirname, '../../../../shared/contracts/schemas/v1/drc-result.schema.json'), 'utf8'));
+const openapiSpec = JSON.parse(readFileSync(join(__dirname, '../packages/contracts/openapi.json'), 'utf8'));
+const DRC_ANALYTICS_ENABLED = (process.env.OTEL_DRC_ANALYTICS ?? 'false') === 'true';
+const recordDrcSubmitAttributes = (designId, severitySummary) => {
+    if (!DRC_ANALYTICS_ENABLED) {
+        return;
+    }
+    const span = trace.getActiveSpan();
+    if (!span) {
+        return;
+    }
+    span.setAttribute('event', 'cable.drc.submit');
+    if (designId) {
+        span.setAttribute('design_id', designId);
+    }
+    if (severitySummary) {
+        span.setAttribute('severity_counts', JSON.stringify(severitySummary));
+    }
+};
 const drcRoutes = async (fastify, opts, done) => {
     fastify.post('/v1/drc/run', {
         preHandler: [authGuard],
         config: { rateLimit: {} },
-        schema: {
-            body: cableDesignSchema,
-            response: {
-                200: drcResultSchema
-            }
-        }
+        // Schema validation removed - handled by BFF layer and DRC service
     }, async (req, reply) => {
         // Use request ID from headers (already set by logging hook)
         const requestId = req.headers['x-request-id'];
@@ -36,6 +46,7 @@ const drcRoutes = async (fastify, opts, done) => {
         if (!validation.ok) {
             throw new BadRequest('validation failed', { errors: validation.errors });
         }
+        const cableDesign = validation.data;
         // Prepare headers for upstream call (forward only safe headers)
         const upstreamHeaders = {
             'content-type': 'application/json',
@@ -58,7 +69,7 @@ const drcRoutes = async (fastify, opts, done) => {
                 return await fetchWithRetry('http://drc:8000/v1/drc/run', {
                     method: 'POST',
                     headers: upstreamHeaders,
-                    body: JSON.stringify(validation.data),
+                    body: JSON.stringify(cableDesign),
                 }, 1, // 1 retry
                 5000, // 5s timeout
                 1000 // 1s base backoff
@@ -104,7 +115,9 @@ const drcRoutes = async (fastify, opts, done) => {
             if (!resultValidation.ok) {
                 throw new UpstreamInvalidPayload();
             }
-            return reply.code(200).send(resultValidation.data);
+            const drcResult = resultValidation.data;
+            recordDrcSubmitAttributes(cableDesign.id, drcResult.severity_summary);
+            return reply.code(200).send(drcResult);
         }
         catch (error) {
             if (error instanceof HttpError && error.status === 408) {

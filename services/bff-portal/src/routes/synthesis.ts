@@ -30,9 +30,21 @@ const validateSynthesisProposal = ajv.compile({
     bom: { type: 'array' },
     warnings: { type: 'array', items: { type: 'string' } },
     errors: { type: 'array', items: { type: 'string' } },
-    explain: { type: 'array', items: { type: 'string' } }
+    explain: { type: 'array', items: { type: 'string' } },
   },
-  required: ['proposal_id', 'draft_id', 'cable', 'conductors', 'endpoints', 'shield', 'wirelist', 'bom', 'warnings', 'errors', 'explain']
+  required: [
+    'proposal_id',
+    'draft_id',
+    'cable',
+    'conductors',
+    'endpoints',
+    'shield',
+    'wirelist',
+    'bom',
+    'warnings',
+    'errors',
+    'explain',
+  ],
 });
 
 const validateDrcResult = ajv.compile({
@@ -40,14 +52,14 @@ const validateDrcResult = ajv.compile({
   properties: {
     status: { enum: ['pass', 'warning', 'error'] },
     issues: { type: 'array' },
-    summary: { type: 'string' }
+    summary: { type: 'string' },
   },
-  required: ['status', 'issues', 'summary']
+  required: ['status', 'issues', 'summary'],
 });
 
 // Auth hook
 async function requireAuth(request: AuthenticatedRequest, reply: FastifyReply) {
-  const devBypass = (process.env.DEV_AUTH_BYPASS ?? "false") === "true";
+  const devBypass = (process.env.DEV_AUTH_BYPASS ?? 'false') === 'true';
 
   if (devBypass) {
     request.user = { sub: 'dev-user' };
@@ -98,8 +110,8 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
           },
           body: JSON.stringify({
             draft_id,
-            step1_payload: draft.payload
-          })
+            step1_payload: draft.payload,
+          }),
         });
 
         if (!response.ok) {
@@ -113,7 +125,7 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
           return reply.status(502).send({
             code: 'SCHEMA_VALIDATION_FAILED',
             message: 'DRC service returned invalid proposal schema',
-            details: ajv.errorsText(validateSynthesisProposal.errors)
+            details: ajv.errorsText(validateSynthesisProposal.errors),
           });
         }
 
@@ -122,19 +134,21 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
 
         // 5. Return the proposal
         return reply.status(200).send(proposal);
-
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({ error: 'Internal server error' });
       }
-    }
+    },
   });
 
   // POST /v1/synthesis/recompute - Recompute with user locks
   fastify.post('/v1/synthesis/recompute', {
     preHandler: requireAuth,
     handler: async (request: AuthenticatedRequest, reply) => {
-      const { draft_id, locks } = request.body as { draft_id: string; locks?: Record<string, unknown> };
+      const { draft_id, locks } = request.body as {
+        draft_id: string;
+        locks?: Record<string, unknown>;
+      };
       const userId = request.user!.sub;
 
       try {
@@ -156,7 +170,7 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
         const drcServiceUrl = process.env.DRC_SERVICE_URL || 'http://localhost:8000';
         const payload = {
           draft_id,
-          step1_payload: draft.payload
+          step1_payload: draft.payload,
         };
 
         // Merge locks if provided
@@ -169,7 +183,7 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
@@ -181,25 +195,27 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
         if (!validateSynthesisProposal(proposal)) {
           return reply.status(502).send({
             code: 'SCHEMA_VALIDATION_FAILED',
-            message: 'DRC service returned invalid proposal schema'
+            message: 'DRC service returned invalid proposal schema',
           });
         }
 
         await synthesisDao.saveProposal(draft_id, proposal);
         return reply.status(200).send(proposal);
-
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({ error: 'Internal server error' });
       }
-    }
+    },
   });
 
   // POST /v1/synthesis/accept - Accept proposal and create schema
   fastify.post('/v1/synthesis/accept', {
     preHandler: requireAuth,
     handler: async (request: AuthenticatedRequest, reply) => {
-      const { proposal_id, locks } = request.body as { proposal_id: string; locks?: Record<string, unknown> };
+      const { proposal_id, locks } = request.body as {
+        proposal_id: string;
+        locks?: Record<string, unknown>;
+      };
 
       try {
         // 1. Load proposal
@@ -218,31 +234,28 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
         // 3. Persist assemblies_schema
         const schema = {
           ...proposal,
-          locks: locks || {}
+          locks: locks || {},
         };
 
         // Generate hash of the schema
-        const schemaHash = crypto.createHash('sha256')
-          .update(JSON.stringify(schema))
-          .digest('hex');
+        const schemaHash = crypto.createHash('sha256').update(JSON.stringify(schema)).digest('hex');
 
         const schemaRecord = await synthesisDao.saveSchema(
           proposalRecord.draft_id,
           schema,
-          schemaHash
+          schemaHash,
         );
 
         // 4. Return result
         return reply.status(200).send({
           assembly_id: schemaRecord.assembly_id,
-          schema_hash: schemaRecord.schema_hash
+          schema_hash: schemaRecord.schema_hash,
         });
-
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({ error: 'Internal server error' });
       }
-    }
+    },
   });
 
   // POST /v1/drc/preview - Proxy to DRC service
@@ -257,7 +270,7 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
           return reply.status(400).send({
             code: 'SCHEMA_VALIDATION_FAILED',
             message: 'Invalid proposal schema',
-            details: ajv.errorsText(validateSynthesisProposal.errors)
+            details: ajv.errorsText(validateSynthesisProposal.errors),
           });
         }
 
@@ -268,7 +281,7 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(proposal)
+          body: JSON.stringify(proposal),
         });
 
         if (!response.ok) {
@@ -281,16 +294,15 @@ export async function synthesisRoutes(fastify: FastifyInstance) {
         if (!validateDrcResult(result)) {
           return reply.status(502).send({
             code: 'SCHEMA_VALIDATION_FAILED',
-            message: 'DRC service returned invalid result schema'
+            message: 'DRC service returned invalid result schema',
           });
         }
 
         return reply.status(200).send(result);
-
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({ error: 'Internal server error' });
       }
-    }
+    },
   });
 }

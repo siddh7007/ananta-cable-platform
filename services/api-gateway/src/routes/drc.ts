@@ -11,21 +11,34 @@ import { BadRequest, UpstreamUnavailable, UpstreamInvalidPayload, UpstreamBadReq
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const openapiSpec = JSON.parse(
+  readFileSync(join(__dirname, '../../../../packages/contracts/openapi.json'), 'utf8')
+);
 
-// Load schemas at runtime to avoid JSON import issues
-const cableDesignSchema = JSON.parse(readFileSync(join(__dirname, '../../../../shared/contracts/schemas/v1/cable-design.schema.json'), 'utf8'));
-const drcResultSchema = JSON.parse(readFileSync(join(__dirname, '../../../../shared/contracts/schemas/v1/drc-result.schema.json'), 'utf8'));
+const DRC_ANALYTICS_ENABLED = (process.env.OTEL_DRC_ANALYTICS ?? 'false') === 'true';
+
+const recordDrcSubmitAttributes = (designId: string | undefined, severitySummary: Record<string, unknown> | undefined) => {
+  if (!DRC_ANALYTICS_ENABLED) {
+    return;
+  }
+  const span = trace.getActiveSpan();
+  if (!span) {
+    return;
+  }
+  span.setAttribute('event', 'cable.drc.submit');
+  if (designId) {
+    span.setAttribute('design_id', designId);
+  }
+  if (severitySummary) {
+    span.setAttribute('severity_counts', JSON.stringify(severitySummary));
+  }
+};
 
 const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
   fastify.post('/v1/drc/run', {
     preHandler: [authGuard],
     config: { rateLimit: {} },
-    schema: {
-      body: cableDesignSchema,
-      response: {
-        200: drcResultSchema
-      }
-    }
+    // Schema validation removed - handled by BFF layer and DRC service
   }, async (req: FastifyRequest, reply: FastifyReply) => {
     // Use request ID from headers (already set by logging hook)
     const requestId = req.headers['x-request-id'] as string;
@@ -42,6 +55,7 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
     if (!validation.ok) {
       throw new BadRequest('validation failed', { errors: validation.errors });
     }
+    const cableDesign = validation.data;
 
     // Prepare headers for upstream call (forward only safe headers)
     const upstreamHeaders: Record<string, string> = {
@@ -69,7 +83,7 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
           {
             method: 'POST',
             headers: upstreamHeaders,
-            body: JSON.stringify(validation.data),
+            body: JSON.stringify(cableDesign),
           },
           1, // 1 retry
           5000, // 5s timeout
@@ -125,8 +139,9 @@ const drcRoutes: FastifyPluginCallback = async (fastify, opts, done) => {
       if (!resultValidation.ok) {
         throw new UpstreamInvalidPayload();
       }
-
-      return reply.code(200).send(resultValidation.data);
+      const drcResult = resultValidation.data;
+      recordDrcSubmitAttributes(cableDesign.id, drcResult.severity_summary);
+      return reply.code(200).send(drcResult);
 
     } catch (error) {
       if (error instanceof HttpError && error.status === 408) {

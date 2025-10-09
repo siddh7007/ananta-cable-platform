@@ -6,6 +6,11 @@
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@cable-platform/types": ["shared/libs/types/index.ts"],
+      "@cable-platform/types/*": ["shared/libs/types/*.ts"]
+    },
     "types": [
       "node"
     ]

@@ -1,0 +1,24 @@
+{
+  "name": "temperature_ranges",
+  "version": "1.0.0",
+  "description": "Temperature range validation for different environments",
+  "type": "validation",
+  "data": {
+    "indoor": {
+      "min_temp_c": -20,
+      "max_temp_c": 85
+    },
+    "outdoor": {
+      "min_temp_c": -40,
+      "max_temp_c": 70
+    },
+    "industrial": {
+      "min_temp_c": -40,
+      "max_temp_c": 125
+    },
+    "extreme": {
+      "min_temp_c": -65,
+      "max_temp_c": 200
+    }
+  }
+}

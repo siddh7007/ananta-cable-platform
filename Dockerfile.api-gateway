@@ -23,10 +23,12 @@ COPY packages ./packages
 COPY shared ./shared
 COPY services/api-gateway ./services/api-gateway
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm --filter @cable-platform/types... build
 RUN pnpm --filter @cable-platform/validation... build
 RUN pnpm --filter @cable-platform/contracts... build
 RUN pnpm --filter api-gateway... build
 RUN pnpm deploy --filter api-gateway --prod /opt/app
+RUN mkdir -p /opt/app/dist/packages/contracts && cp packages/contracts/openapi.json /opt/app/dist/packages/contracts/openapi.json
 RUN rm -rf /opt/app/test /opt/app/test-e2e /opt/app/test-contract /opt/app/.tap /opt/app/src /opt/app/tmp-deploy
 
 FROM node:${NODE_VERSION} AS runner
@@ -35,4 +37,4 @@ ENV PORT=8080
 WORKDIR /app
 COPY --from=builder /opt/app/ ./
 EXPOSE 8080
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/services/api-gateway/src/index.js"]

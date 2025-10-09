@@ -1,19 +1,18 @@
 import { getAjv, toErrors } from "./ajv.js";
-import schema from "../../contracts/schemas/v1/drc-result.schema.json" assert { type: "json" };
+import schema from "./schemas/v1/drc-result.schema.json" assert { type: "json" };
+import type {
+  DRCResult,
+  DRCFinding,
+  DRCSeverity,
+  DRCSeveritySummary,
+} from "@cable-platform/types";
 
-export interface DRCResult {
-  design_id: string;
-  findings: Array<{
-    code: string;
-    message: string;
-    severity: string;
-  }>;
-  severity_summary: {
-    error: number;
-    warning: number;
-    info: number;
-  };
-}
+export type {
+  DRCResult,
+  DRCFinding,
+  DRCSeverity,
+  DRCSeveritySummary,
+} from "@cable-platform/types";
 
 const validate = getAjv().compile(schema);
 

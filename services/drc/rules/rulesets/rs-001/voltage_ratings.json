@@ -1,0 +1,52 @@
+{
+  "name": "voltage_ratings",
+  "version": "1.0.0",
+  "description": "Voltage rating compatibility checks by AWG",
+  "type": "validation",
+  "data": {
+    "30": {
+      "max_voltage_v": 150,
+      "safety_margin_v": 30
+    },
+    "28": {
+      "max_voltage_v": 150,
+      "safety_margin_v": 30
+    },
+    "26": {
+      "max_voltage_v": 150,
+      "safety_margin_v": 30
+    },
+    "24": {
+      "max_voltage_v": 300,
+      "safety_margin_v": 60
+    },
+    "22": {
+      "max_voltage_v": 300,
+      "safety_margin_v": 60
+    },
+    "20": {
+      "max_voltage_v": 300,
+      "safety_margin_v": 60
+    },
+    "18": {
+      "max_voltage_v": 600,
+      "safety_margin_v": 120
+    },
+    "16": {
+      "max_voltage_v": 600,
+      "safety_margin_v": 120
+    },
+    "14": {
+      "max_voltage_v": 600,
+      "safety_margin_v": 120
+    },
+    "12": {
+      "max_voltage_v": 600,
+      "safety_margin_v": 120
+    },
+    "10": {
+      "max_voltage_v": 600,
+      "safety_margin_v": 120
+    }
+  }
+}

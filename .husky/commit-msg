@@ -1,7 +1,12 @@
 #!/bin/sh
+if [ "$HUSKY_SKIP_HOOKS" = "1" ]; then
+  exit 0
+fi
 . "$(dirname -- "$0")/_/husky.sh"
 
 if [ ! -s "$1" ]; then
   echo "husky - aborting commit due to empty commit message" >&2
   exit 1
 fi
+
+pnpm exec commitlint --edit "$1"

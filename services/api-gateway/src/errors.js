@@ -1,3 +1,4 @@
+import { ErrorCode } from '../../../shared/libs/error-codes.js';
 export class HttpError extends Error {
     status;
     code;
@@ -11,37 +12,37 @@ export class HttpError extends Error {
 }
 export class BadRequest extends HttpError {
     constructor(msg = 'bad request', details) {
-        super('bad_request', 400, msg, details);
+        super(ErrorCode.BAD_REQUEST, 400, msg, details);
     }
 }
 export class Unauthorized extends HttpError {
     constructor(msg = 'unauthorized') {
-        super('unauthorized', 401, msg);
+        super(ErrorCode.UNAUTHORIZED, 401, msg);
     }
 }
 export class Forbidden extends HttpError {
     constructor(msg = 'forbidden') {
-        super('forbidden', 403, msg);
+        super(ErrorCode.FORBIDDEN, 403, msg);
     }
 }
 export class NotFound extends HttpError {
     constructor(msg = 'not found') {
-        super('not_found', 404, msg);
+        super(ErrorCode.NOT_FOUND, 404, msg);
     }
 }
 export class Conflict extends HttpError {
     constructor(msg = 'conflict', details) {
-        super('conflict', 409, msg, details);
+        super(ErrorCode.CONFLICT, 409, msg, details);
     }
 }
 export class RateLimited extends HttpError {
     constructor(retryMs) {
-        super('rate_limited', 429, 'rate limited', retryMs ? { retry_after_ms: retryMs } : undefined);
+        super(ErrorCode.RATE_LIMITED, 429, 'rate limited', retryMs ? { retry_after_ms: retryMs } : undefined);
     }
 }
 export class UpstreamUnavailable extends HttpError {
     constructor(msg = 'upstream unavailable') {
-        super('upstream_unavailable', 502, msg);
+        super(ErrorCode.UPSTREAM_UNAVAILABLE, 502, msg);
     }
 }
 export class UpstreamInvalidPayload extends HttpError {
@@ -71,8 +72,8 @@ export function toResponse(err) {
             body: {
                 error: err.code,
                 message: err.message,
-                details: err.details
-            }
+                details: err.details,
+            },
         };
     }
     // Handle unknown errors
@@ -83,7 +84,7 @@ export function toResponse(err) {
         body: {
             error: internal.code,
             message: internal.message,
-            details: err instanceof Error ? { original_message: err.message } : undefined
-        }
+            details: err instanceof Error ? { original_message: err.message } : undefined,
+        },
     };
 }

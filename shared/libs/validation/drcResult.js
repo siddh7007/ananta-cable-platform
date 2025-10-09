@@ -1,7 +1,5 @@
-import { createRequire } from "module";
 import { getAjv, toErrors } from "./ajv.js";
-const require = createRequire(import.meta.url);
-const schema = require("../../contracts/schemas/v1/drc-result.schema.json");
+import schema from "./schemas/v1/drc-result.schema.json" assert { type: "json" };
 const validate = getAjv().compile(schema);
 export function validateDRCResult(input) {
     const valid = validate(input);

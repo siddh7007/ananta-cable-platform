@@ -1,6 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "../.."
+  },
   "include": [
-    "src"
+    "src",
+    "../../shared/libs/error-codes.ts",
+    "../../shared/libs/http.ts"
   ]
 }

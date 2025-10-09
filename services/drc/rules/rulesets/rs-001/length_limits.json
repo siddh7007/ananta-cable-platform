@@ -1,0 +1,28 @@
+{
+  "name": "length_limits",
+  "version": "1.0.0",
+  "description": "Cable length limits based on application type",
+  "type": "validation",
+  "data": {
+    "ribbon": {
+      "max_length_mm": 3000,
+      "warning_threshold_mm": 2000
+    },
+    "power_cable": {
+      "max_length_mm": 5000,
+      "warning_threshold_mm": 3000
+    },
+    "sensor_lead": {
+      "max_length_mm": 1000,
+      "warning_threshold_mm": 500
+    },
+    "rf_coax": {
+      "max_length_mm": 2000,
+      "warning_threshold_mm": 1000
+    },
+    "custom": {
+      "max_length_mm": 10000,
+      "warning_threshold_mm": 5000
+    }
+  }
+}

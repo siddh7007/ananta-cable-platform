@@ -19,7 +19,7 @@ class DrcEngine:
 
     def _load_rule_tables(self) -> Dict[str, Any]:
         """Load JSON rule tables for the specified ruleset."""
-        rules_dir = Path(__file__).parent.parent / "rules" / "rulesets" / self.ruleset_id
+        rules_dir = Path(__file__).parent / "rules" / "rulesets" / self.ruleset_id
         rule_tables = {}
 
         # Load all JSON files in the ruleset directory
@@ -64,6 +64,11 @@ class DrcEngine:
 
         # Check environmental compatibility
         issues.extend(self._check_environmental_compatibility(proposal))
+
+        # Sample deterministic rules
+        issues.extend(self._check_length_limits(proposal))
+        issues.extend(self._check_temperature_ranges(proposal))
+        issues.extend(self._check_voltage_ratings(proposal))
 
         # Determine overall result
         has_errors = any(issue.severity == "error" for issue in issues)
@@ -404,6 +409,128 @@ class DrcEngine:
 
         # This would check temperature, chemicals, etc.
         # For now, placeholder for future implementation
+        return issues
+
+    def _check_length_limits(self, proposal: SynthesisProposal) -> List[DrcIssue]:
+        """Check length limits for cables and wires using rule table."""
+        issues = []
+
+        # Get length limits data from rule table
+        length_limits_table = self.rule_tables.get("length_limits", {}).get("data", {})
+        if not length_limits_table:
+            return issues
+
+        cable_type = proposal.conductors.family or "standard"
+        limits = length_limits_table.get(cable_type, length_limits_table.get("standard", {}))
+        
+        if not limits:
+            return issues
+
+        max_length_mm = limits.get("max_length_mm", 1000)
+        warning_length_mm = limits.get("warning_length_mm", 800)
+
+        if proposal.conductors.length_mm:
+            if proposal.conductors.length_mm > max_length_mm:
+                issues.append(DrcIssue(
+                    type="bend_radius_too_small",  # Using existing type for length issue
+                    severity="error",
+                    message=f"Conductor length {proposal.conductors.length_mm}mm exceeds maximum limit of {max_length_mm}mm for {cable_type}",
+                    location="conductors.length_mm",
+                    suggestion=f"Reduce length to ≤{max_length_mm}mm"
+                ))
+            elif proposal.conductors.length_mm > warning_length_mm:
+                issues.append(DrcIssue(
+                    type="bend_radius_too_small",  # Using existing type for length issue
+                    severity="warning",
+                    message=f"Conductor length {proposal.conductors.length_mm}mm approaches maximum limit of {max_length_mm}mm for {cable_type}",
+                    location="conductors.length_mm",
+                    suggestion=f"Consider reducing length below {warning_length_mm}mm"
+                ))
+
+        return issues
+
+    def _check_temperature_ranges(self, proposal: SynthesisProposal) -> List[DrcIssue]:
+        """Check that temperature ratings are within acceptable ranges using rule table."""
+        issues = []
+
+        # Get temperature ranges data from rule table
+        temp_ranges_table = self.rule_tables.get("temperature_ranges", {}).get("data", {})
+        if not temp_ranges_table:
+            return issues
+
+        environment = proposal.environment or "indoor"
+        temp_range = temp_ranges_table.get(environment, temp_ranges_table.get("indoor", {}))
+        
+        if not temp_range:
+            return issues
+
+        min_temp_c = temp_range.get("min_temp_c", -40)
+        max_temp_c = temp_range.get("max_temp_c", 125)
+        temp_rating = proposal.conductors.temp_rating_c
+
+        if temp_rating is not None:
+            if temp_rating < min_temp_c:
+                issues.append(DrcIssue(
+                    type="temperature_rating_exceeded",  # Using existing type
+                    severity="error",
+                    message=f"Temperature rating {temp_rating}°C is below minimum for {environment} environment ({min_temp_c}°C)",
+                    location="conductors.temp_rating_c",
+                    suggestion=f"Increase temperature rating to ≥{min_temp_c}°C"
+                ))
+            elif temp_rating > max_temp_c:
+                issues.append(DrcIssue(
+                    type="temperature_rating_exceeded",  # Using existing type
+                    severity="error",
+                    message=f"Temperature rating {temp_rating}°C exceeds maximum for {environment} environment ({max_temp_c}°C)",
+                    location="conductors.temp_rating_c",
+                    suggestion=f"Reduce temperature rating to ≤{max_temp_c}°C"
+                ))
+
+        return issues
+
+    def _check_voltage_ratings(self, proposal: SynthesisProposal) -> List[DrcIssue]:
+        """Check that voltage ratings are within acceptable limits using rule table."""
+        issues = []
+
+        # Get voltage ratings data from rule table
+        voltage_ratings_table = self.rule_tables.get("voltage_ratings", {}).get("data", {})
+        if not voltage_ratings_table:
+            return issues
+
+        awg = proposal.conductors.awg
+        if awg is None:
+            return issues
+
+        awg_str = str(awg)
+        voltage_data = voltage_ratings_table.get(awg_str, {})
+        
+        if not voltage_data:
+            return issues
+
+        max_voltage_v = voltage_data.get("max_voltage_v", 600)
+        safety_margin_v = voltage_data.get("safety_margin_v", 50)
+        recommended_max_v = max_voltage_v - safety_margin_v
+
+        voltage_rating = proposal.conductors.voltage_rating
+
+        if voltage_rating is not None:
+            if voltage_rating > max_voltage_v:
+                issues.append(DrcIssue(
+                    type="voltage_rating_exceeded",  # Using existing type
+                    severity="error",
+                    message=f"Voltage rating {voltage_rating}V exceeds AWG {awg} limit of {max_voltage_v}V",
+                    location="conductors.voltage_rating",
+                    suggestion=f"Reduce voltage rating to ≤{max_voltage_v}V or use larger AWG wire"
+                ))
+            elif voltage_rating > recommended_max_v:
+                issues.append(DrcIssue(
+                    type="voltage_rating_exceeded",  # Using existing type
+                    severity="warning",
+                    message=f"Voltage rating {voltage_rating}V approaches AWG {awg} limit of {max_voltage_v}V",
+                    location="conductors.voltage_rating",
+                    suggestion=f"Consider reducing voltage below {recommended_max_v}V for safety margin"
+                ))
+
         return issues
 
     def _generate_summary(self, issues: List[DrcIssue]) -> str:

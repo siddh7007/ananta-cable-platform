@@ -1,7 +1,7 @@
 import Ajv, { ErrorObject } from "ajv";
 import addFormats from "ajv-formats";
-import cableDesignSchema from "../../contracts/schemas/v1/cable-design.schema.json" assert { type: "json" };
-import drcResultSchema from "../../contracts/schemas/v1/drc-result.schema.json" assert { type: "json" };
+import cableDesignSchema from "./schemas/v1/cable-design.schema.json" assert { type: "json" };
+import drcResultSchema from "./schemas/v1/drc-result.schema.json" assert { type: "json" };
 
 let _ajv: Ajv | null = null;
 

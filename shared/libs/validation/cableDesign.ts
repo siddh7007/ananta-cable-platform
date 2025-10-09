@@ -1,11 +1,8 @@
 import { getAjv, toErrors } from "./ajv.js";
-import schema from "../../contracts/schemas/v1/cable-design.schema.json" assert { type: "json" };
+import schema from "./schemas/v1/cable-design.schema.json" assert { type: "json" };
+import type { CableDesign } from "@cable-platform/types";
 
-export interface CableDesign {
-  id: string;
-  name: string;
-  cores: number;
-}
+export type { CableDesign } from "@cable-platform/types";
 
 const validate = getAjv().compile(schema);
 

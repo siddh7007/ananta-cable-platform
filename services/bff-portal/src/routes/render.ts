@@ -87,7 +87,11 @@ async function requireAuth(request: AuthenticatedRequest, reply: FastifyReply) {
 /**
  * Calculate cache key from schema hash + template + renderer kind
  */
-function calculateCacheKey(schemaHash: string, templatePackId: string, rendererKind: string): string {
+function calculateCacheKey(
+  schemaHash: string,
+  templatePackId: string,
+  rendererKind: string,
+): string {
   const data = `${schemaHash}:${templatePackId}:${rendererKind}`;
   return createHash('sha256').update(data).digest('hex');
 }
@@ -137,7 +141,7 @@ async function loadTemplatePackManifests(): Promise<TemplatePackManifest[]> {
 
 export async function renderRoutes(fastify: FastifyInstance) {
   console.log('Inside renderRoutes function');
-  
+
   /**
    * POST /v1/render - Render an assembly drawing
    */
@@ -145,7 +149,13 @@ export async function renderRoutes(fastify: FastifyInstance) {
     preHandler: requireAuth,
     handler: async (request: AuthenticatedRequest, reply: FastifyReply) => {
       const body = request.body as RenderRequest;
-      const { assembly_id, schema: providedSchema, templatePackId = 'basic-a3', format = 'svg', inline = false } = body;
+      const {
+        assembly_id,
+        schema: providedSchema,
+        templatePackId = 'basic-a3',
+        format = 'svg',
+        inline = false,
+      } = body;
 
       // Validate request
       if (!assembly_id && !providedSchema) {
@@ -164,7 +174,7 @@ export async function renderRoutes(fastify: FastifyInstance) {
         } else if (assembly_id) {
           // Load from database
           assemblyRecord = await assembliesDao.getAssemblySchema(assembly_id);
-          
+
           if (!assemblyRecord) {
             return reply.code(404).send({ error: 'Assembly not found' });
           }
@@ -176,20 +186,22 @@ export async function renderRoutes(fastify: FastifyInstance) {
 
         // Validate template pack exists
         const templates = await loadTemplatePackManifests();
-        const template = templates.find(t => t.id === templatePackId);
+        const template = templates.find((t) => t.id === templatePackId);
         if (!template) {
           return reply.code(400).send({ error: `Template pack '${templatePackId}' not found` });
         }
 
         // Calculate cache key
-        const schemaHash = schema.schema_hash || createHash('sha256').update(JSON.stringify(schema)).digest('hex').slice(0, 16);
+        const schemaHash =
+          schema.schema_hash ||
+          createHash('sha256').update(JSON.stringify(schema)).digest('hex').slice(0, 16);
         const cacheKey = calculateCacheKey(schemaHash, templatePackId, 'svg2d');
         const rev = cacheKey.slice(0, 8); // Use first 8 chars as revision
 
         // Check if cached drawing exists
         const assemblyId = schema.assembly_id;
         const drawingPath = getDrawingPath(assemblyId, rev, format);
-        
+
         if (await fileExists(drawingPath)) {
           // Cache hit! Return cached drawing
           fastify.log.info({ assemblyId, rev, format, cacheKey }, 'Cache hit for drawing');
@@ -229,11 +241,11 @@ export async function renderRoutes(fastify: FastifyInstance) {
         // Call renderer service
         const rendererURL = getRendererServiceURL();
         fastify.log.info({ rendererURL, assemblyId }, 'Calling renderer service');
-        
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let renderResult: any;
         let svgContent: string;
-        
+
         // In test mode, return mock response directly
         if (process.env.TEST_MODE === 'true') {
           svgContent = `<?xml version="1.0" encoding="UTF-8"?>
@@ -262,7 +274,10 @@ export async function renderRoutes(fastify: FastifyInstance) {
 
           if (!renderServiceResponse.ok) {
             const errorText = await renderServiceResponse.text();
-            fastify.log.error({ status: renderServiceResponse.status, error: errorText }, 'Renderer service error');
+            fastify.log.error(
+              { status: renderServiceResponse.status, error: errorText },
+              'Renderer service error',
+            );
             return reply.code(500).send({ error: 'Renderer service failed', details: errorText });
           }
 
@@ -307,7 +322,7 @@ export async function renderRoutes(fastify: FastifyInstance) {
         } as RenderResponse);
       } catch (error) {
         fastify.log.error(error, 'Render error');
-        return reply.code(500).send({ 
+        return reply.code(500).send({
           error: 'Internal server error',
           message: error instanceof Error ? error.message : 'Unknown error',
         });

@@ -5,12 +5,14 @@ Smoke tests for the Cable Platform Portal using Playwright.
 ## 📋 Test Coverage
 
 ### Home Page Tests
+
 - ✅ Loads home page and displays main heading
 - ✅ Displays navigation cards (DRC, Synthesis, Drawing Generation)
 - ✅ Has skip to content link
 - ✅ Navigates to DRC page when clicking card
 
 ### DRC Page Tests
+
 - ✅ Loads DRC page and displays form
 - ✅ Validates form fields on blur
 - ✅ Enables submit button when form is valid
@@ -19,6 +21,7 @@ Smoke tests for the Cable Platform Portal using Playwright.
 - ✅ Has proper form accessibility
 
 ### Accessibility Tests
+
 - ✅ Proper focus management
 - ✅ Keyboard navigation
 - ✅ Proper heading hierarchy (single h1 per page)
@@ -26,31 +29,37 @@ Smoke tests for the Cable Platform Portal using Playwright.
 ## 🚀 Running Tests
 
 ### Run all tests
+
 ```bash
 pnpm test
 ```
 
 ### Run tests with UI mode (interactive)
+
 ```bash
 pnpm test:ui
 ```
 
 ### Run tests in headed mode (see browser)
+
 ```bash
 pnpm test:headed
 ```
 
 ### Debug tests
+
 ```bash
 pnpm test:debug
 ```
 
 ### Run specific test file
+
 ```bash
 pnpm test smoke.spec.ts
 ```
 
 ### Run tests in specific browser
+
 ```bash
 pnpm test --project=chromium
 pnpm test --project=firefox
@@ -114,21 +123,26 @@ test('my new test', async ({ page }) => {
 ## 🐛 Debugging
 
 ### Visual debugging
+
 ```bash
 pnpm test:debug
 ```
 
 This opens the Playwright Inspector where you can:
+
 - Step through tests
 - Inspect the page
 - View console logs
 - Take screenshots
 
 ### Screenshots on failure
+
 Screenshots are automatically captured on test failure and saved to `test-results/`.
 
 ### Trace viewer
+
 If a test fails after retry, a trace is captured. View it with:
+
 ```bash
 npx playwright show-trace test-results/<test-name>/trace.zip
 ```

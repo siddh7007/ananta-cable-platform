@@ -45,7 +45,12 @@ export class Conflict extends HttpError {
 
 export class RateLimited extends HttpError {
   constructor(retryMs?: number) {
-    super(ErrorCode.RATE_LIMITED, 429, 'rate limited', retryMs ? { retry_after_ms: retryMs } : undefined);
+    super(
+      ErrorCode.RATE_LIMITED,
+      429,
+      'rate limited',
+      retryMs ? { retry_after_ms: retryMs } : undefined,
+    );
   }
 }
 
@@ -92,8 +97,8 @@ export function toResponse(err: unknown): { status: number; body: ErrorResponse 
       body: {
         error: err.code,
         message: err.message,
-        details: err.details
-      }
+        details: err.details,
+      },
     };
   }
 
@@ -105,7 +110,7 @@ export function toResponse(err: unknown): { status: number; body: ErrorResponse 
     body: {
       error: internal.code,
       message: internal.message,
-      details: err instanceof Error ? { original_message: err.message } : undefined
-    }
+      details: err instanceof Error ? { original_message: err.message } : undefined,
+    },
   };
 }

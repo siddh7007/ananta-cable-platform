@@ -187,7 +187,7 @@ class HttpClientStub {
     return this.request<T>(url, 'DELETE', options);
   }
 
-  ensureConsumed(t: test.Test) {
+  ensureConsumed(t: { equal: (a: number, b: number, msg: string) => void }) {
     t.equal(this.queue.length, 0, 'all HTTP expectations should be consumed');
   }
 }

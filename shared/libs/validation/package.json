@@ -5,6 +5,14 @@
   "main": "index.js",
   "types": "index.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "prebuild": "node ./scripts/sync-schemas.mjs",
+    "build": "tsc -p tsconfig.json",
+    "postbuild": "node ./scripts/copy-schemas.mjs"
+  },
+  "dependencies": {
+    "@cable-platform/types": "workspace:*",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "zod": "^3.25.3"
   }
 }
