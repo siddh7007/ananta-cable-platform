@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from models import (
     SynthesisProposal, DrcResult, DrcIssue, DrcIssueType, DrcSeverity,
-    ConductorSpec, EndpointFull, TerminationType
+    ConductorSpec, EndpointFull, TerminationType, RulesManifest
 )
 from mdm_dao import MDMDAO
 
@@ -420,3 +420,50 @@ class DrcEngine:
             return f"DRC passed with warnings: {warning_count} warnings"
         else:
             return "DRC passed"
+
+    def get_rules_manifest(self) -> RulesManifest:
+        """Get rules manifest with version, rules list, and IPC620 set metadata."""
+        # Load manifest from shared rulesets
+        manifest_path = Path(__file__).parent.parent.parent / "shared" / "rulesets" / "ipc620" / "v1" / "manifest.json"
+
+        try:
+            with open(manifest_path, 'r') as f:
+                manifest_data = json.load(f)
+        except FileNotFoundError:
+            # Fallback manifest if file doesn't exist
+            manifest_data = {
+                "name": "ipc620-baseline",
+                "engine_version": "0.1.0",
+                "pack_version": "1.0.0",
+                "rules": []
+            }
+
+        # Extract rules from loaded rule tables
+        rules_list = []
+        for rule_name, rule_data in self.rule_tables.items():
+            rules_list.append({
+                "name": rule_name,
+                "type": rule_data.get("type", "unknown"),
+                "description": rule_data.get("description", ""),
+                "version": rule_data.get("version", "1.0.0")
+            })
+
+        # IPC620 metadata
+        ipc620_metadata = {
+            "standard": "IPC-620",
+            "version": "1.0",
+            "description": "IPC-620 Standard for Requirements and Acceptance of Cable and Wire Harness Assemblies",
+            "ruleset_id": self.ruleset_id,
+            "last_updated": "2025-01-01",
+            "compliance_class": "Class 2"
+        }
+
+        return RulesManifest(
+            version=manifest_data.get("engine_version", "0.1.0"),
+            ruleset_id=self.ruleset_id,
+            ruleset_name=manifest_data.get("name", "ipc620-baseline"),
+            engine_version=manifest_data.get("engine_version", "0.1.0"),
+            pack_version=manifest_data.get("pack_version", "1.0.0"),
+            rules=rules_list,
+            metadata=ipc620_metadata
+        )

@@ -162,3 +162,13 @@ class DrcResult(BaseModel):
     status: Literal["pass", "warning", "error"]
     issues: List[DrcIssue]
     summary: str
+
+# Rules manifest
+class RulesManifest(BaseModel):
+    version: str
+    ruleset_id: str
+    ruleset_name: str
+    engine_version: str
+    pack_version: str
+    rules: List[dict]  # List of rule definitions
+    metadata: dict  # IPC620 set metadata

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from typing import Optional
-from models import AssemblyStep1, SynthesisProposal, DrcResult
+from models import AssemblyStep1, SynthesisProposal, DrcResult, RulesManifest
 from synthesis import SynthesisEngine
 from drc import DrcEngine
 
@@ -41,3 +41,13 @@ def run_drc_legacy(design: dict):
         "findings": [],
         "severity_summary": {"info": 0, "warn": 0, "error": 0}
     }
+
+@app.get("/v1/drc/rules/manifest", response_model=RulesManifest)
+def get_rules_manifest():
+    """Get rules manifest with version, rules list, and IPC620 set metadata."""
+    try:
+        # Get manifest data from DRC engine
+        manifest_data = drc_engine.get_rules_manifest()
+        return manifest_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve rules manifest: {str(e)}")
