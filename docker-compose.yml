@@ -10,7 +10,11 @@ services:
       BFF_PORTAL_URL: http://bff-portal:4001
       PORT: 3000
     ports: ["5173:3000"]
-    depends_on: [api-gateway, bff-portal]
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      bff-portal:
+        condition: service_healthy
 
   api-gateway:
     build: { context: ., dockerfile: Dockerfile.api-gateway }
@@ -25,7 +29,26 @@ services:
       BFF_PORTAL_URL: http://bff-portal:4001
       RENDERER_SERVICE_URL: http://renderer:5002
     ports: ["8080:8080"]
-    depends_on: [bff-portal, drc]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          node -e "fetch('http://localhost:8080/health').then(r=>process.exit(r.ok ? 0 : 1)).catch(()=>process.exit(1));"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      bff-portal:
+        condition: service_healthy
+      drc:
+        condition: service_healthy
+      supabase-db:
+        condition: service_healthy
+      pg-extra:
+        condition: service_healthy
+      oracle-xe:
+        condition: service_healthy
 
   bff-portal:
     build: { context: ., dockerfile: Dockerfile.bff-portal }
@@ -38,7 +61,22 @@ services:
       DATABASE_URL: "postgresql://postgres:${SUPABASE_POSTGRES_PASSWORD:-postgres}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-appdb}"
       DRC_SERVICE_URL: "http://drc:8000"
     ports: ["8081:4001"]
-    depends_on: [supabase-db]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          node -e "fetch('http://localhost:4001/health').then(r=>process.exit(r.ok ? 0 : 1)).catch(()=>process.exit(1));"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+      pg-extra:
+        condition: service_healthy
+      drc:
+        condition: service_healthy
     restart: unless-stopped
 
   drc:
@@ -51,7 +89,27 @@ services:
       BFF_DATABASE_URL: "postgresql://postgres:${SUPABASE_POSTGRES_PASSWORD:-postgres}@supabase-db:5432/${SUPABASE_POSTGRES_DB:-appdb}"
       MDM_DATABASE_URL: "postgresql://${PG_EXTRA_USER:-postgres}:${PG_EXTRA_PASSWORD:-postgres}@pg-extra:5432/${PG_EXTRA_DB:-extradb}"
     ports: ["8000:8000"]
-    depends_on: [supabase-db, pg-extra]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          python -c "import sys, urllib.request, urllib.error;
+          url = 'http://localhost:8000/health';
+          try:
+              resp = urllib.request.urlopen(url, timeout=5)
+          except Exception:
+              sys.exit(1)
+          else:
+              sys.exit(0 if resp.status == 200 else 1)"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+      pg-extra:
+        condition: service_healthy
     restart: unless-stopped
 
   otel-collector:
@@ -82,6 +140,12 @@ services:
       POSTGRES_USER: ${SUPABASE_POSTGRES_USER:-postgres}
       POSTGRES_DB: ${SUPABASE_POSTGRES_DB:-appdb}
     ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER:-postgres}\" -d \"$${POSTGRES_DB:-appdb}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     volumes:
       - supabase_pg_data:/var/lib/postgresql/data
       - ./db/supabase/init:/docker-entrypoint-initdb.d:ro
@@ -95,6 +159,12 @@ services:
       POSTGRES_USER: ${PG_EXTRA_USER:-postgres}
       POSTGRES_DB: ${PG_EXTRA_DB:-extradb}
     ports: ["5442:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER:-postgres}\" -d \"$${POSTGRES_DB:-extradb}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     volumes:
       - pg_extra_data:/var/lib/postgresql/data
       - ./db/postgres_extra/init:/docker-entrypoint-initdb.d:ro
@@ -111,6 +181,12 @@ services:
     ports:
       - "1521:1521"   # Oracle Listener
       - "5500:5500"   # EM Express
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
     volumes:
       - oracle_data:/opt/oracle/oradata
 
