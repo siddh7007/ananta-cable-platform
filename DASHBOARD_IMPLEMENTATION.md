@@ -3,20 +3,23 @@
 ## Summary
 
 Successfully implemented a Home dashboard at `/` for the SvelteKit portal with four tiles:
+
 - System Health (from API gateway `/ready`)
 - Recent Projects (top 5)
-- Latest Quotes (top 5)  
+- Latest Quotes (top 5)
 - Recent Orders (top 5)
 
 ## Files Created
 
 ### 1. `apps/portal/src/lib/format.ts` (NEW)
+
 - Currency formatter utility
 - `formatMoney(amount?: number): string` - formats numbers as USD currency
 - No external dependencies
 - Handles null/undefined gracefully
 
 ### 2. `apps/portal/src/routes/+page.ts` (NEW)
+
 - SSR load function for dashboard page
 - Fetches all data in parallel with Promise.all()
 - Never throws - returns safe defaults on error
@@ -29,6 +32,7 @@ Successfully implemented a Home dashboard at `/` for the SvelteKit portal with f
 - Uses VITE_API_BASE_URL environment variable (defaults to localhost:8080)
 
 ### 3. `apps/portal/src/routes/+page.svelte` (REPLACED)
+
 - Dashboard UI with responsive grid layout
 - Four tiles with proper semantic HTML (h2 headings, sections, ul lists)
 - System Health tile:
@@ -59,6 +63,7 @@ Successfully implemented a Home dashboard at `/` for the SvelteKit portal with f
   - Status color classes with accessible contrast
 
 ### 4. `services/bff-portal/src/routes/dashboard.ts` (NEW)
+
 - BFF stub endpoints for dashboard data
 - Three GET routes:
   - `/v1/dashboard/projects/recent` - Returns empty projects array (TODO: implement when projects service available)
@@ -68,11 +73,13 @@ Successfully implemented a Home dashboard at `/` for the SvelteKit portal with f
 - Designed to be replaced with real implementations later
 
 ### 5. `services/bff-portal/src/app.ts` (MODIFIED)
+
 - Added import for `dashboardRoutes`
 - Registered dashboard routes after vendor routes
 - Added console log for debugging
 
 ### 6. `apps/portal/tests/dashboard.spec.ts` (NEW)
+
 - Playwright UI test suite
 - Tests:
   - ✅ Dashboard renders with all four tiles
@@ -85,12 +92,14 @@ Successfully implemented a Home dashboard at `/` for the SvelteKit portal with f
   - ✅ Responsive layout (stacks on mobile)
 
 ### 7. `services/bff-portal/test/dashboard.test.ts` (NEW)
+
 - Tap unit tests for BFF dashboard routes
 - Tests all three endpoints return 200 with empty arrays
 
 ## Testing Results
 
 ### BFF Endpoints
+
 All dashboard endpoints are live and responding correctly:
 
 ```bash
@@ -105,6 +114,7 @@ $ curl http://localhost:8081/v1/dashboard/orders/recent
 ```
 
 ### API Gateway Health
+
 The `/ready` endpoint is working:
 
 ```bash
@@ -120,6 +130,7 @@ The dashboard will correctly map "degraded" status to a yellow badge.
 ## What Was NOT Implemented
 
 As instructed by the prompt:
+
 - Real projects/quotes/orders data - stubs return empty lists
 - Actual links to project/quote/order detail pages (placeholders: `/projects/{id}`, `/quotes/{id}`, `/orders/{id}`)
 - The prompt requested confirmation on these routes, but since they don't exist yet, the links are currently non-functional placeholders
@@ -156,12 +167,14 @@ As instructed by the prompt:
 ## Build & Deployment
 
 BFF Portal rebuilt successfully:
+
 ```bash
 docker compose build bff-portal
 docker compose up -d bff-portal
 ```
 
 BFF Portal logs confirm dashboard routes registered:
+
 ```
 Registering dashboard routes...
 Dashboard routes registered successfully

@@ -1,6 +1,7 @@
 {
   "name": "cable-platform",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@9.0.0",
   "scripts": {
     "build": "pnpm -r run build",
@@ -10,7 +11,12 @@
     "prepare": "husky install",
     "gen:contracts": "cd packages/contracts && pnpm run generate-json && pnpm run generate-types && pnpm run generate-sdk",
     "sdk:gen": "./scripts/gen-sdk.sh",
-    "contracts:verify": "./scripts/verify-contracts.sh"
+    "contracts:verify": "./scripts/verify-contracts.sh",
+    "dev:check": "node scripts/health-check.js",
+    "dev:toolkit": "node scripts/dev-toolkit.js",
+    "dev:workflows": "node scripts/dev-workflows.js",
+    "dev:admin-test": "node scripts/test-admin-mcp.js",
+    "mcp:start": "cd services/mcp-playwright && pnpm run mcp"
   },
   "workspaces": [
     "apps/*",

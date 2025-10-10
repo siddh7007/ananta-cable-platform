@@ -11,8 +11,6 @@
       "@cable-platform/types": ["shared/libs/types/index.ts"],
       "@cable-platform/types/*": ["shared/libs/types/*.ts"]
     },
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   }
 }
