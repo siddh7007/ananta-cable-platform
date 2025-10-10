@@ -57,7 +57,7 @@ type UserIdParams = {
  */
 export async function adminUsersRoutes(fastify: FastifyInstance) {
   // GET /admin/users - List admin users with search and pagination
-  fastify.get(
+  fastify.get<{ Querystring: ListUsersQuery }>(
     '/admin/users',
     {
       preHandler: adminGuard,
@@ -72,10 +72,7 @@ export async function adminUsersRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (
-      request: FastifyRequest<{ Querystring: ListUsersQuery }>,
-      reply: FastifyReply,
-    ) => {
+    async (request, reply) => {
       const { query, limit = 25, offset = 0 } = request.query ?? {};
 
       let filteredUsers = adminUsers;
@@ -107,15 +104,12 @@ export async function adminUsersRoutes(fastify: FastifyInstance) {
   );
 
   // POST /admin/users/:id/deactivate - Deactivate a user
-  fastify.post(
+  fastify.post<{ Params: UserIdParams }>(
     '/admin/users/:id/deactivate',
     {
       preHandler: adminGuard,
     },
-    async (
-      request: FastifyRequest<{ Params: UserIdParams }>,
-      reply: FastifyReply,
-    ) => {
+    async (request, reply) => {
       const { id } = request.params;
 
       const userIndex = adminUsers.findIndex((user) => user.id === id);
@@ -141,15 +135,12 @@ export async function adminUsersRoutes(fastify: FastifyInstance) {
   );
 
   // POST /admin/users/:id/reactivate - Reactivate a user
-  fastify.post(
+  fastify.post<{ Params: UserIdParams }>(
     '/admin/users/:id/reactivate',
     {
       preHandler: adminGuard,
     },
-    async (
-      request: FastifyRequest<{ Params: UserIdParams }>,
-      reply: FastifyReply,
-    ) => {
+    async (request, reply) => {
       const { id } = request.params;
 
       const userIndex = adminUsers.findIndex((user) => user.id === id);
