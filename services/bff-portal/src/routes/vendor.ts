@@ -35,26 +35,26 @@ const vendorPingSchema = {
                 type: 'object',
                 properties: {
                   configured: { type: 'boolean' },
-                  status: { type: 'string' }
+                  status: { type: 'string' },
                 },
-                required: ['configured', 'status']
-              }
+                required: ['configured', 'status'],
+              },
             },
-            required: ['mouser']
-          }
+            required: ['mouser'],
+          },
         },
-        required: ['status', 'service', 'vendors']
+        required: ['status', 'service', 'vendors'],
       },
       404: {
         type: 'object',
         properties: {
           error: { type: 'string' },
-          message: { type: 'string' }
+          message: { type: 'string' },
         },
-        required: ['error', 'message']
-      }
-    }
-  }
+        required: ['error', 'message'],
+      },
+    },
+  },
 } as const;
 
 function isDevVendorEnabled(): boolean {
@@ -71,9 +71,9 @@ function buildVendorPingResponse(mouserClient: MouserClient): VendorPingResponse
     vendors: {
       mouser: {
         configured: mouserConfigured,
-        status: mouserStatus
-      }
-    }
+        status: mouserStatus,
+      },
+    },
   };
 }
 
@@ -81,10 +81,7 @@ function buildVendorPingResponse(mouserClient: MouserClient): VendorPingResponse
  * Vendor routes for external vendor integrations
  * Currently supports Mouser Electronics
  */
-export async function vendorRoutes(
-  server: FastifyInstance,
-  options: VendorRouteOptions = {}
-) {
+export async function vendorRoutes(server: FastifyInstance, options: VendorRouteOptions = {}) {
   const mouserClient = options.mouserClient || new MouserClient();
 
   const registerPingRoute = (path: string) => {
@@ -95,12 +92,12 @@ export async function vendorRoutes(
         if (!isDevVendorEnabled()) {
           return reply.code(404).send({
             error: 'Not Found',
-            message: 'Vendor development endpoints are disabled'
+            message: 'Vendor development endpoints are disabled',
           });
         }
 
         return buildVendorPingResponse(mouserClient);
-      }
+      },
     );
   };
 

@@ -199,7 +199,11 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
         });
       }
 
-      const { assembly_id, fix_ids, ruleset_id } = body as { assembly_id: string; fix_ids: string[]; ruleset_id: string };
+      const { assembly_id, fix_ids, ruleset_id } = body as {
+        assembly_id: string;
+        fix_ids: string[];
+        ruleset_id: string;
+      };
 
       try {
         const assemblyRecord = await assembliesDao.getAssemblySchema(assembly_id);
@@ -215,7 +219,7 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
           });
         }
 
-        const availableFixes = new Set((latestReport.fixes ?? []).map(fix => fix.id));
+        const availableFixes = new Set((latestReport.fixes ?? []).map((fix) => fix.id));
         const missingFixes = fix_ids.filter((fixId: string) => !availableFixes.has(fixId));
         if (missingFixes.length > 0) {
           return reply.status(400).send({
@@ -231,7 +235,10 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
           schema: assemblyPayload,
           ...(ruleset_id ? { ruleset_id } : {}),
         };
-        const response = await client.post(buildRulesServiceUrl('/drc/apply-fixes'), requestPayload);
+        const response = await client.post(
+          buildRulesServiceUrl('/drc/apply-fixes'),
+          requestPayload,
+        );
 
         if (!response.response.ok) {
           const errorBody = response.data;
@@ -251,7 +258,11 @@ export async function drcRoutes(fastify: FastifyInstance, options: DrcRouteOptio
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const typedApplyResponse = applyResponse as { schema: any; schema_hash: string; drc: any };
         const designSchema = extractDesignSchema(typedApplyResponse.schema);
-        await assembliesDao.updateAssemblySchema(assembly_id, designSchema, typedApplyResponse.schema_hash);
+        await assembliesDao.updateAssemblySchema(
+          assembly_id,
+          designSchema,
+          typedApplyResponse.schema_hash,
+        );
         await drcDao.upsertReport(typedApplyResponse.drc);
 
         return reply.status(200).send(applyResponse);

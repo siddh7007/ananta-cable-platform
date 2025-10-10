@@ -1,1 +1,3 @@
-{"disable-coverage": true}
+disable-coverage: true
+node-arg:
+  - "--experimental-json-modules"

@@ -20,7 +20,7 @@ type AssembliesDaoLike = {
   updateAssemblySchema(
     assemblyId: string,
     schema: Record<string, unknown>,
-    schemaHash: string
+    schemaHash: string,
   ): Promise<void>;
 };
 
@@ -41,7 +41,11 @@ class AssembliesStub implements AssembliesDaoLike {
     return record ? structuredClone(record) : null;
   }
 
-  async updateAssemblySchema(assemblyId: string, schema: Record<string, unknown>, schemaHash: string) {
+  async updateAssemblySchema(
+    assemblyId: string,
+    schema: Record<string, unknown>,
+    schemaHash: string,
+  ) {
     const existing = this.store.get(assemblyId);
     if (!existing) {
       throw new Error(`Assembly ${assemblyId} not found`);
@@ -95,7 +99,9 @@ class FetchStub {
     }
 
     if (match.path !== url.pathname || match.method !== method) {
-      throw new Error(`Expected ${match.method} ${match.path} but received ${method} ${url.pathname}`);
+      throw new Error(
+        `Expected ${match.method} ${match.path} but received ${method} ${url.pathname}`,
+      );
     }
 
     let parsedBody: unknown = undefined;
@@ -129,7 +135,11 @@ class HttpClientStub {
     this.queue.push({ path, method: method.toUpperCase(), handler: wrapped });
   }
 
-  async request<T = unknown>(url: string, method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET', options: { body?: unknown } = {}): Promise<HttpResponse<T>> {
+  async request<T = unknown>(
+    url: string,
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
+    options: { body?: unknown } = {},
+  ): Promise<HttpResponse<T>> {
     const parsedUrl = new URL(url);
     const requestMethod = method.toUpperCase();
     const match = this.queue.shift();
@@ -138,7 +148,9 @@ class HttpClientStub {
     }
 
     if (match.path !== parsedUrl.pathname || match.method !== requestMethod) {
-      throw new Error(`Expected ${match.method} ${match.path} but received ${requestMethod} ${parsedUrl.pathname}`);
+      throw new Error(
+        `Expected ${match.method} ${match.path} but received ${requestMethod} ${parsedUrl.pathname}`,
+      );
     }
 
     const { status = 200, body = null } = match.handler(options.body);
@@ -171,15 +183,27 @@ class HttpClientStub {
     return this.request<T>(url, 'GET', options);
   }
 
-  async post<T = unknown>(url: string, body?: unknown, options?: { body?: unknown }): Promise<HttpResponse<T>> {
+  async post<T = unknown>(
+    url: string,
+    body?: unknown,
+    options?: { body?: unknown },
+  ): Promise<HttpResponse<T>> {
     return this.request<T>(url, 'POST', { ...options, body });
   }
 
-  async put<T = unknown>(url: string, body?: unknown, options?: { body?: unknown }): Promise<HttpResponse<T>> {
+  async put<T = unknown>(
+    url: string,
+    body?: unknown,
+    options?: { body?: unknown },
+  ): Promise<HttpResponse<T>> {
     return this.request<T>(url, 'PUT', { ...options, body });
   }
 
-  async patch<T = unknown>(url: string, body?: unknown, options?: { body?: unknown }): Promise<HttpResponse<T>> {
+  async patch<T = unknown>(
+    url: string,
+    body?: unknown,
+    options?: { body?: unknown },
+  ): Promise<HttpResponse<T>> {
     return this.request<T>(url, 'PATCH', { ...options, body });
   }
 
@@ -229,13 +253,17 @@ const BASE_SCHEMA = {
   bom: [{ ref: { mpn: 'IDC-04A' }, qty: 1, role: 'primary' }],
 };
 
-function buildAssemblyRecord(assemblyId: string, schemaHash: string, labels: Record<string, unknown> | null): AssemblyRecord {
+function buildAssemblyRecord(
+  assemblyId: string,
+  schemaHash: string,
+  labels: Record<string, unknown> | null,
+): AssemblyRecord {
   return {
     assembly_id: assemblyId,
     draft_id: `draft-${assemblyId}`,
     schema: {
       ...BASE_SCHEMA,
-      labels: labels === null ? undefined : labels ?? { offset_mm: 10 },
+      labels: labels === null ? undefined : (labels ?? { offset_mm: 10 }),
     },
     schema_hash: schemaHash,
     created_at: new Date().toISOString(),
@@ -292,7 +320,11 @@ test('DRC BFF integration', async (t) => {
 
     httpStub.reply('/drc/run', 'POST', () => ({ body: drcReport }));
 
-    const app = await createApp({ assembliesDao: assemblies, drcDao: reports, httpClient: httpStub });
+    const app = await createApp({
+      assembliesDao: assemblies,
+      drcDao: reports,
+      httpClient: httpStub,
+    });
     t.teardown(() => app.close());
 
     const response = await app.inject({
@@ -352,7 +384,11 @@ test('DRC BFF integration', async (t) => {
 
     httpStub.reply('/drc/run', 'POST', () => ({ body: runReport }));
 
-    const app = await createApp({ assembliesDao: assemblies, drcDao: reports, httpClient: httpStub });
+    const app = await createApp({
+      assembliesDao: assemblies,
+      drcDao: reports,
+      httpClient: httpStub,
+    });
     t.teardown(() => app.close());
 
     await app.inject({
@@ -438,7 +474,11 @@ test('DRC BFF integration', async (t) => {
       generated_at: new Date().toISOString(),
     });
 
-    const app = await createApp({ assembliesDao: assemblies, drcDao: reports, httpClient: httpStub });
+    const app = await createApp({
+      assembliesDao: assemblies,
+      drcDao: reports,
+      httpClient: httpStub,
+    });
     t.teardown(() => app.close());
 
     const response = await app.inject({
