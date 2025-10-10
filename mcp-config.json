@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp", "mcp-server-playwright"],
+      "cwd": "./services/mcp-playwright",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  }
+}
