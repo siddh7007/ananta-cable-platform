@@ -35,7 +35,7 @@ export class HttpError extends Error {
     message: string,
     public status: number,
     public statusText: string,
-    public response?: Response
+    public response?: Response,
   ) {
     super(message);
     this.name = 'HttpError';
@@ -46,14 +46,18 @@ export class HttpError extends Error {
  * Default HTTP client with timeout, retries, and JSON handling
  */
 export class HttpClient {
-  private defaultOptions: Required<Pick<HttpRequestOptions, 'timeout' | 'retries' | 'retryDelay' | 'fetch'>>;
+  private defaultOptions: Required<
+    Pick<HttpRequestOptions, 'timeout' | 'retries' | 'retryDelay' | 'fetch'>
+  >;
 
-  constructor(options: {
-    timeout?: number;
-    retries?: number;
-    retryDelay?: number;
-    fetch?: typeof fetch;
-  } = {}) {
+  constructor(
+    options: {
+      timeout?: number;
+      retries?: number;
+      retryDelay?: number;
+      fetch?: typeof fetch;
+    } = {},
+  ) {
     this.defaultOptions = {
       timeout: options.timeout ?? 30000, // 30 seconds
       retries: options.retries ?? 3,
@@ -68,7 +72,7 @@ export class HttpClient {
   async request<T = unknown>(
     url: string,
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
-    options: HttpRequestOptions = {}
+    options: HttpRequestOptions = {},
   ): Promise<HttpResponse<T>> {
     const {
       timeout = this.defaultOptions.timeout,
@@ -82,7 +86,7 @@ export class HttpClient {
     // Default JSON headers
     const defaultHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      Accept: 'application/json',
       ...headers,
     };
 
@@ -147,12 +151,11 @@ export class HttpClient {
             `HTTP ${response.status}: ${response.statusText}`,
             response.status,
             response.statusText,
-            response
+            response,
           );
         }
 
         return httpResponse;
-
       } catch (error) {
         lastError = error as Error;
 
@@ -174,7 +177,7 @@ export class HttpClient {
 
         // Wait before retrying
         if (retryDelay > 0) {
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
         }
       }
     }
@@ -184,7 +187,9 @@ export class HttpClient {
       throw lastError;
     }
 
-    throw new Error(`Request failed after ${retries + 1} attempts: ${lastError?.message || 'Unknown error'}`);
+    throw new Error(
+      `Request failed after ${retries + 1} attempts: ${lastError?.message || 'Unknown error'}`,
+    );
   }
 
   /**
@@ -197,28 +202,43 @@ export class HttpClient {
   /**
    * POST request
    */
-  async post<T = unknown>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<HttpResponse<T>> {
+  async post<T = unknown>(
+    url: string,
+    body?: unknown,
+    options: HttpRequestOptions = {},
+  ): Promise<HttpResponse<T>> {
     return this.request<T>(url, 'POST', { ...options, body });
   }
 
   /**
    * PUT request
    */
-  async put<T = unknown>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<HttpResponse<T>> {
+  async put<T = unknown>(
+    url: string,
+    body?: unknown,
+    options: HttpRequestOptions = {},
+  ): Promise<HttpResponse<T>> {
     return this.request<T>(url, 'PUT', { ...options, body });
   }
 
   /**
    * PATCH request
    */
-  async patch<T = unknown>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<HttpResponse<T>> {
+  async patch<T = unknown>(
+    url: string,
+    body?: unknown,
+    options: HttpRequestOptions = {},
+  ): Promise<HttpResponse<T>> {
     return this.request<T>(url, 'PATCH', { ...options, body });
   }
 
   /**
    * DELETE request
    */
-  async delete<T = unknown>(url: string, options: HttpRequestOptions = {}): Promise<HttpResponse<T>> {
+  async delete<T = unknown>(
+    url: string,
+    options: HttpRequestOptions = {},
+  ): Promise<HttpResponse<T>> {
     return this.request<T>(url, 'DELETE', options);
   }
 }
@@ -233,8 +253,12 @@ export const httpClient = new HttpClient();
  */
 export const http = {
   get: <T = unknown>(url: string, options?: HttpRequestOptions) => httpClient.get<T>(url, options),
-  post: <T = unknown>(url: string, body?: unknown, options?: HttpRequestOptions) => httpClient.post<T>(url, body, options),
-  put: <T = unknown>(url: string, body?: unknown, options?: HttpRequestOptions) => httpClient.put<T>(url, body, options),
-  patch: <T = unknown>(url: string, body?: unknown, options?: HttpRequestOptions) => httpClient.patch<T>(url, body, options),
-  delete: <T = unknown>(url: string, options?: HttpRequestOptions) => httpClient.delete<T>(url, options),
+  post: <T = unknown>(url: string, body?: unknown, options?: HttpRequestOptions) =>
+    httpClient.post<T>(url, body, options),
+  put: <T = unknown>(url: string, body?: unknown, options?: HttpRequestOptions) =>
+    httpClient.put<T>(url, body, options),
+  patch: <T = unknown>(url: string, body?: unknown, options?: HttpRequestOptions) =>
+    httpClient.patch<T>(url, body, options),
+  delete: <T = unknown>(url: string, options?: HttpRequestOptions) =>
+    httpClient.delete<T>(url, options),
 };
