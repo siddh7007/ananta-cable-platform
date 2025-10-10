@@ -17,14 +17,18 @@ export interface RetryResult {
 export async function fetchWithTimeout(
   url: string,
   options: RequestInit = {},
-  timeoutMs: number = 5000
+  timeoutMs: number = 5000,
 ): Promise<Response> {
-  const response = await httpClient.request(url, options.method as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' || 'GET', {
-    timeout: timeoutMs,
-    headers: options.headers as Record<string, string>,
-    body: options.body,
-    retries: 0, // No retries for timeout-only function
-  });
+  const response = await httpClient.request(
+    url,
+    (options.method as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE') || 'GET',
+    {
+      timeout: timeoutMs,
+      headers: options.headers as Record<string, string>,
+      body: options.body,
+      retries: 0, // No retries for timeout-only function
+    },
+  );
   return response.response;
 }
 
@@ -34,16 +38,20 @@ export async function fetchWithRetry(
   options: RequestInit = {},
   maxRetries: number = 1,
   timeoutMs: number = 5000,
-  baseBackoffMs: number = 1000
+  baseBackoffMs: number = 1000,
 ): Promise<RetryResult> {
   try {
-    const response = await httpClient.request(url, options.method as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' || 'GET', {
-      timeout: timeoutMs,
-      headers: options.headers as Record<string, string>,
-      body: options.body,
-      retries: maxRetries,
-      retryDelay: baseBackoffMs,
-    });
+    const response = await httpClient.request(
+      url,
+      (options.method as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE') || 'GET',
+      {
+        timeout: timeoutMs,
+        headers: options.headers as Record<string, string>,
+        body: options.body,
+        retries: maxRetries,
+        retryDelay: baseBackoffMs,
+      },
+    );
     return { response: response.response, retryCount: 0 }; // retryCount not tracked in new implementation
   } catch (error) {
     if (error instanceof HttpError) {

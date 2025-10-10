@@ -4,9 +4,5 @@
     "outDir": "./dist",
     "rootDir": "../.."
   },
-  "include": [
-    "src",
-    "../../shared/libs/error-codes.ts",
-    "../../shared/libs/http.ts"
-  ]
+  "include": ["src", "../../shared/libs/error-codes.ts", "../../shared/libs/http.ts"]
 }

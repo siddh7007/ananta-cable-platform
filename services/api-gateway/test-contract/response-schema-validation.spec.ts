@@ -44,7 +44,7 @@ describe('Response Schema Validation', () => {
     it('should validate response against OpenAPI schema', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/ready'
+        url: '/ready',
       });
 
       expect(response.statusCode).toBe(200);
@@ -97,7 +97,10 @@ describe('Response Schema Validation', () => {
     it('should validate request and response against OpenAPI schemas', async () => {
       // Increase timeout for DRC operations which can be slow
       // Load sample design fixture
-      const sampleDesignPath = join(__dirname, '../../../shared/testing/fixtures/sample-design.json');
+      const sampleDesignPath = join(
+        __dirname,
+        '../../../shared/testing/fixtures/sample-design.json',
+      );
       const sampleDesign = JSON.parse(readFileSync(sampleDesignPath, 'utf8'));
 
       // Validate request against schema if available
@@ -115,8 +118,8 @@ describe('Response Schema Validation', () => {
         url: '/v1/drc/run',
         payload: sampleDesign,
         headers: {
-          'content-type': 'application/json'
-        }
+          'content-type': 'application/json',
+        },
       });
 
       // DRC service may not be available in test environment, so we accept both success and error responses

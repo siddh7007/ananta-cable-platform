@@ -137,10 +137,36 @@ export async function buildServer() {
       .send(body);
   });
 
-  server.get('/v1/me', { preHandler: [authGuard], config: { rateLimit: {} } }, async (req) => ({
-    sub: req.user?.sub ?? 'dev-user',
-    roles: req.user?.roles ?? [],
-  }));
+  server.get('/v1/me', { preHandler: [authGuard], config: { rateLimit: {} } }, async (req) => {
+    const devBypass = (process.env.DEV_AUTH_BYPASS ?? 'false') === 'true';
+    return {
+      sub: req.user?.sub ?? 'dev-user',
+      roles: req.user?.roles ?? (devBypass ? ['dev'] : []),
+    };
+  });
+
+  // Config endpoint for portal (public, non-sensitive config only)
+  server.get('/config', { config: { rateLimit: {} } }, async () => {
+    const nodeEnv = process.env.NODE_ENV || 'development';
+    const env = ['development', 'staging', 'production'].includes(nodeEnv)
+      ? nodeEnv
+      : 'development';
+    const devBypass = (process.env.DEV_AUTH_BYPASS ?? 'false') === 'true';
+
+    return {
+      env,
+      apiBaseUrl: process.env.VITE_API_BASE_URL || 'http://localhost:8080',
+      auth: {
+        domain: process.env.AUTH0_DOMAIN || null,
+        audience: process.env.AUTH0_AUDIENCE || null,
+        devBypass,
+      },
+      features: {
+        otel: false,
+        flags: [],
+      },
+    };
+  });
 
   // simple reverse-proxy style handoff (local dev): /drc/* -> http://drc:8000/*
   server.get('/drc/health', { config: { rateLimit: {} } }, async (_req, reply) => {

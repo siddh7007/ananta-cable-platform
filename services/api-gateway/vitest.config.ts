@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
@@ -7,7 +7,7 @@ export default defineConfig({
     env: {
       DEV_AUTH_BYPASS: 'true',
       AUTH0_DOMAIN: 'test.auth0.com',
-      AUTH0_AUDIENCE: 'test-audience'
-    }
+      AUTH0_AUDIENCE: 'test-audience',
+    },
   },
-})
+});
