@@ -62,3 +62,10 @@ desktop.ini
 # Build artifacts
 *.tsbuildinfo
 .turbo/
+
+# Playwright artifacts
+apps/portal/playwright-report/
+apps/portal/test-results/
+apps/portal/screenshots/
+apps/portal/screenshot-portal.js
+apps/portal/screenshot-*.png
