@@ -1,0 +1,5 @@
+[
+  {"id":"p-001","name":"Demo Cable A","status":"active"},
+  {"id":"p-002","name":"Harness B","status":"draft"},
+  {"id":"p-003","name":"Assembly C","status":"archived"}
+]

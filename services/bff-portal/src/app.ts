@@ -14,6 +14,8 @@ import { vendorRoutes } from './routes/vendor.js';
 import { dashboardRoutes } from './routes/dashboard.js';
 import { adminUsersRoutes } from './routes/admin/users.js';
 import { adminDbStatsRoutes } from './routes/admin/db.stats.js';
+import { adminFlagsRoutes } from './routes/admin/flags.js';
+import { projectsRoutes } from './routes/projects.js';
 
 export async function build() {
   const server = Fastify({ logger: true });
@@ -82,6 +84,20 @@ export async function build() {
     console.log('Admin DB stats routes registered successfully');
   } catch (error) {
     console.error('Failed to register admin DB stats routes:', error);
+  }
+  console.log('Registering admin feature flags routes...');
+  try {
+    await server.register(adminFlagsRoutes);
+    console.log('Admin feature flags routes registered successfully');
+  } catch (error) {
+    console.error('Failed to register admin feature flags routes:', error);
+  }
+  console.log('Registering projects routes...');
+  try {
+    await server.register(projectsRoutes);
+    console.log('Projects routes registered successfully');
+  } catch (error) {
+    console.error('Failed to register projects routes:', error);
   }
 
   // Health endpoint

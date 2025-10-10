@@ -49,3 +49,26 @@ export interface AdminDbData {
   stats?: DbStats;
   error?: string;
 }
+
+// Feature flag types
+export interface FeatureFlag {
+  key: string;
+  description?: string;
+  enabled: boolean;
+  scope: 'org' | 'workspace';
+  workspaceId?: string;
+  updatedAt?: string;
+}
+
+export interface FeatureFlagToggleRequest {
+  key: string;
+  enabled: boolean;
+  scope: 'org' | 'workspace';
+  workspaceId?: string;
+}
+
+export interface FeatureFlagToggleResponse {
+  success: boolean;
+  flag: FeatureFlag;
+  message?: string;
+}

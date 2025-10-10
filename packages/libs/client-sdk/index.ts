@@ -15,8 +15,10 @@ import type {
   DRCApplyFixesResponse,
   TemplatePack,
   RenderRequest,
-  RenderResponse
-} from '../types/api';
+  RenderResponse,
+  Project,
+  ProjectList,
+} from '@cable-platform/contracts/types/api';
 
 export interface ApiResponse<T> {
   ok: boolean;
@@ -34,10 +36,7 @@ class CablePlatformClient {
     this.apiKey = apiKey;
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const headers: HeadersInit = {
@@ -84,7 +83,7 @@ class CablePlatformClient {
 
   async saveDraftStep1(
     body: AssemblyDraft,
-    idempotencyKey: string
+    idempotencyKey: string,
   ): Promise<ApiResponse<AssemblyDraftResponse>> {
     return this.request<AssemblyDraftResponse>('/v1/assemblies/draft', {
       method: 'POST',
@@ -111,14 +110,20 @@ class CablePlatformClient {
     });
   }
 
-  async acceptSynthesis(proposalId: string, locks?: string[]): Promise<ApiResponse<{ assembly_id: string; schema_hash: string }>> {
+  async acceptSynthesis(
+    proposalId: string,
+    locks?: string[],
+  ): Promise<ApiResponse<{ assembly_id: string; schema_hash: string }>> {
     return this.request<{ assembly_id: string; schema_hash: string }>('/v1/synthesis/accept', {
       method: 'POST',
       body: JSON.stringify({ proposal_id: proposalId, locks }),
     });
   }
 
-  async recomputeSynthesis(draftId: string, locks?: string[]): Promise<ApiResponse<SynthesisProposal>> {
+  async recomputeSynthesis(
+    draftId: string,
+    locks?: string[],
+  ): Promise<ApiResponse<SynthesisProposal>> {
     return this.request<SynthesisProposal>('/v1/synthesis/recompute', {
       method: 'POST',
       body: JSON.stringify({ draft_id: draftId, locks }),
@@ -148,7 +153,11 @@ class CablePlatformClient {
     });
   }
 
-  async applyDrcFixes(assemblyId: string, fixIds: string[], rulesetId?: string): Promise<ApiResponse<DRCApplyFixesResponse>> {
+  async applyDrcFixes(
+    assemblyId: string,
+    fixIds: string[],
+    rulesetId?: string,
+  ): Promise<ApiResponse<DRCApplyFixesResponse>> {
     const payload: DRCApplyFixesRequest = { assembly_id: assemblyId, fix_ids: fixIds };
     if (rulesetId) {
       payload.ruleset_id = rulesetId;
@@ -174,6 +183,14 @@ class CablePlatformClient {
       body: JSON.stringify(request),
     });
   }
+
+  async getProjects(): Promise<ApiResponse<ProjectList>> {
+    return this.request<ProjectList>('/v1/projects');
+  }
+
+  async getProject(id: string): Promise<ApiResponse<Project>> {
+    return this.request<Project>(`/v1/projects/${id}`);
+  }
 }
 
 // Export singleton instance
@@ -182,3 +199,22 @@ export const api = new CablePlatformClient();
 // Export class for custom instances
 export { CablePlatformClient };
 export default CablePlatformClient;
+
+// Export generated services and types
+export { ApiError } from './core/ApiError';
+export { CancelablePromise, CancelError } from './core/CancelablePromise';
+export { OpenAPI } from './core/OpenAPI';
+export type { OpenAPIConfig } from './core/OpenAPI';
+
+export { AdminDbStats } from './models/AdminDbStats';
+export { AdminUser } from './models/AdminUser';
+export type { AdminUserList } from './models/AdminUserList';
+export type { Error } from './models/Error';
+export { FeatureFlag } from './models/FeatureFlag';
+export type { FeatureFlags } from './models/FeatureFlags';
+export { FeatureFlagToggleRequest } from './models/FeatureFlagToggleRequest';
+export type { FeatureFlagToggleResponse } from './models/FeatureFlagToggleResponse';
+export { Project } from './models/Project';
+export type { ProjectList } from './models/ProjectList';
+
+export { DefaultService } from './services/DefaultService';

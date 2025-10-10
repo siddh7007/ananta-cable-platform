@@ -1,0 +1,46 @@
+[
+  {
+    "key": "portal.diagnostics",
+    "description": "Enable diagnostic tools in the portal",
+    "enabled": false,
+    "scope": "org",
+    "updatedAt": "2025-10-09T00:00:00.000Z"
+  },
+  {
+    "key": "portal.dark_mode",
+    "description": "Enable dark mode theme option",
+    "enabled": true,
+    "scope": "org",
+    "updatedAt": "2025-10-09T00:00:00.000Z"
+  },
+  {
+    "key": "drc.advanced_rules",
+    "description": "Enable advanced DRC validation rules",
+    "enabled": false,
+    "scope": "org",
+    "updatedAt": "2025-10-09T00:00:00.000Z"
+  },
+  {
+    "key": "synthesis.auto_optimize",
+    "description": "Automatically optimize cable synthesis",
+    "enabled": true,
+    "scope": "org",
+    "updatedAt": "2025-10-09T00:00:00.000Z"
+  },
+  {
+    "key": "workspace.beta_features",
+    "description": "Enable beta features for workspace",
+    "enabled": false,
+    "scope": "workspace",
+    "workspaceId": "ws_001",
+    "updatedAt": "2025-10-09T00:00:00.000Z"
+  },
+  {
+    "key": "workspace.advanced_reporting",
+    "description": "Enable advanced reporting dashboard",
+    "enabled": true,
+    "scope": "workspace",
+    "workspaceId": "ws_001",
+    "updatedAt": "2025-10-09T00:00:00.000Z"
+  }
+]

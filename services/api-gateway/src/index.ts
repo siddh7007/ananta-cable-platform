@@ -116,11 +116,13 @@ export async function buildServer() {
   const synthesisModule = await import('./routes/synthesis.js');
   const renderModule = await import('./routes/render.js');
   const vendorModule = await import('./routes/vendor.js');
+  const projectsModule = await import('./routes/projects.js');
 
   await server.register(drcModule.default);
   await server.register(synthesisModule.default);
   await server.register(renderModule.default);
   await server.register(vendorModule.default);
+  await server.register(projectsModule.default);
 
   // Log all registered routes for debugging
   server.ready(() => {

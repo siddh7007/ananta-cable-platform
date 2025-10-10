@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cable-platform.example.com/schemas/v1/feature-flag-toggle-request.schema.json",
+  "title": "FeatureFlagToggleRequest",
+  "description": "Request to toggle a feature flag",
+  "type": "object",
+  "required": ["key", "enabled", "scope"],
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Feature flag key to toggle",
+      "pattern": "^[a-z0-9._-]+$",
+      "minLength": 3,
+      "maxLength": 100
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "New enabled state"
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["org", "workspace"],
+      "description": "Scope of the flag"
+    },
+    "workspaceId": {
+      "type": "string",
+      "description": "Workspace ID (required when scope is workspace)",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "maxLength": 100
+    }
+  },
+  "if": {
+    "properties": {
+      "scope": {
+        "const": "workspace"
+      }
+    }
+  },
+  "then": {
+    "required": ["workspaceId"]
+  }
+}

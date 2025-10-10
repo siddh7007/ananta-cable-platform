@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cable-platform.example.com/schemas/v1/feature-flag-toggle-response.schema.json",
+  "title": "FeatureFlagToggleResponse",
+  "description": "Response from toggling a feature flag",
+  "type": "object",
+  "required": ["success", "flag"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether the toggle was successful"
+    },
+    "flag": {
+      "$ref": "./feature-flag.schema.json",
+      "description": "The updated feature flag"
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable message about the operation"
+    }
+  }
+}

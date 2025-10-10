@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cable-platform.example.com/schemas/v1/feature-flag.schema.json",
+  "title": "FeatureFlag",
+  "description": "A feature flag configuration at org or workspace scope",
+  "type": "object",
+  "required": ["key", "enabled", "scope"],
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Unique identifier for the feature flag",
+      "pattern": "^[a-z0-9._-]+$",
+      "minLength": 3,
+      "maxLength": 100,
+      "examples": ["portal.diagnostics", "drc.advanced_rules"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the feature flag",
+      "maxLength": 500
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Whether the feature flag is enabled"
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["org", "workspace"],
+      "description": "Scope at which the flag applies"
+    },
+    "workspaceId": {
+      "type": "string",
+      "description": "Workspace ID (required when scope is workspace)",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "maxLength": 100
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO timestamp of last update"
+    }
+  },
+  "if": {
+    "properties": {
+      "scope": {
+        "const": "workspace"
+      }
+    }
+  },
+  "then": {
+    "required": ["workspaceId"]
+  }
+}

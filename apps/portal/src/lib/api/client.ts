@@ -1,4 +1,4 @@
-import { CablePlatformClient, type ApiResponse } from '@cable-platform/client-sdk';
+import { CablePlatformClient, type ApiResponse, type Project, type ProjectList } from '@cable-platform/client-sdk';
 import type { 
   SynthesisProposal, 
   DrcReport,
@@ -148,6 +148,14 @@ class ApiClient {
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Network error' };
     }
+  }
+
+  async getProjects(): Promise<ApiResponse<ProjectList>> {
+    return sdkApi.getProjects();
+  }
+
+  async getProject(id: string): Promise<ApiResponse<Project>> {
+    return sdkApi.getProject(id);
   }
 }
 

@@ -66,6 +66,41 @@ paths:
                         type: integer
                       error:
                         type: integer
+  /v1/projects:
+    get:
+      summary: List projects
+      description: Get paginated list of projects
+      responses:
+        '200':
+          description: Projects retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectList'
+  /v1/projects/{id}:
+    get:
+      summary: Get project
+      description: Get a specific project by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project ID
+      responses:
+        '200':
+          description: Project retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /admin/users:
     get:
       summary: List admin users
@@ -197,6 +232,69 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /admin/flags:
+    get:
+      summary: List feature flags
+      description: Get feature flags filtered by scope and optional workspaceId
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: scope
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [org, workspace]
+            default: org
+          description: Scope of feature flags to retrieve
+        - name: workspaceId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Workspace ID (required when scope is workspace)
+      responses:
+        '200':
+          description: Feature flags retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlags'
+        '403':
+          description: Forbidden - admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /admin/flags/toggle:
+    post:
+      summary: Toggle feature flag
+      description: Enable or disable a feature flag
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureFlagToggleRequest'
+      responses:
+        '200':
+          description: Feature flag toggled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlagToggleResponse'
+        '400':
+          description: Bad request - flag not found or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   securitySchemes:
     bearerAuth:
@@ -210,6 +308,18 @@ components:
       $ref: '../../schemas/v1/admin-user-list.schema.json'
     AdminDbStats:
       $ref: '../../schemas/v1/admin-db-stats.schema.json'
+    FeatureFlag:
+      $ref: '../../schemas/v1/feature-flag.schema.json'
+    FeatureFlags:
+      $ref: '../../schemas/v1/feature-flags.schema.json'
+    FeatureFlagToggleRequest:
+      $ref: '../../schemas/v1/feature-flag-toggle-request.schema.json'
+    FeatureFlagToggleResponse:
+      $ref: '../../schemas/v1/feature-flag-toggle-response.schema.json'
+    Project:
+      $ref: '../../schemas/v1/project.schema.json'
+    ProjectList:
+      $ref: '../../schemas/v1/project-list.schema.json'
     Error:
       type: object
       required: [error]
