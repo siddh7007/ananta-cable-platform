@@ -98,7 +98,7 @@ export class DefaultService {
      * @returns AdminUser User deactivated successfully
      * @throws ApiError
      */
-    public static postAdminUsers-:deactivate(
+    public static postAdminUsersDeactivate(
         id: string,
     ): CancelablePromise<AdminUser> {
         return __request(OpenAPI, {
@@ -120,7 +120,7 @@ export class DefaultService {
      * @returns AdminUser User reactivated successfully
      * @throws ApiError
      */
-    public static postAdminUsers-:reactivate(
+    public static postAdminUsersReactivate(
         id: string,
     ): CancelablePromise<AdminUser> {
         return __request(OpenAPI, {

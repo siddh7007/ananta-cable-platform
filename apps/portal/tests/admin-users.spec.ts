@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Dialog } from '@playwright/test';
 
 test.describe('Admin Users Management', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -104,7 +104,7 @@ test.describe('Admin Users Management', () => {
     const deactivateButton = firstRow.locator('button').filter({ hasText: 'Deactivate' });
 
     // Click deactivate (this will show alert in placeholder implementation)
-    page.on('dialog', async (dialog: any) => {
+    page.on('dialog', async (dialog: Dialog) => {
       expect(dialog.message()).toContain('Placeholder: Deactivate user');
       await dialog.accept();
     });
@@ -118,7 +118,7 @@ test.describe('Admin Users Management', () => {
     const reactivateButton = bobRow.locator('button').filter({ hasText: 'Reactivate' });
 
     // Click reactivate (this will show alert in placeholder implementation)
-    page.on('dialog', async (dialog: any) => {
+    page.on('dialog', async (dialog: Dialog) => {
       expect(dialog.message()).toContain('Placeholder: Reactivate user');
       await dialog.accept();
     });

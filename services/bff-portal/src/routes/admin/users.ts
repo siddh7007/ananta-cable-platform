@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { adminGuard } from '../../lib/adminGuard.js';
 
 interface AdminUser {
@@ -41,6 +41,16 @@ export function getAdminUsers() {
   return adminUsers;
 }
 
+type ListUsersQuery = {
+  query?: string;
+  limit?: number;
+  offset?: number;
+};
+
+type UserIdParams = {
+  id: string;
+};
+
 /**
  * Admin users routes
  * Provides CRUD operations for admin user management
@@ -62,8 +72,11 @@ export async function adminUsersRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (request: any, reply: any) => {
-      const { query, limit = 25, offset = 0 } = request.query;
+    async (
+      request: FastifyRequest<{ Querystring: ListUsersQuery }>,
+      reply: FastifyReply,
+    ) => {
+      const { query, limit = 25, offset = 0 } = request.query ?? {};
 
       let filteredUsers = adminUsers;
 
@@ -99,8 +112,11 @@ export async function adminUsersRoutes(fastify: FastifyInstance) {
     {
       preHandler: adminGuard,
     },
-    async (request: any, reply: any) => {
-      const { id } = request.params as { id: string };
+    async (
+      request: FastifyRequest<{ Params: UserIdParams }>,
+      reply: FastifyReply,
+    ) => {
+      const { id } = request.params;
 
       const userIndex = adminUsers.findIndex((user) => user.id === id);
       if (userIndex === -1) {
@@ -130,8 +146,11 @@ export async function adminUsersRoutes(fastify: FastifyInstance) {
     {
       preHandler: adminGuard,
     },
-    async (request: any, reply: any) => {
-      const { id } = request.params as { id: string };
+    async (
+      request: FastifyRequest<{ Params: UserIdParams }>,
+      reply: FastifyReply,
+    ) => {
+      const { id } = request.params;
 
       const userIndex = adminUsers.findIndex((user) => user.id === id);
       if (userIndex === -1) {
