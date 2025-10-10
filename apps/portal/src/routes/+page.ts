@@ -45,8 +45,8 @@ async function fetchHealth(baseUrl: string): Promise<HealthData> {
     const response = await fetch(`${baseUrl}/ready`, {
       signal: controller.signal,
       headers: {
-        'Accept': 'application/json'
-      }
+        Accept: 'application/json',
+      },
     });
 
     clearTimeout(timeoutId);
@@ -56,17 +56,17 @@ async function fetchHealth(baseUrl: string): Promise<HealthData> {
     }
 
     const data = await response.json();
-    
+
     // Map the status from the ready endpoint
     if (data.status === 'ok') {
       return {
         status: 'ok',
-        version: data.version
+        version: data.version,
       };
     } else if (data.status === 'degraded') {
       return {
         status: 'degraded',
-        version: data.version
+        version: data.version,
       };
     } else {
       return { status: 'fail' };
@@ -88,8 +88,8 @@ async function fetchRecentProjects(baseUrl: string): Promise<Project[]> {
     const response = await fetch(`${baseUrl}/v1/dashboard/projects/recent`, {
       signal: controller.signal,
       headers: {
-        'Accept': 'application/json'
-      }
+        Accept: 'application/json',
+      },
     });
 
     clearTimeout(timeoutId);
@@ -118,8 +118,8 @@ async function fetchLatestQuotes(baseUrl: string): Promise<Quote[]> {
     const response = await fetch(`${baseUrl}/v1/dashboard/quotes/latest`, {
       signal: controller.signal,
       headers: {
-        'Accept': 'application/json'
-      }
+        Accept: 'application/json',
+      },
     });
 
     clearTimeout(timeoutId);
@@ -148,8 +148,8 @@ async function fetchRecentOrders(baseUrl: string): Promise<Order[]> {
     const response = await fetch(`${baseUrl}/v1/dashboard/orders/recent`, {
       signal: controller.signal,
       headers: {
-        'Accept': 'application/json'
-      }
+        Accept: 'application/json',
+      },
     });
 
     clearTimeout(timeoutId);
@@ -181,14 +181,14 @@ export const load: Load = async ({ fetch: svelteKitFetch }) => {
     fetchHealth(baseUrl),
     fetchRecentProjects(baseUrl),
     fetchLatestQuotes(baseUrl),
-    fetchRecentOrders(baseUrl)
+    fetchRecentOrders(baseUrl),
   ]);
 
   const dashboardData: DashboardData = {
     health,
     projects,
     quotes,
-    orders
+    orders,
   };
 
   return dashboardData;

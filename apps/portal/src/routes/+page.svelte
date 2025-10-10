@@ -39,7 +39,10 @@
 </svelte:head>
 
 <main class="dashboard-page">
-  <h1>Dashboard</h1>
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p class="page-subtitle">Overview of your cable platform activity</p>
+  </div>
 
   <div class="dashboard-grid">
     <!-- System Health Tile -->
@@ -69,7 +72,9 @@
                 <a href="/projects/{project.id}">
                   {project.name}
                   {#if project.updatedAt}
-                    <span class="timestamp">Updated: {new Date(project.updatedAt).toLocaleDateString()}</span>
+                    <span class="timestamp"
+                      >Updated: {new Date(project.updatedAt).toLocaleDateString()}</span
+                    >
                   {/if}
                 </a>
               </li>
@@ -118,7 +123,9 @@
                 <a href="/orders/{order.id}">
                   Order #{order.id}
                   {#if order.status}
-                    <span class="order-status status-{order.status.toLowerCase()}">{order.status}</span>
+                    <span class="order-status status-{order.status.toLowerCase()}"
+                      >{order.status}</span
+                    >
                   {/if}
                   {#if order.createdAt}
                     <span class="timestamp">{new Date(order.createdAt).toLocaleDateString()}</span>
@@ -137,13 +144,22 @@
   .dashboard-page {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
   }
 
   h1 {
     font-size: 2rem;
-    margin-bottom: 2rem;
+    margin: 0 0 0.5rem 0;
     color: #1a202c;
+  }
+
+  .page-subtitle {
+    color: #718096;
+    margin: 0;
+    font-size: 0.9375rem;
   }
 
   .dashboard-grid {

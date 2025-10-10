@@ -1,6 +1,7 @@
 <script lang="ts">
   import '$lib/styles/base.css';
-  import Nav from '$lib/components/Nav.svelte';
+  import Header from '$lib/components/Header.svelte';
+  import Sidebar from '$lib/components/Sidebar.svelte';
   import Toaster from '$lib/components/Toaster.svelte';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
@@ -22,7 +23,8 @@
 <a href="#main" class="skip-link">Skip to content</a>
 
 <div class="app-container">
-  <Nav />
+  <Header />
+  <Sidebar />
 
   <main id="main" class="main-content">
     <slot />
@@ -60,5 +62,18 @@
 
   .main-content {
     flex: 1;
+    margin-left: 240px; /* Width of sidebar */
+    margin-top: 60px; /* Height of header */
+    padding: 2rem;
+    background-color: #f5f7fa;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .main-content {
+      margin-left: 64px; /* Collapsed sidebar width */
+      padding: 1rem;
+    }
   }
 </style>

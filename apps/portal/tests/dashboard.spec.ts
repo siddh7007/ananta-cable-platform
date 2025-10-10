@@ -32,9 +32,9 @@ test.describe('Dashboard', () => {
     // Verify health tile has a status badge
     const healthTile = page.locator('section').filter({ hasText: 'System Health' });
     const statusBadge = healthTile.locator('.health-badge');
-    
+
     await expect(statusBadge).toBeVisible();
-    
+
     // Status should be one of: Operational, Degraded, or Unavailable
     const statusText = await statusBadge.textContent();
     expect(['Operational', 'Degraded', 'Unavailable']).toContain(statusText);
@@ -77,7 +77,7 @@ test.describe('Dashboard', () => {
 
     const healthTile = page.locator('section').filter({ hasText: 'System Health' });
     const viewDetailsLink = healthTile.locator('a:has-text("View details")');
-    
+
     await expect(viewDetailsLink).toBeVisible();
     await expect(viewDetailsLink).toHaveAttribute('href', '/ready');
   });
@@ -85,7 +85,7 @@ test.describe('Dashboard', () => {
   test('should handle health status changes gracefully', async ({ page }) => {
     // This test verifies the UI can handle different health statuses
     // In a real scenario, you would mock the /ready endpoint to return different statuses
-    
+
     await page.goto('/');
 
     const healthTile = page.locator('section').filter({ hasText: 'System Health' });
@@ -108,10 +108,10 @@ test.describe('Dashboard', () => {
     // Verify tiles stack vertically on mobile (single column)
     const firstTile = tiles.nth(0);
     const secondTile = tiles.nth(1);
-    
+
     const firstBox = await firstTile.boundingBox();
     const secondBox = await secondTile.boundingBox();
-    
+
     if (firstBox && secondBox) {
       // Second tile should be below first tile (stacked vertically)
       expect(secondBox.y).toBeGreaterThan(firstBox.y + firstBox.height - 10);
