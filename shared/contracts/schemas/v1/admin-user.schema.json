@@ -1,0 +1,16 @@
+{
+  "$id": "admin-user.schema.json",
+  "type": "object",
+  "required": ["id", "name", "email", "roles", "status"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string", "minLength": 1 },
+    "email": { "type": "string", "format": "email" },
+    "roles": { "type": "array", "items": { "type": "string" } },
+    "status": { "type": "string", "enum": ["active", "deactivated"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "lastLoginAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
