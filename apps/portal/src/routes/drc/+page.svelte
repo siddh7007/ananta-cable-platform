@@ -351,33 +351,4 @@
     }
   }
 
-  .banner {
-    margin-top: 2rem;
-    padding: 1rem;
-    border-radius: 4px;
-    border: 1px solid;
-  }
-
-  .banner.error {
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    color: #721c24;
-  }
-
-  .banner.error h3 {
-    margin-top: 0;
-    color: #721c24;
-  }
-
-  .banner.error details {
-    margin-top: 1rem;
-  }
-
-  .banner.error pre {
-    background: #f1f1f1;
-    padding: 0.5rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    overflow-x: auto;
-  }
 </style>

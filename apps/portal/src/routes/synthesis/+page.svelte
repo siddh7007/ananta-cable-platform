@@ -638,30 +638,12 @@ Content-Type: application/json
     margin-bottom: 2rem;
   }
 
-  .loading,
-  .error,
-  .error-instructions {
+  .loading {
     text-align: center;
     padding: 2rem;
     border-radius: 8px;
-  }
-
-  .loading {
     background: #f0f8ff;
     color: #0066cc;
-  }
-
-  .error {
-    background: #ffebee;
-    color: #c62828;
-  }
-
-  .error-instructions {
-    background: #fff;
-    color: #333;
-    text-align: left;
-    max-width: 800px;
-    margin: 0 auto;
   }
 
   .error-subtitle {
@@ -1053,15 +1035,6 @@ Content-Type: application/json
     font-size: 1.1rem;
     border-bottom: 2px solid #007bff;
     padding-bottom: 0.5rem;
-  }
-
-  .error-message {
-    background: #f8d7da;
-    color: #721c24;
-    padding: 1rem;
-    border-radius: 6px;
-    border: 1px solid #f5c6cb;
-    margin: 1rem 0;
   }
 
   .form-actions {

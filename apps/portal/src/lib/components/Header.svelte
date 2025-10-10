@@ -16,7 +16,7 @@
   }
 </script>
 
-<header class="top-header" role="banner">
+<header class="top-header">
   <div class="header-content">
     <!-- Logo and Brand -->
     <div class="header-brand">

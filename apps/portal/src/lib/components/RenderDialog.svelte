@@ -99,6 +99,7 @@
       role="dialog"
       aria-labelledby="dialog-title"
       aria-modal="true"
+      tabindex="-1"
     >
       <header class="dialog-header">
         <h2 id="dialog-title">Generate Drawing</h2>
