@@ -32,9 +32,20 @@ export interface AssemblyStep1 {
   type: 'ribbon' | 'power_cable' | 'sensor_lead' | 'rf_coax' | 'custom';
   length_mm: number;
   tolerance_mm: number;
-  environment: { temp_min_c: number; temp_max_c: number; flex_class: 'static' | 'flex' | 'high_flex'; chemicals: string[] };
-  electrical?: { system_voltage_v: number; per_circuit: { circuit: string; current_a: number; voltage_v: number }[] };
-  emi: { shield: 'none' | 'foil' | 'braid' | 'foil_braid'; drain_policy: 'isolated' | 'fold_back' | 'pigtail' };
+  environment: {
+    temp_min_c: number;
+    temp_max_c: number;
+    flex_class: 'static' | 'flex' | 'high_flex';
+    chemicals: string[];
+  };
+  electrical?: {
+    system_voltage_v: number;
+    per_circuit: { circuit: string; current_a: number; voltage_v: number }[];
+  };
+  emi: {
+    shield: 'none' | 'foil' | 'braid' | 'foil_braid';
+    drain_policy: 'isolated' | 'fold_back' | 'pigtail';
+  };
   locale: Region;
   compliance: { ipc_class: '1' | '2' | '3'; ul94_v0_labels: boolean; rohs_reach: boolean };
   endA: Endpoint;
@@ -99,9 +110,30 @@ export interface SynthesisProposal {
   proposal_id: string;
   draft_id: string;
   cable: { primary: PartRef; alternates: PartRef[] };
-  conductors: { count: number; awg: number; color_map: string[]; ribbon: { pitch_in: number; ways: number; red_stripe: boolean } };
-  endpoints: { endA: { connector: PartRef; termination: 'crimp' | 'idc' | 'ring_lug' | 'solder'; contacts: { primary: PartRef; alternates: PartRef[] }; accessories: PartRef[] }; endB: { connector: PartRef; termination: 'crimp' | 'idc' | 'ring_lug' | 'solder'; contacts: { primary: PartRef; alternates: PartRef[] }; accessories: PartRef[] } };
-  shield: { type: 'none' | 'foil' | 'braid' | 'foil_braid'; drain_policy: 'isolated' | 'fold_back' | 'pigtail' };
+  conductors: {
+    count: number;
+    awg: number;
+    color_map: string[];
+    ribbon: { pitch_in: number; ways: number; red_stripe: boolean };
+  };
+  endpoints: {
+    endA: {
+      connector: PartRef;
+      termination: 'crimp' | 'idc' | 'ring_lug' | 'solder';
+      contacts: { primary: PartRef; alternates: PartRef[] };
+      accessories: PartRef[];
+    };
+    endB: {
+      connector: PartRef;
+      termination: 'crimp' | 'idc' | 'ring_lug' | 'solder';
+      contacts: { primary: PartRef; alternates: PartRef[] };
+      accessories: PartRef[];
+    };
+  };
+  shield: {
+    type: 'none' | 'foil' | 'braid' | 'foil_braid';
+    drain_policy: 'isolated' | 'fold_back' | 'pigtail';
+  };
   wirelist: WirelistRow[];
   bom: BomLine[];
   warnings: string[];
@@ -265,4 +297,3 @@ export interface VendorQuote {
   /** Additional vendor-specific data */
   vendorData?: Record<string, unknown>;
 }
-

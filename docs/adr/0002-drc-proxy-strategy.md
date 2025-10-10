@@ -17,6 +17,7 @@ The platform needs to integrate with DRC (Design Rule Check) services for valida
 - Performance monitoring
 
 Key considerations:
+
 - DRC service may be unreliable or slow
 - Need to handle various error conditions (timeouts, 5xx, 4xx)
 - Request tracing and observability requirements
@@ -40,6 +41,7 @@ The proxy will be implemented as a Fastify route handler with comprehensive midd
 ## Consequences
 
 ### Positive
+
 - Centralized DRC integration point
 - Robust error handling and retry logic
 - Full request tracing and observability
@@ -47,12 +49,14 @@ The proxy will be implemented as a Fastify route handler with comprehensive midd
 - Improved resilience against DRC service issues
 
 ### Negative
+
 - Additional complexity in API Gateway
 - Potential performance overhead from proxying
 - Dependency on DRC service availability
 - Need to maintain proxy logic as DRC API evolves
 
 ### Risks and Mitigations
+
 - **Service coupling**: Versioned API contracts and comprehensive testing
 - **Performance impact**: Caching strategies and async processing where appropriate
 - **Error masking**: Detailed error logging and client error transparency

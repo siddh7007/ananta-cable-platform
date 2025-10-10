@@ -9,6 +9,7 @@ Date: [YYYY-MM-DD]
 ## Context
 
 [Describe the context and forces at play, including:
+
 - Business context
 - Technical context
 - Constraints and requirements
@@ -17,6 +18,7 @@ Date: [YYYY-MM-DD]
 ## Decision
 
 [Describe the decision that was made, including:
+
 - What was decided
 - Why this option was chosen
 - Alternatives considered and why they were rejected]
@@ -24,6 +26,7 @@ Date: [YYYY-MM-DD]
 ## Consequences
 
 [Describe the resulting context after applying the decision, including:
+
 - Positive consequences
 - Negative consequences
 - Risks and mitigations
